@@ -86,6 +86,23 @@ python -m src.cli log me
 python -m src.cli accept me length                   # adopt the observed preference
 ```
 
+## HTTP API
+
+```bash
+python -m src.main      # http://127.0.0.1:8000, interactive docs at /docs
+```
+
+| Method | Path | What it does |
+|---|---|---|
+| `POST` | `/chat` | `{user_id, message}` → answer, tier chosen, reason, conflict scores, stats, and the "update your preference?" suggestion when there is one |
+| `GET` | `/profiles/{user_id}` | Stated vs observed profiles, live conflict scores, and the tier the next request would get. Read-only |
+| `GET` | `/decision-log/{user_id}?limit=10` | Recent routing decisions, newest first (timestamps in UTC) |
+| `POST` | `/update-style` | `{user_id, dimension, value}` sets a stated preference |
+| `POST` | `/accept` | `{user_id, dimension}` adopts the observed value as the stated one and closes the conflict |
+| `GET` | `/health` | Status and which model serves each tier |
+
+If the model backend is unreachable, `/chat` returns `503` with the reason.
+
 ## Dev dashboard
 
 A small local dashboard runs the test suite and live-model scenarios and shows progress in real time: pass/fail, the model chosen for each request and why, tokens, speed (tok/s), time to first token, context used, and an estimated cost per run compared with sending everything to Ultra. Runs are saved to `data/history/`.
@@ -100,6 +117,8 @@ The cost figures use Token Factory list prices taken from third-party listings (
 
 ```
 src/agent/        profiles, conflict detection, routing, signals, prompts, LLM client, decision logger
+src/api/          FastAPI routes, request schemas, dependencies
+src/main.py       API entry point
 src/db/           SQLite connection and schema
 src/devdash/      local test dashboard (stdlib server + one HTML page)
 src/cli.py        terminal interface

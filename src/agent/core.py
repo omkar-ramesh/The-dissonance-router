@@ -81,6 +81,16 @@ class Agent:
                 changed[dim] = value
         return changed
 
+    def inspect(self, user_id: str) -> dict:
+        """Current profiles, conflict scores and the tier the next request would get.
+
+        Read-only: nothing is logged, so viewing a profile never counts as a request.
+        """
+        analysis = self._analyze(user_id, "")
+        keys = ("user_id", "stated_profile", "observed_profile", "conflicts_detected", "overall_score",
+                "conflict_score", "model_chosen", "routing_reason", "highest_conflict", "suggestion")
+        return {key: analysis[key] for key in keys}
+
     def accept_observed(self, user_id: str, dimension: str) -> None:
         """User agreed: adopt observed behavior as the stated preference and close the conflict."""
         observed = self.profiles.get_observed_profile(user_id)[dimension]

@@ -44,6 +44,9 @@ TIER_PROVIDERS = {
     tier: os.getenv(f"PROVIDER_{tier.upper()}", LLM_PROVIDER) for tier in MODEL_TIERS
 }
 
+API_HOST = os.getenv("API_HOST", "127.0.0.1")
+API_PORT = int(os.getenv("API_PORT", "8000"))
+
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 NEBIUS_API_KEY = os.getenv("NEBIUS_API_KEY", "")
 NEBIUS_BASE_URL = os.getenv("NEBIUS_BASE_URL", "")
