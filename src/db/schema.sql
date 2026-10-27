@@ -37,5 +37,60 @@ CREATE TABLE IF NOT EXISTS conflicts (
     resolved BOOLEAN NOT NULL DEFAULT 0
 );
 
+-- Added later; the three tables above are unchanged.
+-- What the user did with an answer: behavior, as opposed to the words in their messages.
+CREATE TABLE IF NOT EXISTS feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    interaction_id INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('up', 'down', 'regenerate', 'copy')),
+    reason TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Moments the note bot writes about: a preference set, a habit learned or faded, a
+-- contradiction first seen, a suggestion accepted. `detail` may quote the user; it is
+-- erased with the conversation it came from.
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    dimension TEXT NOT NULL DEFAULT '',
+    value TEXT NOT NULL DEFAULT '',
+    detail TEXT NOT NULL DEFAULT '',
+    interaction_id INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Archived past conversations: interactions first_id..last_id, compressed into `file`.
+-- Deleted after expires_at unless saved (kept) = 1.
+CREATE TABLE IF NOT EXISTS conversations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    first_id INTEGER NOT NULL,
+    last_id INTEGER NOT NULL,
+    turns INTEGER NOT NULL,
+    bytes INTEGER NOT NULL,
+    file TEXT NOT NULL,
+    archived_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    saved INTEGER NOT NULL DEFAULT 0
+);
+
+-- A simulated wallet per user: a $ limit and what answers have cost so far (list prices).
+CREATE TABLE IF NOT EXISTS budgets (
+    user_id TEXT PRIMARY KEY,
+    limit_usd REAL NOT NULL DEFAULT 0,
+    spent_usd REAL NOT NULL DEFAULT 0
+);
+
+-- What the Nano signal reader found in a message, so each message is read once.
+CREATE TABLE IF NOT EXISTS signal_cache (
+    text_hash TEXT PRIMARY KEY,
+    signals TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_interactions_user ON interactions (user_id, timestamp);
+CREATE INDEX IF NOT EXISTS idx_feedback_user ON feedback (user_id, interaction_id);
 CREATE INDEX IF NOT EXISTS idx_conflicts_user ON conflicts (user_id, conflict_type, resolved);

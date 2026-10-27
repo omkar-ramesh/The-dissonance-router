@@ -21,14 +21,21 @@ STYLE_RULES = {
                  "accepts": "Deliver a ready-to-use answer without hedging."},
 }
 
-BASE_PROMPT = "You are a personal assistant that adapts to how this user actually works, not only what they say."
+BASE_PROMPT = (
+    "You are a personal assistant that adapts to how this user actually works, not only what they say. "
+    # Guideline 6: honesty over looking helpful.
+    "If you don't know something or can't verify it, say so plainly instead of guessing. "
+    "Never invent sources, quotes, links or numbers."
+)
 
 ULTRA_PROMPT = (
     "This user's stated preferences contradict their actual behavior:\n{contradictions}\n"
-    "Work out the real need behind both signals for this request and serve it. "
-    "Shape the answer like this:\n{hints}\n"
+    "Work out the real need behind both signals for this request and serve it.{shape}\n"
     "Do not mention this analysis."
 )
+
+# Guideline 3: what the user asks for in this message beats the profile, for this message.
+TURN_RULE = "Follow any explicit instruction in the user's latest message, even where it differs from the style above."
 
 # How to honor both sides of a contradiction in one answer. Keyed by dimension.
 RECONCILE_HINTS = {
@@ -51,12 +58,15 @@ def effective_style(stated: dict, observed: dict) -> dict:
 def build_system_prompt(analysis: dict) -> str:
     """Compose the system prompt for the tier the router picked."""
     stated, observed = analysis["stated_profile"], analysis["observed_profile"]
-    style = effective_style(stated, observed)
+    turn = analysis.get("turn_signals") or {}
+    style = {**effective_style(stated, observed), **turn}          # this turn's instruction wins
     rules = [STYLE_RULES[dim][value] for dim, value in style.items() if value in STYLE_RULES[dim]]
 
     parts = [BASE_PROMPT]
     if rules:
         parts.append("Style: " + " ".join(rules))
+    if turn:
+        parts.append(TURN_RULE)
 
     tier = analysis["model_chosen"]
     if tier == "ultra":
@@ -64,8 +74,9 @@ def build_system_prompt(analysis: dict) -> str:
         contradictions = "\n".join(
             f"- {dim}: says '{stated[dim]}', behaves '{observed[dim]}'" for dim in conflicting
         )
-        hints = "\n".join(RECONCILE_HINTS[dim] for dim in conflicting)
-        parts.append(ULTRA_PROMPT.format(contradictions=contradictions, hints=hints))
+        hints = _hints(analysis)
+        shape = (" Shape the answer like this:\n" + "\n".join(hints)) if hints else ""
+        parts.append(ULTRA_PROMPT.format(contradictions=contradictions, shape=shape))
     elif tier == "super":
         parts.append(SUPER_PROMPT)
     return "\n\n".join(parts)
@@ -83,12 +94,25 @@ def build_messages(analysis: dict, history: list[dict], user_message: str) -> li
             messages.append({"role": "assistant", "content": turn["agent_response"]})
     # Some models (e.g. deepseek-r1) under-weight the system prompt, so the
     # reconciliation format is repeated where every model reads it: the user turn.
-    if analysis["model_chosen"] == "ultra":
-        hints = " ".join(RECONCILE_HINTS[dim].lstrip("- ") for dim in _conflicting(analysis))
-        user_message = f"{user_message}\n\n(Answer format: {hints})"
+    hints = _hints(analysis) if analysis["model_chosen"] == "ultra" else []
+    if hints:
+        user_message = f"{user_message}\n\n(Answer format: {' '.join(h.lstrip('- ') for h in hints)})"
     messages.append({"role": "user", "content": user_message})
     return messages
 
 
 def _conflicting(analysis: dict) -> list[str]:
     return [dim for dim, score in analysis["conflicts_detected"].items() if score > 0]
+
+
+def _hints(analysis: dict) -> list[str]:
+    """Reconciliation hints for the conflicting dimensions.
+
+    A hint adds the *stated* side on top of the observed behavior (e.g. a TL;DR line on
+    top of the depth they keep asking for), so it is skipped only when this message
+    itself sides with what they said ("keep it short" from someone who claimed concise):
+    then they are doing what they said, and the plain instruction wins.
+    """
+    turn = analysis.get("turn_signals") or {}
+    stated = analysis["stated_profile"]
+    return [RECONCILE_HINTS[dim] for dim in _conflicting(analysis) if turn.get(dim) != stated[dim]]

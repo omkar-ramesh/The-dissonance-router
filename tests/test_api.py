@@ -36,6 +36,39 @@ def chat(client, message, user="u1"):
     return response.json()
 
 
+def test_home_serves_the_product_page(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "The Dissonance Router" in response.text
+
+
+def test_proof_serves_the_eval_report_without_answers(client, monkeypatch, tmp_path):
+    report = tmp_path / "report.json"
+    report.write_text('{"simulated": true, "scenarios": [{"id": "a", "turns": [{"say": "hi", "response": "long text"}]}]}')
+    monkeypatch.setattr("src.api.routes.PROOF_SOURCES", [tmp_path / "missing.json", report])
+    body = client.get("/proof").json()
+    assert body["source"] == "report.json" and body["report"]["simulated"] is True
+    assert "response" not in body["report"]["scenarios"][0]["turns"][0]      # prose stays out of the payload
+
+
+def test_proof_says_so_when_there_is_no_report(client, monkeypatch, tmp_path):
+    monkeypatch.setattr("src.api.routes.PROOF_SOURCES", [tmp_path / "nope.json"])
+    monkeypatch.setattr("src.api.routes.NANO_SOURCES", [tmp_path / "nope2.json"])
+    monkeypatch.setattr("src.api.routes.COMPARE_SOURCES", [tmp_path / "nope3.json"])
+    body = client.get("/proof").json()
+    assert body["report"] is None and body["source"] is None
+    assert body["nano_report"] is None and body["compare"] is None
+
+
+def test_the_committed_snapshot_is_valid():
+    """The hosted demo falls back to docs/eval-report.json, so it must exist and parse."""
+    import json
+    from src.api.routes import PROOF_SOURCES
+    report = json.loads(PROOF_SOURCES[-1].read_text(encoding="utf-8"))
+    assert report["scenarios"] and report["strategies"] and report["self_test"]["total"]
+
+
 def test_health_lists_tiers(client):
     body = client.get("/health").json()
     assert body["status"] == "ok"

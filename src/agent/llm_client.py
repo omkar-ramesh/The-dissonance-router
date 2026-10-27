@@ -17,6 +17,14 @@ from src import config
 # Reasoning models inline their thinking in <think> tags.
 THINK_RE = re.compile(r"<think>(.*?)</think>", re.S)
 
+# How to ask each backend to skip the thinking phase. Ollama's /v1 endpoint: measured on
+# nemotron-3-nano:4b (reasoning 89 chars -> 0). Token Factory: the usual switch for
+# vLLM-served Nemotron, NOT yet verified against the live API.
+REASONING_OFF = {
+    "ollama": {"reasoning_effort": "none"},
+    "nebius": {"chat_template_kwargs": {"enable_thinking": False}},
+}
+
 
 class LLMError(RuntimeError):
     """The model backend was unreachable or returned an error."""
@@ -38,6 +46,12 @@ class LLMResult:
     context_window: Optional[int] = None
     est_cost_usd: Optional[float] = None
     est_cost_if_ultra_usd: Optional[float] = None
+    reasoning_on: Optional[bool] = None
+
+    @property
+    def reasoning_tokens(self) -> int:
+        """Rough size of the thinking phase (~4 chars per token); it is billed as output."""
+        return len(self.reasoning) // 4
 
     @property
     def total_tokens(self) -> int:
@@ -63,6 +77,8 @@ class LLMResult:
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "total_tokens": self.total_tokens,
+            "reasoning_tokens": self.reasoning_tokens,
+            "reasoning_on": self.reasoning_on,
             "tokens_estimated": self.tokens_estimated,
             "tokens_per_sec": self.tokens_per_sec,
             "ttft_ms": self.ttft_ms,
@@ -89,17 +105,26 @@ class LLMClient:
         ps_urls: Optional[dict] = None,
         context_windows: Optional[dict] = None,
         prices: Optional[dict] = None,
+        providers: Optional[dict] = None,
+        reasoning: Optional[dict] = None,
+        max_tokens: Optional[dict] = None,
     ):
         """`overrides` maps a tier to {"base_url": ..., "api_key": ...} for tiers that use a
         different backend than the default. `ps_urls` maps tiers served by Ollama to its
         /api/ps URL, used to read the loaded model's real context window.
         `context_windows` is a fallback {tier: tokens} for backends that don't report one.
-        `prices` maps tier -> {"in": usd, "out": usd} per 1M tokens, for cost estimates."""
+        `prices` maps tier -> {"in": usd, "out": usd} per 1M tokens, for cost estimates.
+        `providers` ({tier: "ollama" | "nebius"}) and `reasoning` ({tier: "on" | "off"})
+        decide how to switch thinking off; `max_tokens` ({tier: n}, 0 = none) caps output."""
         self.models = models
         self._transport = transport
         self._ps_urls = ps_urls or {}
         self._context_windows = context_windows or {}
         self._prices = prices or {}
+        self._providers = providers or {}
+        self._reasoning = reasoning or {}
+        self._max_tokens = max_tokens or {}
+        self._info_cache: dict[tuple, tuple] = {}
         self._clients = {tier: self._make_http(base_url, api_key, timeout, transport) for tier in models}
         for tier, backend in (overrides or {}).items():
             self._clients[tier] = self._make_http(
@@ -134,11 +159,22 @@ class LLMClient:
         return cls(
             default["base_url"], config.MODEL_TIERS, default.get("api_key", ""),
             overrides=backends, ps_urls=ps_urls, context_windows=config.CONTEXT_WINDOWS,
-            prices=config.PRICES,
+            prices=config.PRICES, providers=config.TIER_PROVIDERS, reasoning=config.REASONING,
+            max_tokens=config.MAX_TOKENS,
         )
 
-    def chat(self, tier: str, messages: list[dict], temperature: float = 0.7) -> LLMResult:
-        """Stream a chat completion from the tier's model and return its cleaned answer + stats."""
+    def chat(
+        self,
+        tier: str,
+        messages: list[dict],
+        temperature: float = 0.7,
+        reasoning: Optional[str] = None,
+        max_tokens: Optional[int] = None,
+    ) -> LLMResult:
+        """Stream a chat completion from the tier's model and return its cleaned answer + stats.
+
+        `reasoning` ("on" | "off") and `max_tokens` override the tier's configured defaults.
+        """
         if tier not in self.models:
             raise ValueError(f"Unknown tier {tier!r}; expected one of {list(self.models)}")
         model = self.models[tier]
@@ -150,6 +186,12 @@ class LLMClient:
             "stream": True,
             "stream_options": {"include_usage": True},
         }
+        mode = reasoning or self._reasoning.get(tier)
+        if mode == "off":
+            payload.update(REASONING_OFF.get(self._providers.get(tier), {}))
+        cap = max_tokens if max_tokens is not None else self._max_tokens.get(tier, 0)
+        if cap:
+            payload["max_tokens"] = cap
 
         content_parts, reasoning_parts, usage = [], [], {}
         ttft_ms = None
@@ -213,6 +255,7 @@ class LLMClient:
             context_window=context_window,
             est_cost_usd=self._cost(tier, input_tokens, output_tokens),
             est_cost_if_ultra_usd=self._cost("ultra", input_tokens, output_tokens),
+            reasoning_on=None if mode is None else mode != "off",
         )
 
     def _cost(self, tier: str, input_tokens: int, output_tokens: int) -> Optional[float]:
@@ -228,6 +271,8 @@ class LLMClient:
         Ollama's /api/ps reports the context the loaded model really runs with, which
         is what determines when it starts truncating.
         """
+        if (tier, model) in self._info_cache:      # a loaded model's details don't change between calls
+            return self._info_cache[(tier, model)]
         name, window = model, self._context_windows.get(tier) or None
         ps_url = self._ps_urls.get(tier)
         if ps_url:
@@ -242,6 +287,7 @@ class LLMClient:
                             )
                             name = label or model
                             window = loaded.get("context_length") or window
+                            self._info_cache[(tier, model)] = (name, window)
             except (httpx.HTTPError, ValueError):
                 pass
         return name, window

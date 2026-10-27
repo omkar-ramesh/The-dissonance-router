@@ -24,3 +24,31 @@ class StyleUpdate(BaseModel):
 class AcceptRequest(BaseModel):
     user_id: str = USER_ID
     dimension: Dimension
+
+
+class FeedbackRequest(BaseModel):
+    user_id: str = USER_ID
+    interaction_id: int = Field(ge=1)
+    kind: Literal["up", "down", "copy"]
+    # Why a thumbs-down: too_long, too_short, too_formal, too_casual, needs_sources, ...
+    reason: str = Field("", max_length=32)
+
+
+class RegenerateRequest(BaseModel):
+    user_id: str = USER_ID
+
+
+class NewChat(BaseModel):
+    user_id: str = USER_ID
+
+
+class KeepRequest(BaseModel):
+    user_id: str = USER_ID
+    conversation_id: int = Field(ge=1)
+    kept: bool = True
+
+
+class BudgetUpdate(BaseModel):
+    user_id: str = USER_ID
+    limit_usd: float = Field(ge=0, le=100)     # 0 = no limit
+    reset_spent: bool = False

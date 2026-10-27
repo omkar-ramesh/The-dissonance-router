@@ -210,7 +210,7 @@ class TestAgent:
         set_profile(agent.profiles, "u1", observed={"length": "detailed"})
         result = agent.analyze_request("u1", "hi")
         assert result["model_chosen"] == "super"
-        assert result["suggestion"] is None
+        assert "Set it as your preference?" in result["suggestion"]   # guideline 5: a way out at Super too
 
     def test_accepting_observed_resolves_conflict(self, db_path):
         agent = Agent(db_path)

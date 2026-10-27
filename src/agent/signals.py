@@ -1,13 +1,18 @@
 """Infers the observed profile from what the user actually asks for.
 
-Deterministic keyword signals, voted over the user's recent messages. A dimension
-only changes once a value has MIN_EVIDENCE votes and strictly leads, so a single
-offhand "elaborate" doesn't rewrite someone's profile.
+Deterministic keyword signals, weighted by recency (guideline 2): a signal in the
+newest message weighs 1.0, one message older DECAY, two older DECAY**2, and so on.
+A value becomes a habit once its weight reaches MIN_WEIGHT and strictly leads, which
+takes two signals within roughly the last five messages, so a single offhand
+"elaborate" doesn't rewrite someone's profile. A habit whose weight falls below
+FADE_WEIGHT is forgotten.
 """
 import re
 from collections import Counter
 
-MIN_EVIDENCE = 2
+DECAY = 0.85
+MIN_WEIGHT = 1.5
+FADE_WEIGHT = 0.5
 
 # Per dimension: (value, pattern), checked in order; first match wins. Negated
 # phrasings ("no bullets", "less formal") come before the bare keyword they contain.
@@ -51,6 +56,36 @@ PATTERNS = {
     for dim, rules in _RAW_PATTERNS.items()
 }
 
+# Behavior: what the user did with an answer. Accepting it (thumbs up, copy) or rejecting it
+# (thumbs down, regenerate) is revision evidence; a thumbs-down reason adds the dimension it names.
+FEEDBACK_SIGNALS = {
+    "up": {"revision": "accepts"},
+    "copy": {"revision": "accepts"},
+    "down": {"revision": "rejects"},
+    "regenerate": {"revision": "rejects"},
+}
+DOWN_REASONS = {
+    "too_long": {"length": "concise"},
+    "too_short": {"length": "detailed"},
+    "too_formal": {"tone": "casual"},
+    "too_casual": {"tone": "formal"},
+    "needs_sources": {"sourcing": "full"},
+    "too_many_sources": {"sourcing": "minimal"},
+    "use_bullets": {"structure": "bullet"},
+    "use_paragraphs": {"structure": "paragraph"},
+    "wrong": {},
+}
+
+
+def feedback_signals(events: list[dict]) -> dict[str, str]:
+    """Signals from everything the user did with one answer (oldest first; later wins)."""
+    signals: dict[str, str] = {}
+    for event in events:
+        signals.update(FEEDBACK_SIGNALS.get(event["kind"], {}))
+        if event["kind"] == "down":
+            signals.update(DOWN_REASONS.get(event.get("reason") or "", {}))
+    return signals
+
 
 class SignalExtractor:
     """Turns raw user messages into style evidence."""
@@ -65,16 +100,28 @@ class SignalExtractor:
                     break
         return signals
 
-    def infer_profile(self, messages: list[str], min_evidence: int = MIN_EVIDENCE) -> dict[str, str]:
-        """Vote across messages; return only dimensions with a clear, repeated winner."""
-        votes: dict[str, Counter] = {}
-        for message in messages:
-            for dim, value in self.extract(message).items():
-                votes.setdefault(dim, Counter())[value] += 1
+    def weigh(self, messages: list[str]) -> dict[str, Counter]:
+        """Recency-weighted evidence per dimension and value. `messages` is oldest first."""
+        return self.weigh_signals([self.extract(m) for m in messages])
 
+    def infer_profile(self, messages: list[str], min_weight: float = MIN_WEIGHT) -> dict[str, str]:
+        """Dimensions with a clear, recent habit. `messages` is oldest first."""
+        return self.infer_from_signals([self.extract(m) for m in messages], min_weight)
+
+    @staticmethod
+    def weigh_signals(turns: list[dict]) -> dict[str, Counter]:
+        """Recency-weighted evidence from per-turn signal dicts (oldest first). A turn's
+        signals can come from its words, from what the user did with its answer, or both."""
+        weights: dict[str, Counter] = {}
+        for age, signals in enumerate(reversed(turns)):
+            for dim, value in signals.items():
+                weights.setdefault(dim, Counter())[value] += DECAY ** age
+        return weights
+
+    def infer_from_signals(self, turns: list[dict], min_weight: float = MIN_WEIGHT) -> dict[str, str]:
         inferred = {}
-        for dim, counter in votes.items():
-            (value, count), *rest = counter.most_common()
-            if count >= min_evidence and (not rest or rest[0][1] < count):
+        for dim, counter in self.weigh_signals(turns).items():
+            (value, weight), *rest = counter.most_common()
+            if weight >= min_weight and (not rest or rest[0][1] < weight):
                 inferred[dim] = value
         return inferred

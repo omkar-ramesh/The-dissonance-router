@@ -114,9 +114,9 @@ class TestSignalExtractor:
         messages = ["elaborate please", "what is X?", "go deeper on that"]
         assert SignalExtractor().infer_profile(messages) == {"length": "detailed"}
 
-    def test_tie_is_not_a_winner(self):
-        messages = ["elaborate", "tell me more", "shorter", "too long"]
-        assert SignalExtractor().infer_profile(messages) == {}
+    def test_mixed_recent_signals_are_not_a_habit(self):
+        """One request each way: neither side has enough recent weight."""
+        assert SignalExtractor().infer_profile(["make it shorter", "elaborate"]) == {}
 
 
 def analysis(tier, stated=None, observed=None, conflicts=None):

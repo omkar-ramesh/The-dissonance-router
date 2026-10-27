@@ -44,10 +44,36 @@ TIER_PROVIDERS = {
     tier: os.getenv(f"PROVIDER_{tier.upper()}", LLM_PROVIDER) for tier in MODEL_TIERS
 }
 
+# Reasoning per tier. "off" asks the model to answer without a thinking phase: on local
+# Nemotron Nano that cut "hi" from 33 to 13 output tokens. Thinking is kept where it pays,
+# on Ultra. Models that always reason (e.g. deepseek-r1) ignore "off".
+REASONING = {
+    tier: os.getenv(f"REASONING_{tier.upper()}", "on" if tier == "ultra" else "off") for tier in MODEL_TIERS
+}
+
+# Who reads each message for style requests: "keywords" (fast, English-only phrasings)
+# or "nano" (Nemotron Nano reads it, keywords as the fallback if the call fails).
+SIGNAL_EXTRACTOR = os.getenv("SIGNAL_EXTRACTOR", "nano")
+
+# Public demo mode: private random session ids, a per-IP rate limit, output caps and a daily
+# spend cut-off, so a public link can't read other people's chats or drain the credits.
+PUBLIC_DEMO = os.getenv("PUBLIC_DEMO", "0") == "1"
+RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "6"))
+DAILY_BUDGET_USD = float(os.getenv("DAILY_BUDGET_USD", "1.00"))
+# Max output tokens per answer (0 = no cap). Capped by default only in public demo mode.
+_CAP_DEFAULTS = {"nano": "1500", "super": "2500", "ultra": "4000"} if PUBLIC_DEMO else {}
+MAX_TOKENS = {tier: int(os.getenv(f"MAX_TOKENS_{tier.upper()}", _CAP_DEFAULTS.get(tier, "0"))) for tier in MODEL_TIERS}
+
+# Past conversations: compressed files here, deleted after this many days unless kept.
+MEMORY_DIR = os.getenv("MEMORY_DIR", str(ROOT_DIR / "data" / "memory"))
+MEMORY_RETENTION_DAYS = float(os.getenv("MEMORY_RETENTION_DAYS", "10"))
+
 API_HOST = os.getenv("API_HOST", "127.0.0.1")
 API_PORT = int(os.getenv("API_PORT", "8000"))
 
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+# 127.0.0.1, not "localhost": on Windows every new connection to "localhost" tries IPv6
+# first and costs ~2.2 s before falling back (measured), against 0.16 s for 127.0.0.1.
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434").replace("//localhost", "//127.0.0.1")
 NEBIUS_API_KEY = os.getenv("NEBIUS_API_KEY", "")
 NEBIUS_BASE_URL = os.getenv("NEBIUS_BASE_URL", "")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
