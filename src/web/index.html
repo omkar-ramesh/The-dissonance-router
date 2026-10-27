@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Dissonance Router</title>
+<style>
+:root{--bg:#0b0e14;--panel:#131822;--line:#232b3a;--text:#d7deea;--muted:#7d889c;
+  --green:#3ddc84;--red:#ff5d6c;--amber:#ffb020;--blue:#5aa9ff;--purple:#b48cff;--pink:#ff7ad9}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+/* dark, thin scrollbars everywhere (standard properties first, WebKit as the fallback) */
+:root{color-scheme:dark}
+*{scrollbar-width:thin;scrollbar-color:#2c374b transparent}
+@supports not (scrollbar-color:auto){
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#2c374b;border-radius:8px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:#3a4862}::-webkit-scrollbar-corner{background:transparent}
+}
+body{background:var(--bg);color:var(--text);font:13px/1.45 ui-monospace,"Cascadia Mono",Consolas,monospace;display:flex;flex-direction:column;overflow:hidden}
+.spacer{flex:1}
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);flex:none}
+header h1{font-size:13px;margin:0;font-weight:700}header h1 span{color:var(--muted);font-weight:400}
+h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 4px 8px;font-weight:600}
+.pill{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;border-radius:99px;padding:1px 8px;text-transform:uppercase;margin-right:6px}
+.nano{color:var(--blue);background:#5aa9ff22}.super{color:var(--purple);background:#b48cff22}.ultra{color:var(--pink);background:#ff7ad922}
+.pill.ok{color:var(--green);background:#3ddc8422;font-size:11px;padding:3px 10px}.pill.warn{color:var(--amber);background:#ffb02022}.pill.bad{color:var(--red);background:#ff5d6c22}
+.btn{background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px 12px;cursor:pointer;font:inherit}
+.btn:hover:not(:disabled){border-color:var(--blue)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{border-color:var(--green);color:var(--green);font-weight:700}.btn.ghost{background:none}
+input.user{background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);font:inherit;padding:5px 8px;width:150px}
+.shell{flex:1;min-height:0;display:flex}
+/* sidebar: full, or collapsed to icons (VS Code style) with the arrow on the seam */
+aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:relative;z-index:2;display:flex;flex-direction:column;transition:width .18s ease}
+.side-inner{flex:1;min-height:0;overflow:auto;padding:14px 10px}
+.side-foot{padding:8px 10px 12px;border-top:1px solid var(--line)}
+#collapse{position:absolute;right:-12px;top:50%;transform:translateY(-50%);z-index:5;width:24px;height:48px;padding:0;border-radius:8px;
+  background:var(--panel);border:1px solid var(--line);color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
+#collapse:hover{color:var(--text);border-color:var(--blue)}
+.view-btn{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:1px solid transparent;color:var(--muted);border-radius:8px;padding:8px 10px;margin-bottom:4px;font:inherit;cursor:pointer}
+.view-btn:hover{border-color:var(--line)}.view-btn.on{background:var(--panel);border-color:var(--line);color:var(--text)}
+.view-btn small{display:block;color:var(--muted);font-size:10px}
+.view-btn svg{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.collapsed aside.side{width:58px}
+.collapsed .side-inner{padding:14px 8px}.collapsed .side-foot{padding:8px}
+.collapsed .view-btn{justify-content:center;padding:9px 0}
+.collapsed .view-btn .label,.collapsed .side h2,.collapsed #side-log{display:none}
+[hidden]{display:none!important}
+.run{border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:7px 9px;margin-bottom:6px;font-size:12px;cursor:pointer}
+.run:hover{border-color:var(--blue)}
+.run .t{display:flex;align-items:center;gap:6px}.run .m{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.run small{color:var(--muted);font-size:10px}
+.msg.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 2px var(--blue)}100%{box-shadow:0 0 0 2px transparent}}
+@media(prefers-reduced-motion:reduce){aside.side{transition:none}.msg.flash{animation:none;box-shadow:0 0 0 2px var(--blue)}}
+/* settings */
+.settings{max-width:none}.settings [data-panel]:not([data-panel=overview]){max-width:1280px}
+.sechead{display:flex;gap:14px;align-items:center;margin-bottom:14px}.sechead h3{margin:0;font-size:16px}.sechead p{margin:3px 0 0;color:var(--muted);font-size:12px;max-width:760px;line-height:1.5}
+.ib{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;flex:none;background:#7d889c1f;color:var(--muted)}.ib .ico{width:22px;height:22px}
+.ib.green{background:#3ddc8420;color:var(--green)}.ib.blue{background:#5aa9ff20;color:var(--blue)}.ib.amber{background:#ffb02020;color:var(--amber)}.ib.pink{background:#ff7ad920;color:var(--pink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.two.wide-right{grid-template-columns:1fr 2fr}
+.settings .pn p{margin:4px 0 10px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.steps>div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.steps i{width:24px;height:24px;border-radius:50%;background:#5aa9ff22;color:var(--blue);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:12px;margin-bottom:4px}.steps b{color:var(--text);font-size:13px}
+.facts{display:grid;gap:10px}.facts div{display:flex;flex-direction:column;font-size:12px;color:var(--muted)}.facts b{color:var(--text);font-size:13px}
+.kpis3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.tiercards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.tiercard{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.tiercard.nano{border-top-color:var(--blue)}.tiercard.super{border-top-color:var(--amber)}.tiercard.ultra{border-top-color:var(--pink)}
+.tiercard .mn{font-size:15px;font-weight:700;word-break:break-all}.tiercard .row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.tiercard .row .ico{width:15px;height:15px}
+.tiercard .role{font-size:11px;color:var(--muted)}
+#sec-title{display:none}
+@media(max-width:1000px){.two,.two.wide-right,.steps,.kpis3,.tiercards{grid-template-columns:1fr}}
+#tiles{display:grid;gap:14px}
+.ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.idstrip{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.idstrip code{color:var(--text);background:#0e131c;border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:12px}
+.more{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;padding:2px 4px;border-radius:6px}
+.more .ico{width:13px;height:13px}.more:hover,.more:focus-visible{color:var(--blue);outline:none}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.kpi{display:flex;gap:14px;align-items:center;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;color:var(--text);font:inherit;cursor:pointer;transition:border-color .15s,transform .15s}
+.kpi:hover,.kpi:focus-visible{border-color:var(--blue);outline:none;transform:translateY(-2px)}
+.kpi .ib{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;flex:none;background:#7d889c1f;color:var(--muted)}
+.kpi .ib .ico{width:22px;height:22px}
+.kpi.green .ib{background:#3ddc8420;color:var(--green)}.kpi.blue .ib{background:#5aa9ff20;color:var(--blue)}.kpi.amber .ib{background:#ffb02020;color:var(--amber)}.kpi.pink .ib{background:#ff7ad920;color:var(--pink)}
+.kt{display:flex;flex-direction:column;min-width:0}.kt .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kt .v{font-size:26px;font-weight:700;line-height:1.15}.kt .s{font-size:11px;color:var(--muted)}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.pn{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.pn header{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--muted)}.pn header b{color:var(--text);font-size:13px}
+.mrow{display:grid;grid-template-columns:62px 1fr;gap:2px 10px;align-items:center;padding:8px 0;border-top:1px solid #1a2130}
+.mrow:first-of-type{border-top:0}.mrow .mn{font-size:12px}.mrow .where,.mrow .think{grid-column:2;font-size:11px;color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.mrow .where .ico{width:13px;height:13px}.think.on{color:var(--amber)}
+.gauge{height:10px;border-radius:99px;background:#0e131c;border:1px solid var(--line);overflow:hidden}.gauge i{display:block;height:100%;background:var(--green)}.gauge i.hot{background:var(--amber)}
+.gl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.lrow{display:flex;gap:10px;align-items:flex-start;font-size:12px;padding:7px 0;border-top:1px solid #1a2130}.lrow:first-of-type{border-top:0}
+.lrow .ic{flex:none;width:18px;text-align:center}.lrow .tag,.lrow .src{flex:none;margin:0}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.pgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.kpis,.pgrid{grid-template-columns:1fr}}
+.rfilters{display:flex;gap:6px;margin:0 4px 10px;flex-wrap:wrap}
+.chipbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:3px 12px;font:inherit;font-size:12px;cursor:pointer}
+.chipbtn.on{color:var(--text);border-color:var(--blue);background:#5aa9ff1a}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:12px}
+.rcard{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--text);font:inherit;cursor:pointer;min-height:170px}
+.rcard:hover,.rcard:focus-visible{border-color:var(--blue);outline:none}
+.rcard .t{font-weight:700;font-size:13px}.rcard .h{font-size:20px;font-weight:700;color:var(--green)}.rcard .h.warn{color:var(--amber)}
+.rcard .d{font-size:11px;color:var(--muted);line-height:1.45;flex:1}.rcard .f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
+.src{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:1px 8px;border-radius:99px;font-weight:700}
+.src.local{color:var(--blue);background:#5aa9ff22}.src.api{color:var(--pink);background:#ff7ad922}
+#rmodal{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:4vh 16px;overflow:auto}
+#rmodal[hidden]{display:none}
+#rmodal .sheet{background:var(--bg);border:1px solid var(--line);border-radius:14px;width:min(980px,100%);padding:18px 20px}
+.rd-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.rd-head .title{font-size:16px;font-weight:700}
+.srow{cursor:pointer}.srow:hover td{background:#1a2130}.sdetail td{background:#0e131c;padding:8px 12px}
+.sdetail table{font-size:12px}.sdetail td{white-space:nowrap}.sdetail td.reason,.sdetail td:first-child{white-space:normal}.sdetail .reason{color:var(--muted)}
+.case{border-top:1px solid var(--line);padding:10px 0}.case q{color:var(--muted)}
+.ans{background:#0e131c;border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:12px;white-space:pre-wrap}
+.settings .card h3{margin:0 0 4px;font-size:13px}.settings .card p{margin:4px 0 10px}
+.field{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* memory */
+.mem{display:flex;gap:12px;align-items:flex-start}.mem .main{flex:1;min-width:0}
+.mem .title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mem .acts2{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.mem .btn{padding:4px 10px;font-size:12px}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;margin-left:6px}
+.tag.kept{color:var(--green);background:#3ddc8422}.tag.soon{color:var(--amber);background:#ffb02022}.tag.later{color:var(--muted);background:#7d889c22}
+.transcript{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;max-height:420px;overflow:auto}
+.transcript .q{color:var(--text);font-weight:600;margin-top:8px}.transcript .a{color:#c9d1df;white-space:pre-wrap;margin:4px 0 8px;font:13px/1.55 system-ui,sans-serif}
+#remind .ask{border-color:#ffb02055;background:#ffb02011}
+a{color:var(--blue)}
+.content{flex:1;min-width:0;display:flex;flex-direction:column}
+main{flex:1;min-height:0;display:grid}
+.col{min-height:0;overflow:auto;padding:14px 16px}.col+.col{border-left:1px solid var(--line)}
+.col.fit{overflow:hidden}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.note{color:var(--muted);font-size:12px}
+/* banner + stat groups */
+.banner{border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;background:var(--panel);padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin-bottom:12px}
+.banner.amber{border-left-color:var(--amber)}.banner b{font-size:14px;white-space:nowrap}.banner .m{color:var(--muted);font-size:12px}
+.groups{display:grid;grid-template-columns:5fr 3fr 3fr;gap:10px;margin-bottom:12px}
+.group{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.group .gt{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.group .gi{display:flex;gap:22px;flex-wrap:wrap}.gi small{display:block;color:var(--muted);font-size:10px;letter-spacing:.06em;text-transform:uppercase}.gi b{font-size:15px;font-weight:600}
+/* chat */
+.chat{display:flex;flex-direction:column;height:100%;min-height:0}
+.thread{flex:1;min-height:0;overflow:auto;padding-right:4px}
+.msg{margin:0 0 12px;max-width:92%}.msg.you{margin-left:auto;background:#1c2434;padding:8px 12px;border-radius:10px;white-space:pre-wrap}
+.msg .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px;margin-bottom:3px}
+.msg .why{color:var(--muted);font-size:12px;margin:2px 0 6px}
+/* answers: a reading font, a comfortable line length and clear structure */
+.msg .body{font:14px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:74ch;color:#e3e8f2}
+.msg .body p{margin:.55em 0}.msg .body ul,.msg .body ol{margin:.5em 0;padding-left:1.4em}.msg .body li{margin:.25em 0}
+.msg .body h4{margin:1em 0 .35em;font-size:14.5px;color:#fff;padding-bottom:3px;border-bottom:1px solid var(--line)}
+.msg .body strong{color:#fff}
+.msg .body code{font:12.5px ui-monospace,Consolas,monospace;background:#1c2434;padding:1px 5px;border-radius:4px}
+.msg .body pre{background:#0e131c;border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow:auto;margin:.6em 0}.msg .body pre code{background:none;padding:0}
+.msg .body .tldr{border-left:3px solid var(--green);background:#3ddc8412;padding:8px 12px;border-radius:0 8px 8px 0;font-weight:600}
+.msg .body table{margin:.6em 0;font-size:13px}.msg .body th{text-transform:none;letter-spacing:0;font-size:12px}
+.msg .body hr{border:0;border-top:1px solid var(--line);margin:1em 0}
+.msg.pending .meta::after{content:"thinking…"}
+.note-line{color:var(--muted);font-size:12px;margin:0 0 12px;text-align:center}.note-line.err{color:var(--red)}
+.ask{border:1px solid #ff7ad94d;background:#ff7ad911;border-radius:10px;padding:10px 12px;margin:8px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ask .t{flex:1;min-width:180px}
+.empty{margin:auto;text-align:center;max-width:460px;color:var(--muted)}.empty h3{color:var(--text);font-size:15px;margin:0 0 8px}
+.composer{display:flex;gap:8px;margin-top:10px}
+/* note bot */
+.notebot{position:relative;flex:none}
+.nb{width:38px;height:38px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--green);cursor:pointer;padding:0;display:grid;place-items:center;position:relative}
+.nb:hover,.nb:focus-visible{border-color:var(--green);outline:none}
+.nb svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nb-badge{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--green);color:#06210f;font-size:10px;font-weight:700;line-height:17px;text-align:center}
+.nb-pop{display:none;position:absolute;bottom:46px;left:0;width:290px;z-index:6;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 38px 10px 12px;box-shadow:0 10px 30px #0008;font-size:12px}
+.nb-pop p{margin:4px 0 0;color:var(--muted)}
+.notebot:hover .nb-pop,.notebot:focus-within .nb-pop{display:block}
+.nb-more{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;border:1px solid var(--amber);background:none;color:var(--amber);font:inherit;font-weight:700;cursor:pointer;padding:0}
+.nb-more:hover{background:#ffb02022}
+.notes-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #1a2130;font:13px/1.5 system-ui,sans-serif}
+.notes-row:last-child{border-bottom:0}.notes-row .ic{flex:none;width:20px;text-align:center}.notes-row time{flex:none;color:var(--muted);font:11px ui-monospace,monospace;width:92px;padding-top:2px}
+.meter{font-size:11px;color:var(--muted);margin-top:6px;min-height:15px}
+.composer textarea{flex:1;resize:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--text);font:inherit;height:38px;max-height:160px}
+.composer textarea:focus,input.user:focus{outline:none;border-color:var(--blue)}
+/* mirror */
+.dim{margin-bottom:12px}.dim .head{display:flex;justify-content:space-between;font-size:12px}.dim .name{font-weight:700;text-transform:capitalize}
+.track{position:relative;height:2px;background:var(--line);margin:12px 4px 6px}
+.mark{position:absolute;top:-5px;width:11px;height:11px;border-radius:50%;transform:translateX(-50%)}
+.mark.said{border:2px solid var(--blue);background:var(--bg)}.mark.did{background:var(--amber)}.mark.did.unknown{display:none}
+.gap{position:absolute;top:-1px;height:4px;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--amber));box-shadow:0 0 10px #ffb02088}
+/* "what I prefer": a real three-way control, so it reads as clickable */
+.poles{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:6px}
+.pole{background:var(--panel);border:0;border-left:1px solid var(--line);color:var(--muted);font:inherit;font-size:11px;cursor:pointer;padding:6px 4px}
+.pole:first-child{border-left:0}.pole:hover{color:var(--text);background:#1a2130}
+.pole.on{background:#5aa9ff22;color:var(--blue);font-weight:700}
+.pole:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.did-line{font-size:11px;color:var(--muted);margin-top:4px}.did-line b{color:var(--amber);font-weight:600}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin:0 4px 10px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.lamps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.lamp{border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;color:var(--muted);font-size:11px}
+.lamp b{display:block;color:var(--text);letter-spacing:.08em}.lamp.on{border-color:var(--pink);box-shadow:0 0 12px #ff7ad933}
+.warnline{margin-top:6px;padding:6px 10px;border:1px solid #ffb02055;background:#ffb02011;border-radius:8px;color:var(--amber);font-size:12px}
+.warnline code{background:#1c2434;padding:0 4px;border-radius:4px;color:var(--text)}
+/* what you did with an answer */
+.acts{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.act{background:none;border:1px solid transparent;border-radius:6px;color:var(--muted);font:inherit;font-size:12px;padding:2px 7px;cursor:pointer}
+.act:hover:not(:disabled){border-color:var(--line);color:var(--text)}.act.on{border-color:var(--line);color:var(--green)}.act.on.neg{color:var(--amber)}
+.act:disabled{opacity:.4;cursor:default}
+.reasons{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}.reasons .act{border-color:var(--line)}
+/* proof */
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:6px 7px;border-bottom:1px solid var(--line);background:#0e131c;white-space:nowrap}
+td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
+.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--amber)}
+.code{font-size:10px;padding:1px 7px;border-radius:5px;background:#ff5d6c22;color:var(--red);letter-spacing:.04em;margin-right:4px;white-space:nowrap}
+.bars .row{display:grid;grid-template-columns:100px 1fr 70px;align-items:center;gap:10px;margin:7px 0;font-size:12px}
+.bar{height:9px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;border-radius:5px}
+@media(max-width:900px){#collapse{display:none}.collapsed aside.side{width:auto}body{overflow:auto}.shell,main{display:block;overflow:visible}.groups{grid-template-columns:1fr}aside.side{width:auto;border-right:0;border-bottom:1px solid var(--line)}.col{overflow:visible}.col.fit{overflow:visible}.chat{height:75vh}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="home" title="Back to the main page" style="cursor:pointer">The Dissonance Router <span>what you say vs what you do</span></h1>
+  <span class="pill ok" id="status">● connecting…</span>
+  <div class="spacer"></div>
+  <button class="btn" id="newchat" title="Archive this conversation to Memory and start a new one (your profile stays)">＋ New chat</button>
+  <button class="btn primary" id="demo" title="Starts a fresh session and plays the say-concise, ask-for-detail contradiction with real model calls">▶ Play the demo</button>
+</header>
+<div class="shell" id="shell">
+  <aside class="side">
+    <div class="side-inner">
+     <div id="nav-main">
+      <h2>View</h2>
+      <button class="view-btn on" data-v="chat" title="Chat, with the mirror">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="label">Chat<small>with the mirror</small></span></button>
+      <button class="view-btn" data-v="both" title="Chat and proof side by side">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/></svg><span class="label">Chat + Proof<small>side by side</small></span></button>
+      <button class="view-btn" data-v="proof" title="Proof: evaluation and cost">
+        <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span class="label">Proof<small>evaluation and cost</small></span></button>
+      <div style="height:16px"></div>
+      <h2>Decisions</h2>
+      <div id="side-log"><div class="note">Every answer is listed here with the model that wrote it.</div></div>
+     </div>
+     <!-- shown instead of the View section while Settings is open -->
+     <div id="nav-settings" hidden>
+      <h2>Settings</h2>
+      <button class="view-btn" data-sec="overview" title="Overview">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="label">Overview<small>everything at a glance</small></span></button>
+      <button class="view-btn" data-sec="profile" title="Profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg><span class="label">Profile<small>your session</small></span></button>
+      <button class="view-btn" data-sec="budget" title="Budget">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.5 0-2.5.8-2.5 1.9 0 2.7 5 1.4 5 4.1 0 1.1-1 2-2.5 2-1.2 0-2.2-.5-2.7-1.4M12 6.5V8m0 8v1.5"/></svg><span class="label">Budget<small>simulated wallet</small></span></button>
+      <button class="view-btn" data-sec="models" title="Models">
+        <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg><span class="label">Models<small>tiers and thinking</small></span></button>
+      <button class="view-btn" data-sec="memory" title="Memory: past conversations">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg><span class="label">Memory<small>past conversations</small></span></button>
+      <button class="view-btn" data-sec="notes" title="Notes: what I've learned about you">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="label">Notes<small>what I've learned</small></span></button>
+      <button class="view-btn" data-sec="about" title="About">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="label">About<small>how it works</small></span></button>
+     </div>
+    </div>
+    <div class="side-foot">
+      <button class="view-btn" id="gear" data-v="settings" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="label" id="gear-label">Settings<small>profile, budget, memory</small></span></button>
+    </div>
+    <button id="collapse" title="Collapse the sidebar" aria-label="Collapse the sidebar">‹</button>
+  </aside>
+  <div class="content">
+    <div style="padding:12px 16px 0" id="top"><div class="banner" id="banner"></div><div class="groups" id="groups"></div></div>
+    <main id="main"><div class="col" id="colA"></div><div class="col" id="colB"></div></main>
+  </div>
+</div>
+
+<!-- Blocks are built once and moved between columns, so the chat keeps its state when the view changes.
+     Blocks not on screen wait here, still in the document, so lookups by id keep working. -->
+<div hidden id="parking">
+  <section class="chat" id="chatBlock">
+    <h2>Chat</h2>
+    <div class="thread" id="thread"></div>
+    <div id="suggest"></div><div id="undo"></div><div id="remind"></div>
+    <form class="composer" id="form">
+      <div class="notebot"><button type="button" class="nb" id="notebot" aria-label="Note bot: open notes" aria-describedby="nb-pop"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nb-badge" id="nb-badge" hidden></span></button>
+        <div class="nb-pop" id="nb-pop" role="tooltip"><b>Note bot</b>
+          <p>Keeps notes on what I learn about how you like answers, from what you say and what you do.
+             Written from records, so it uses no tokens and can't make things up.</p>
+          <button type="button" class="nb-more" data-goto="notes" title="More in Settings → Notes" aria-label="More in Settings, Notes">!</button></div></div>
+      <textarea id="input" rows="1" placeholder="Ask anything…" aria-label="Message"></textarea><button class="btn primary" id="send">Send</button></form>
+    <div class="meter" id="meter"></div>
+  </section>
+  <section id="mirrorBlock">
+    <h2>The mirror</h2>
+    <div class="legend"><span><i style="border:2px solid var(--blue)"></i>what you said (set it below)</span><span><i style="background:var(--amber)"></i>what you do (learned)</span></div>
+    <div id="dims"></div>
+    <div class="field"><button class="btn ghost" id="forget" title="Clears what the app learned from how you ask and rate answers. What you said stays.">Forget what I do</button></div>
+    <h2 style="margin-top:14px">Next answer goes to <span class="note" id="score"></span></h2>
+    <div class="lamps" id="lamps"></div><div class="note" id="reason" style="margin:0 4px 14px"></div>
+  </section>
+  <section id="storyBlock"><h2>Why it escalated</h2><div id="story"></div></section>
+  <section id="evidenceBlock"></section>
+  <section id="settingsBlock" class="settings">
+    <h2 id="sec-title">Settings</h2>
+    <div data-panel="overview"><div class="tiles" id="tiles"></div></div>
+    <div data-panel="profile">
+      <div class="sechead"><span class="ib blue"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg></span>
+        <div><h3>Profile</h3><p>Who the agent is learning. Everything it knows about you is filed under this id.</p></div></div>
+      <div class="two">
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 0-3.5 6.5L4 21h3v-2h2v-2h2l1.5-1.5A4 4 0 0 0 15 7z"/></svg><b>Session id</b></header>
+          <p class="note">Type an id to switch to that person's profile, or start fresh for a clean slate.</p>
+          <div class="field" id="who"><input class="user" id="user" maxlength="64" spellcheck="false" style="width:260px" aria-label="Session id">
+            <button class="btn" id="fresh">Start fresh</button></div>
+          <p class="note" id="public-note" hidden>Public demo: session ids are random and private.</p></section>
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Where your data lives</b></header>
+          <div class="facts"><div><b>On this machine</b><span>Profiles, notes and saved chats are stored locally.</span></div>
+            <div><b>Never shared</b><span>Nothing is sent anywhere unless a tier is set to the cloud.</span></div>
+            <div><b>Yours to delete</b><span>Saved chats expire after 10 days unless you keep them.</span></div></div></section>
+      </div></div>
+
+    <div data-panel="budget">
+      <div class="sechead"><span class="ib green"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-3v3M16 13.5h2"/></svg></span>
+        <div><h3>Budget <span class="note">· simulated wallet, no real money</span></h3><p>Set a $ limit and the router plans every answer inside it. Costs are real token counts × Token Factory list prices.</p></div></div>
+      <div class="two">
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>Limit</b></header>
+          <div class="field"><span class="note">Limit $</span>
+            <input class="user" id="budget-limit" type="number" min="0" max="100" step="0.001" style="width:120px" aria-label="Budget limit in dollars">
+            <button class="btn primary" id="budget-save">Update</button>
+            <button class="btn ghost" id="budget-reset">Reset spent</button></div>
+          <div class="field" style="margin-top:10px"><span class="note">Quick set</span>
+            <button class="chipbtn" data-preset="0.01">$0.01 · try it</button><button class="chipbtn" data-preset="0.1">$0.10</button>
+            <button class="chipbtn" data-preset="1">$1</button><button class="chipbtn" data-preset="0">No limit</button></div></section>
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v9l6 3"/><circle cx="12" cy="12" r="9"/></svg><b>Spent so far</b></header>
+          <div id="budget-view"></div></section>
+      </div>
+      <div class="steps">
+        <div><i>1</i><b>Steps down a tier</b><span>when one answer would take more than 20% of what's left.</span></div>
+        <div><i>2</i><b>Thinking off, shorter answers</b><span>once under 25% is left.</span></div>
+        <div><i>3</i><b>Never overspends</b><span>an answer can't cost more than what's left; at zero it stops.</span></div>
+      </div>
+      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg><b>Predicted vs measured</b></header>
+        <div id="budget-acc"></div></section></div>
+
+    <div data-panel="models">
+      <div class="sechead"><span class="ib pink"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>
+        <div><h3>Models</h3><p>Which model serves each tier, where it runs, and whether it thinks before answering.</p></div></div>
+      <div id="models"></div></div>
+
+    <div data-panel="memory">
+      <div class="sechead"><span class="ib blue"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/></svg></span>
+        <div><h3>Memory · past conversations</h3><p id="mem-intro">Each <b>＋ New chat</b> saves the conversation before it here, compressed. It's deleted after
+          10 days unless you press <b>Keep</b>: the file and the message text both go (only routing numbers like tier and score stay).
+          Reminders come from dates, not from an AI call, so they cost no tokens.</p></div></div>
+      <div class="kpis3" id="mem-stats"></div>
+      <div id="mem-list"></div></div>
+
+    <div data-panel="notes">
+      <div class="sechead"><span class="ib green"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+        <div><h3>Notes · what I've learned</h3><p>Written by the note bot from what the agent recorded, with fixed sentences: no AI call, no tokens, nothing invented. Quotes from a conversation Memory deleted are erased here too.</p></div></div>
+      <div class="two wide-right">
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg><b>Where things stand</b></header><div id="notes-summary" class="note"></div></section>
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Timeline</b></header><div id="notes-list"></div></section>
+      </div></div>
+
+    <div data-panel="about">
+      <div class="sechead"><span class="ib amber"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></span>
+        <div><h3>About</h3><p>The Dissonance Router keeps two profiles: what you say you prefer and what you actually do. When they clash, it uses a stronger model and tells you why.</p></div></div>
+      <div class="steps">
+        <div><i>1</i><b>You say</b><span>Set how you like answers in the mirror: tone, length, sourcing, structure, revision.</span></div>
+        <div><i>2</i><b>You do</b><span>It learns from what you ask for and what you 👍 or 👎, with a quote as evidence.</span></div>
+        <div><i>3</i><b>It routes</b><span>The bigger the gap, the stronger the model: Nano, Super or Ultra, with the reason logged.</span></div>
+      </div>
+      <div class="two">
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><b>Honest by design</b></header>
+          <p class="note" style="margin:0">Failures are shown with reason codes, simulated numbers are labelled, links the agent can't verify are flagged, and the "right tier" in reports is our own annotation.</p></section>
+        <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg><b>Source and evidence</b></header>
+          <p class="note" style="margin:0">Code, guidelines and the evaluation method are in the project README. Saved runs are on the Proof page.</p></section>
+      </div></div>
+  </section>
+</div>
+
+<div id="rmodal" hidden role="dialog" aria-modal="true" aria-label="Report details"><div class="sheet" id="rsheet"></div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const DIMS = {
+  tone:      { values: ["formal", "balanced", "casual"],     labels: ["formal", "casual"] },
+  length:    { values: ["concise", "balanced", "detailed"],  labels: ["concise", "detailed"] },
+  sourcing:  { values: ["minimal", "balanced", "full"],      labels: ["no sources", "full sources"] },
+  structure: { values: ["bullet", "balanced", "paragraph"],  labels: ["bullets", "paragraphs"] },
+  revision:  { values: ["rejects", "balanced", "accepts"],   labels: ["reworks drafts", "takes drafts as-is"] },
+};
+const TIERS = { nano: "fast, cheap", super: "balanced", ultra: "deep reasoning" };
+// Why a thumbs-down: each reason is behavior evidence on the dimension it names.
+const REASONS = [["too_long", "Too long"], ["too_short", "Too short"], ["too_formal", "Too formal"], ["too_casual", "Too casual"],
+                 ["needs_sources", "Needs sources"], ["use_bullets", "Use bullets"], ["use_paragraphs", "Use paragraphs"], ["wrong", "Missed the point"]];
+const REASON_LABEL = Object.fromEntries(REASONS);
+const pos = (dim, value) => DIMS[dim].values.indexOf(value) * 50;
+const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+const newId = () => "u-" + Array.from(crypto.getRandomValues(new Uint8Array(9)), b => b.toString(36).padStart(2, "0")).join("");
+
+let user = store.get("dr-user") || newId(), busy = false, proof = null, health = null;
+let gen = 0;   // bumps on every user switch, so late answers and loads for the previous user are dropped
+const session = { calls: 0, inp: 0, out: 0, cost: 0, ultraCost: 0, tps: [], ttft: [], think: 0, reads: 0, readCost: 0 };
+
+async function api(path, body) {
+  const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(typeof data.detail === "string" ? data.detail : "Request failed (" + res.status + ")"), { status: res.status });
+  return data;
+}
+
+// Minimal, safe markdown: escape first, then add a few tags.
+function md(text) {
+  const inline = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  let html = "", inList = false, code = null, table = null;
+  const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => inline(c.trim()));
+  const flushTable = () => {                        // | a | b | rows, with an optional |---| separator
+    if (!table) return;
+    const sep = table.findIndex(l => /^\s*\|?\s*:?-{2,}/.test(l));
+    const head = sep === 1 ? cells(table[0]) : null, body = table.filter((_, i) => i !== sep && !(head && i === 0));
+    html += "<table>" + (head ? `<tr>${head.map(c => `<th>${c}</th>`).join("")}</tr>` : "")
+      + body.map(r => `<tr>${cells(r).map(c => `<td>${c}</td>`).join("")}</tr>`).join("") + "</table>";
+    table = null;
+  };
+  for (const raw of esc(text).split(/\r?\n/)) {
+    const line = raw.trimEnd();
+    if (/^\s*```/.test(line)) {                     // fenced code: keep lines and indentation as they are
+      flushTable();
+      if (code === null) { if (inList) { html += "</ul>"; inList = false; } code = []; }
+      else { html += `<pre><code>${code.join("\n")}</code></pre>`; code = null; }
+      continue;
+    }
+    if (code !== null) { code.push(line); continue; }
+    if (/^\s*\|.*\|\s*$/.test(line)) { if (inList) { html += "</ul>"; inList = false; } (table ||= []).push(line); continue; }
+    flushTable();
+    const item = line.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+    if (item) { if (!inList) { html += "<ul>"; inList = true; } html += `<li>${inline(item[1])}</li>`; continue; }
+    if (inList) { html += "</ul>"; inList = false; }
+    const head = line.match(/^#{1,4}\s+(.*)/);
+    if (head) html += `<h4>${inline(head[1])}</h4>`;
+    else if (/^\s*-{3,}\s*$/.test(line)) html += "<hr>";
+    else if (line.trim()) html += `<p>${inline(line)}</p>`;
+  }
+  flushTable();
+  if (inList) html += "</ul>";
+  if (code !== null) html += `<pre><code>${code.join("\n")}</code></pre>`;   // unclosed fence
+  return /^\W*tl;?dr/i.test(text.trim()) ? html.replace("<p>", '<p class="tldr">') : html;
+}
+
+// The router's log-style reason, as a sentence about the person.
+const REASON_RE = /Strongest dissonance: (\w+) \(you said '([^']+)', you behave '([^']+)', seen (\d+)x, score ([\d.]+)\)/;
+function explain(reason, lead) {
+  const at = (reason || "").indexOf("Budget limit:");
+  if (at >= 0) {                                   // the budget changed something: say that first, in its own words
+    const tail = reason.slice(at), cut = tail.indexOf(" Strongest dissonance:");
+    const said = cut >= 0 ? tail.slice(0, cut) : tail, rest = (reason.slice(0, at) + (cut >= 0 ? tail.slice(cut) : "")).trim();
+    const why = REASON_RE.test(rest) ? "<br>" + explain(rest, "What the router saw") : "";
+    return `💰 ${esc(said)}${why}`;
+  }
+  const m = REASON_RE.exec(reason || "");
+  if (!m) return reason && reason.startsWith("No significant") ? "What you say and what you do agree, so the fast model is enough." : esc(reason || "");
+  const [, dim, said, did, n, score] = m;
+  const gap = said === "balanced"
+    ? `you keep asking for <b>${esc(did)}</b> ${esc(dim)}, which you never said you wanted`
+    : `you said <b>${esc(said)}</b> but keep asking for <b>${esc(did)}</b>`;
+  return `${lead}: ${gap} (${esc(dim)}, seen ${n}×, dissonance ${score}).`;
+}
+const LEAD = { ultra: "Escalated to Ultra", super: "Moved up to Super", nano: "Nano" };
+const money = v => "$" + v.toFixed(4);
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+
+/* ---------- chat ---------- */
+const thread = $("thread");
+function add(html, cls) {
+  const el = document.createElement("div"); el.className = cls; el.innerHTML = html;
+  thread.appendChild(el); thread.scrollTop = thread.scrollHeight; return el;
+}
+function askHtml(h) {
+  const said = h.stated === "balanced"
+    ? `You never set a ${esc(h.dimension)} preference, but you keep asking for <b>${esc(h.observed)}</b>.`
+    : `You said <b>${esc(h.stated)}</b>, but you keep asking for <b>${esc(h.observed)}</b>.`;
+  return `<div class="ask"><span class="t">${said} Should I treat <b>${esc(h.observed)}</b> as your ${esc(h.dimension)} preference?</span>
+    <button class="btn primary" data-accept="${esc(h.dimension)}">Yes, update it</button></div>`;
+}
+// What the user can do with an answer. Each click is behavior evidence for the observed profile.
+function actsHtml(id, feedback, latest) {
+  if (!id) return "";
+  let thumb = null;
+  for (const f of feedback || []) if (f.kind === "up" || f.kind === "down") thumb = f;
+  const up = thumb && thumb.kind === "up", down = thumb && thumb.kind === "down";
+  return `<div class="acts" data-id="${Number(id)}">
+    <button class="act ${up ? "on" : ""}" data-fb="up" title="Good answer" aria-label="Good answer">👍</button>
+    <button class="act neg ${down ? "on" : ""}" data-fb="down" title="Not good: say why" aria-label="Not good">👎</button>
+    <button class="act" data-copy>Copy</button>
+    ${latest ? `<button class="act" data-regen title="Ask for another answer (counts as a rejected draft)">↻ Try again</button>` : ""}
+    ${down && thumb.reason ? `<span class="note">${esc(REASON_LABEL[thumb.reason] || "")}</span>` : ""}
+  </div>`;
+}
+// Links in an answer came from the model's memory: the agent has no search, so it can't vouch for them.
+function unverifiedHtml(links) {
+  if (!links || !links.length) return "";
+  const shown = links.slice(0, 3).map(l => `<code>${esc(l.length > 60 ? l.slice(0, 57) + "…" : l)}</code>`).join(", ");
+  return `<div class="warnline">⚠ ${links.length === 1 ? "A link" : links.length + " links"} in this answer ${links.length === 1 ? "isn't" : "aren't"} verified: ${shown}. The model wrote ${links.length === 1 ? "it" : "them"} from memory, so check before relying on ${links.length === 1 ? "it" : "them"}.</div>`;
+}
+function botHtml(r, id, feedback, latest) {
+  const tier = r.model_chosen, secs = r.latency_ms != null ? (r.latency_ms / 1000).toFixed(1) + " s" : "";
+  const meta = `<div class="meta"><span class="pill ${tier}">${tier}</span><span>${esc(r.model_id || "")}</span><span>${secs}</span></div>`;
+  const reason = r.routing_reason || "", quick = reason.startsWith("Quick request"), spent = reason.includes("Budget limit:");
+  const why = tier !== "nano" || quick || spent ? `<div class="why">${explain(reason, LEAD[tier])}</div>` : "";
+  return meta + why + `<div class="body">${md(r.response || "")}</div>` + unverifiedHtml(r.unverified_sources) + actsHtml(id, feedback, latest);
+}
+function emptyState() {
+  thread.innerHTML = `<div class="empty"><h3>Say how you like answers. Then just ask.</h3>
+    <p>Set a preference in the mirror, for example <b>concise</b>, then chat normally. Or press <b>▶ Play the demo</b>.</p>
+    <p>If the way you actually ask, or what you do with answers, contradicts what you said, the router notices,
+    escalates to a stronger model, and tells you why.</p></div>`;
+}
+function noteUpdates(updates) {
+  for (const [d, v] of Object.entries(updates || {})) {
+    add(v === "balanced" ? `Your ${esc(d)} habit has faded, so I've stopped assuming it.` : `Noticed a pattern: you keep wanting ${esc(v)} (${esc(d)}).`, "note-line");
+  }
+}
+function countStats(r) {
+  const s = r.stats || {};
+  session.calls++; session.inp += s.input_tokens || 0; session.out += s.output_tokens || 0;
+  session.cost += s.est_cost_usd || 0; session.ultraCost += s.est_cost_if_ultra_usd || 0; session.think += s.reasoning_tokens || 0;
+  if (s.tokens_per_sec) session.tps.push(s.tokens_per_sec); if (s.ttft_ms) session.ttft.push(s.ttft_ms);
+  for (const read of r.reader_stats || []) {         // the Nano signal reader's own calls, counted not hidden
+    session.reads++; session.inp += read.input_tokens || 0; session.out += read.output_tokens || 0;
+    session.readCost += read.est_cost_usd || 0;
+  }
+  if (r.budget) {
+    wallet = { limit_usd: r.budget.limit_usd, spent_usd: r.budget.spent_usd };
+    accuracy.push({ tier: r.model_chosen, predicted: r.budget.predicted_usd, measured: r.budget.measured_usd });
+    renderBudget();
+  }
+}
+
+/* ---------- budget (simulated wallet) ---------- */
+let wallet = { limit_usd: 0, spent_usd: 0 }, accuracy = [];
+const usd = v => "$" + (v < 0.01 ? v.toFixed(5) : v.toFixed(4));
+function renderBudget() {
+  const { limit_usd: limit, spent_usd: spent } = wallet;
+  if (document.activeElement !== $("budget-limit")) $("budget-limit").value = limit || 0;
+  const pct = limit ? Math.min(100, 100 * spent / limit) : 0;
+  $("budget-view").innerHTML = limit
+    ? `<div class="bar" style="height:10px"><i style="width:${pct}%;background:${pct > 75 ? "var(--amber)" : "var(--green)"}"></i></div>
+       <div class="note" style="margin-top:6px">${usd(spent)} of ${usd(limit)} used · ${usd(Math.max(0, limit - spent))} left${pct > 75 ? " · tight: thinking off, shorter answers" : ""}</div>`
+    : `<div class="note">No limit. Spent so far: ${usd(spent)}.</div>`;
+  if (!accuracy.length) { $("budget-acc").innerHTML = `<div class="note">Predicted vs measured cost appears here for each answer.</div>`; return; }
+  const errs = accuracy.filter(a => a.predicted > 0).map(a => Math.abs(a.measured - a.predicted) / a.predicted);
+  $("budget-acc").innerHTML = `<table><tr><th>Answer</th><th>Tier</th><th>Predicted</th><th>Measured</th><th>Off by</th></tr>`
+    + accuracy.slice(-8).map((a, i) => `<tr><td>${accuracy.length - Math.min(8, accuracy.length) + i + 1}</td><td><span class="pill ${a.tier}">${a.tier}</span></td>
+        <td>${usd(a.predicted)}</td><td>${usd(a.measured)}</td><td>${a.predicted ? Math.round(100 * (a.measured - a.predicted) / a.predicted) + "%" : "–"}</td></tr>`).join("")
+    + `</table><div class="note" style="margin-top:6px">Average miss: ${Math.round(100 * avg(errs))}%. The prediction guesses answer length before the call; the measurement uses the real token counts.</div>`;
+  renderMeter();
+}
+async function loadBudget() {
+  try { wallet = await api("/budget/" + encodeURIComponent(user)); } catch (e) { wallet = { limit_usd: 0, spent_usd: 0 }; }
+  renderBudget(); renderMeter(); renderTiles();
+}
+async function saveBudget(reset) {
+  const v = Number($("budget-limit").value);
+  if (!(v >= 0 && v <= 100)) { $("budget-view").innerHTML = `<div class="note bad">Enter a limit between $0 and $100.</div>`; return; }
+  wallet = await api("/budget", { user_id: user, limit_usd: v, reset_spent: !!reset });
+  renderBudget(); renderMeter();
+  $("budget-view").insertAdjacentHTML("beforeend", `<div class="note ok">Updated. The router plans the next answer within ${v ? usd(v) : "no limit"}.</div>`);
+}
+async function send(text) {
+  if (busy || !text.trim()) return;
+  busy = true; $("send").disabled = true; $("undo").innerHTML = "";
+  const empty = thread.querySelector(".empty"); if (empty) empty.remove();
+  const asked = add(esc(text), "msg you");
+  const pending = add(`<div class="meta"></div>`, "msg pending"), mine = gen;
+  try {
+    const r = await api("/chat", { user_id: user, message: text });
+    if (mine !== gen) return;                      // switched user while waiting: this answer belongs elsewhere
+    thread.querySelectorAll("[data-regen]").forEach(b => b.remove());     // only the latest answer can be retried
+    asked.dataset.id = r.interaction_id;          // so a click in the decision list can jump here
+    pending.className = "msg"; pending.innerHTML = botHtml(r, r.interaction_id, [], true);
+    countStats(r); noteUpdates(r.observed_updates);
+  } catch (e) {
+    if (mine !== gen) return;
+    pending.remove();
+    add(esc(e.message) + (e.status === 503 ? " Check that the model backend (Ollama or Token Factory) is running."
+        : e.status === 402 ? ` <a href="#" data-goto="budget">Open Settings → Budget</a>` : ""), "note-line err");
+  } finally {
+    busy = false; $("send").disabled = false;
+    if (mine === gen) { thread.scrollTop = thread.scrollHeight; await refresh(); }
+  }
+}
+
+/* ---------- mirror, router, decisions ---------- */
+function renderMirror(p) {
+  $("dims").innerHTML = Object.keys(DIMS).map(dim => {
+    const said = p.stated_profile[dim], did = p.observed_profile[dim], score = p.conflicts_detected[dim];
+    const a = pos(dim, said), b = pos(dim, did), known = did !== "balanced";
+    const gap = known && score ? `<span class="gap" style="left:${Math.min(a, b)}%;width:${Math.abs(a - b)}%;opacity:${0.35 + 0.65 * score}"></span>` : "";
+    const marks = `<span class="mark said" style="left:${a}%" title="You said: ${esc(said)}"></span><span class="mark did ${known ? "" : "unknown"}" style="left:${b}%" title="You do: ${esc(did)}"></span>`;
+    const [l, r] = DIMS[dim].labels, [vl, , vr] = DIMS[dim].values;
+    const label = v => v === "balanced" ? "no preference" : v === vl ? l : r;
+    const pole = (value, text) => `<button class="pole ${said === value ? "on" : ""}" data-dim="${dim}" data-value="${value}" aria-pressed="${said === value}" title="Say you prefer: ${esc(text)}">${esc(text)}</button>`;
+    return `<div class="dim" role="group" aria-label="${dim}"><div class="head"><span class="name">${dim}</span><span class="note">${score ? "dissonance " + score.toFixed(2) : known ? "aligned" : "no signal yet"}</span></div>
+      <div class="track">${gap}${marks}</div>
+      <div class="poles">${pole(vl, l)}${pole("balanced", "no preference")}${pole(vr, r)}</div>
+      <div class="did-line">You do: ${known ? `<b>${esc(label(did))}</b>` : "not enough signal yet"}</div></div>`;
+  }).join("");
+  $("score").textContent = p.conflict_score ? "· dissonance " + p.conflict_score.toFixed(2) : "";
+  $("lamps").innerHTML = Object.entries(TIERS).map(([t, d]) => `<div class="lamp ${p.model_chosen === t ? "on" : ""}"><b>${t.toUpperCase()}</b>${d}</div>`).join("");
+  $("reason").innerHTML = explain(p.routing_reason, { ultra: "Ultra, because", super: "Super, because", nano: "Nano" }[p.model_chosen]);
+  $("suggest").innerHTML = p.suggestion && p.highest_conflict ? askHtml(p.highest_conflict) : "";
+}
+function renderDecisions(list) {
+  $("side-log").innerHTML = list.length ? list.slice(0, 12).map(d => {
+    const t = new Date(d.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+    return `<div class="run" data-jump="${Number(d.id)}" title="${esc(d.routing_reason)} (click to jump to this message)"><div class="t"><span class="pill ${d.model_used}">${d.model_used}</span><span class="m">${esc(d.user_message)}</span></div><small>${t} · score ${d.conflict_score.toFixed(2)}</small></div>`;
+  }).join("") : `<div class="note">Every answer is listed here with the model that wrote it.</div>`;
+  const chrono = [...list].reverse();
+  const cards = chrono.map((d, i) => ({ d, n: i + 1 })).filter(x => x.d.model_used !== "nano" && REASON_RE.test(x.d.routing_reason));
+  $("story").innerHTML = cards.length
+    ? cards.slice(-4).map(({ d, n }) => `<div class="card"><span class="pill ${d.model_used}">${d.model_used}</span> #${n} ${esc(d.user_message)}<div class="note">${explain(d.routing_reason, LEAD[d.model_used])}</div></div>`).join("")
+    : `<div class="note" style="margin:0 4px 12px">Nothing escalated yet. When it does, the reason appears here.</div>`;
+}
+async function refresh() {
+  try {
+    const [p, log] = await Promise.all([api("/profiles/" + encodeURIComponent(user)), api(`/decision-log/${encodeURIComponent(user)}?limit=30&current=true`)]);
+    renderMirror(p); renderDecisions(log.decisions); renderStats();
+    loadNotes(view === "settings" && section === "notes");
+    return log.decisions;
+  } catch (e) { $("reason").textContent = e.message; return []; }
+}
+
+/* ---------- stats, banner, evidence (real numbers only) ---------- */
+function group(title, items) {
+  return `<div class="group"><div class="gt">${title}</div><div class="gi">${items.map(([l, v]) => `<div><small>${l}</small><b>${v}</b></div>`).join("")}</div></div>`;
+}
+function renderMeter() {
+  const parts = [];
+  if (session.calls) {
+    const spent = session.cost + session.readCost;
+    const saves = session.ultraCost > 0 ? Math.max(0, 100 * (1 - spent / session.ultraCost)).toFixed(0) + "%" : "–";
+    parts.push(`This session: ${session.calls} answer${session.calls === 1 ? "" : "s"} · ${(session.inp + session.out).toLocaleString()} tokens · est. ${money(spent)} (all-Ultra: ${money(session.ultraCost)}, saved ${saves})`);
+  }
+  if (wallet.limit_usd) parts.push(`budget ${usd(wallet.spent_usd)} of ${usd(wallet.limit_usd)}`);
+  $("meter").textContent = parts.join(" · ");
+}
+function renderStats() {
+  renderMeter();
+  if (!session.calls) {
+    $("groups").innerHTML = `<div class="group" style="grid-column:1/-1"><div class="gt">This session</div><div class="note">Tokens, speed and estimated cost appear here after your first message.</div></div>`;
+    return;
+  }
+  const s = avg(session.tps), t = avg(session.ttft), spent = session.cost + session.readCost;
+  const saves = session.ultraCost > 0 ? Math.max(0, 100 * (1 - spent / session.ultraCost)).toFixed(0) + "%" : "–";
+  $("groups").innerHTML =
+    group("Usage · this session", [["Answers", session.calls], ["Signal reads", session.reads], ["Input tokens", session.inp.toLocaleString()], ["Output tokens", session.out.toLocaleString()]])
+    + group("Performance", [["Speed", s ? s.toFixed(1) + " tok/s" : "–"], ["Avg TTFT", t ? (t / 1000).toFixed(1) + " s" : "–"], ["Thinking tokens", session.think.toLocaleString()]])
+    + group("Est. cost @ Token Factory", [["This session", money(spent)], ["If all Ultra", money(session.ultraCost)], ["Saved", saves]]);
+}
+// The report for the signal reader this server actually uses.
+function primary() {
+  if (!proof) return null;
+  const nano = health && health.signal_reader === "nano" && proof.nano_report;
+  return nano ? { r: proof.nano_report, source: proof.nano_source } : (proof.report ? { r: proof.report, source: proof.source } : null);
+}
+function tierLine() {
+  if (!health) return "";
+  return Object.entries(health.tiers).map(([t, v]) => `${t}: ${esc(v.model)} (${esc(v.provider)}${v.reasoning === "off" ? ", thinking off" : ""})`).join(" · ")
+    + ` · signal reader: ${esc(health.signal_reader)}`;
+}
+function renderBanner() {
+  const b = $("banner");
+  if (proof === null) { b.className = "banner amber"; b.innerHTML = `<b class="warn">Couldn't load the evaluation report</b><span class="m">The server didn't answer. Reload once it's running.</span>`; return; }
+  const p = primary();
+  if (!p) { b.className = "banner amber"; b.innerHTML = `<b class="warn">No evaluation report yet</b><span class="m">Run <code>python -m src.eval</code> to create one.</span><span class="spacer"></span><span class="m">${tierLine()}</span>`; return; }
+  const r = p.r, by = {};
+  for (const s of r.scenarios) { const k = by[s.kind] ||= { n: 0, ok: 0, pass: 0 }; k.n++; k.ok += s.as_expected ? 1 : 0; k.pass += s.label === "PASS" ? 1 : 0; }
+  const all = r.scenarios.every(s => s.as_expected) && r.self_test.caught === r.self_test.total;
+  const part = (k, label, field = "ok") => by[k] ? `<span class="${by[k][field] === by[k].n ? "ok" : "warn"}">${by[k][field]}/${by[k].n}</span> ${label}` : "";
+  b.className = "banner" + (all ? "" : " amber");
+  b.innerHTML = `<b>Evaluation</b><span class="m">${[part("success", "success cases"), part("heldout", "held-out (written after tuning)", "pass"),
+      r.reader === "nano" ? part("failure", "keyword failures re-run") : part("failure", "known failures reproduced"),
+      `<span class="${r.self_test.caught === r.self_test.total ? "ok" : "bad"}">${r.self_test.caught}/${r.self_test.total}</span> injected false claims caught`].filter(Boolean).join(" · ")}</span>`
+    + `<span class="m">· ${r.simulated ? "simulated model answers and tokens" : "real model answers (local stand-ins)"} · ideal tiers are our own annotation</span>`
+    + `<span class="spacer"></span><span class="m">${tierLine()}</span>`;
+}
+const LABEL_CLASS = { PASS: "ok", CAUGHT: "ok", FIXED: "ok", "KNOWN GAP": "warn", "STILL FAILS": "warn" };
+const cell = s => `<td class="${LABEL_CLASS[s.label] || "bad"}">${esc(s.label)}</td>`;
+const codes = s => `<td>${[...new Set(s.findings.map(f => f.code))].map(c => `<span class="code">${esc(c)}</span>`).join("")}</td>`;
+function compareCard(c) {
+  if (!c) return "";
+  const [a, b] = c.contestants;
+  const row = (label, f) => `<tr><td>${label}</td><td>${f(a)}</td><td>${f(b)}</td></tr>`;
+  return `<h2>Is Ultra worth it? · blind comparison</h2><div class="card">
+    <div style="margin-bottom:8px"><b>${esc(c.verdict)}</b></div>
+    <table><tr><th></th><th>${esc(a)}</th><th>${esc(b)}</th></tr>
+    ${row("Cases won", t => c.wins[t])}
+    ${row("Avg cost per answer", t => money(c.avg[t].cost_usd))}
+    ${row("Avg latency", t => (c.avg[t].latency_ms / 1000).toFixed(1) + " s")}
+    ${row("Opens with TL;DR (length cases)", t => esc(c.tldr_on_length_cases[t]))}
+    ${row("Invented links", t => c.unbacked_sources[t])}</table>
+    <div class="note" style="margin-top:6px">${c.cases} contradiction cases, same prompt for both. Judge: ${esc(c.judge)} (${esc(c.models[c.judge])}), shown the answers without the model names, twice with the order swapped; a verdict that flips counts as a tie (${c.ties}). Local stand-ins: ${esc(c.models[a])} vs ${esc(c.models[b])}.</div></div>`;
+}
+function readerCard() {
+  if (!proof || !proof.report || !proof.nano_report) return "";
+  const nano = Object.fromEntries(proof.nano_report.scenarios.map(s => [s.id, s]));
+  const rows = proof.report.scenarios.filter(s => (s.kind === "failure" || s.kind === "heldout") && nano[s.id]);
+  const pass = (rep, kind) => rep.scenarios.filter(s => s.kind === kind && (s.label === "PASS" || s.label === "FIXED")).length;
+  return `<h2>Who reads your messages · keywords vs Nemotron Nano</h2><div class="card">
+    <table><tr><th>Scenario</th><th>Keywords</th><th>Nano</th></tr>
+    ${rows.map(s => `<tr title="${esc(s.why)}"><td>${esc(s.title)}${s.kind === "heldout" ? ' <span class="note">held-out</span>' : ""}</td>${cell(s)}${cell(nano[s.id])}</tr>`).join("")}</table>
+    <div class="note" style="margin-top:6px">Held-out passed: keywords ${pass(proof.report, "heldout")}/7, Nano ${pass(proof.nano_report, "heldout")}/7. Nano costs one short extra call per message (thinking off, cached), and must quote your words as evidence or nothing is learned.</div></div>`;
+}
+/* ---------- reports: a card per saved run, details on click ---------- */
+let reports = null, rfilter = "all", noteCount = 0;
+const SRC = { local: "Local", api: "Token Factory" };
+const stamp = iso => new Date(iso).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+function renderEvidence() {
+  const box = $("evidenceBlock");
+  if (reports === null) { box.innerHTML = `<h2>Reports</h2><div class="card note">Couldn't reach the server for the saved reports.</div>`; return; }
+  const n = k => reports.filter(r => k === "all" || r.source === k).length;
+  const shown = reports.filter(r => rfilter === "all" || r.source === rfilter);
+  const filters = [["all", "All"], ["local", "Local · while building"], ["api", "Token Factory runs"]]
+    .map(([k, l]) => `<button class="chipbtn ${rfilter === k ? "on" : ""}" data-rf="${k}">${l} · ${n(k)}</button>`).join("");
+  const cardHtml = r => `<button class="rcard" data-report="${esc(r.id)}">
+      <div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span><span>${esc(stamp(r.created))}</span></div>
+      <div class="t">${esc(r.title)}</div><div class="h">${esc(r.headline)}</div>
+      <div class="d">${esc(r.description)}</div>
+      <div class="f">${Object.entries(r.models || {}).map(([t, m]) => `<span>${esc(t)}: ${esc(m)}</span>`).join("")}</div>
+      <div class="f">${r.chips.map(c => `<span>${esc(c)}</span>`).join(" · ")}${r.cost_usd ? ` · <span>${money(r.cost_usd)}</span>` : ""}</div></button>`;
+  box.innerHTML = `<h2>Reports · click one for the full detail</h2><div class="rfilters">${filters}</div>`
+    + (shown.length ? `<div class="rgrid">${shown.map(cardHtml).join("")}</div>`
+       : `<div class="card note">${reports.length ? "No reports in this filter yet." : "No saved reports yet. Run <code>python -m src.eval --save</code> and the card appears here."}${rfilter === "api" ? " Token Factory runs appear once the cloud models have been used." : ""}</div>`)
+    + `<div class="note" style="margin:0 4px 12px">Local = runs made while building, on local stand-in models (or the simulator). Token Factory = runs on the real Nemotron models. The "right tier" for each turn is our own annotation.</div>`;
+}
+function strategyBars(r) {
+  const order = ["always-nano", "router", "always-ultra"];
+  const strat = Object.entries(r.strategies || {}).sort((x, y) => order.indexOf(x[0]) - order.indexOf(y[0]));
+  if (!strat.length) return "";
+  const max = Math.max(...strat.map(([, t]) => t.cost_usd), 1e-9);
+  const color = { "always-nano": "var(--blue)", router: "var(--green)", "always-ultra": "var(--pink)" };
+  return `<h2>Cost vs fit · same conversations, three strategies</h2><div class="card">
+    <table><tr><th>Strategy</th><th style="width:40%">Cost</th><th></th><th>Right tier</th><th>Too small</th><th>Too big</th></tr>
+    ${strat.map(([n, t]) => `<tr><td>${esc(n)}</td><td><div class="pbar"><i style="width:${Math.max(2, 100 * t.cost_usd / max)}%;background:${color[n] || "var(--muted)"}"></i></div></td>
+      <td>${money(t.cost_usd)}</td><td>${t.matched}/${t.graded}</td><td>${t.under}</td><td>${t.over}</td></tr>`).join("")}</table>
+    ${r.simulated ? `<div class="note" style="margin-top:6px">Simulated tokens: compare strategies with each other, not with real bills.</div>` : ""}</div>`;
+}
+function scenarioRows(rows) {
+  return rows.map(s => {
+    const turns = s.turns.map(t => `<tr><td>${esc(t.say)}</td><td>${esc(t.ideal)}</td><td><span class="pill ${esc(t.served)}">${esc(t.served)}</span></td>
+      <td>${t.input_tokens}/${t.output_tokens}</td><td>${money(t.cost_usd)}</td><td>${(t.latency_ms / 1000).toFixed(1)} s</td><td class="reason">${esc(t.reason)}</td></tr>`).join("");
+    const found = s.findings.length ? `<p class="note">Findings: ${s.findings.map(f => `<span class="code">${esc(f.code)}</span> ${esc(f.detail || f.message || "")}`).join(" ")}</p>` : "";
+    return `<tr class="srow" data-srow title="Click to open this scenario"><td>${esc(s.title)}${s.kind === "heldout" ? ' <span class="note">held-out</span>' : ""}</td>${cell(s)}${codes(s)}</tr>
+      <tr class="sdetail" hidden><td colspan="3"><p class="note" style="margin:0 0 6px">${esc(s.why)}</p>
+      <table><tr><th>You said</th><th>Ideal</th><th>Served by</th><th>Tokens in/out</th><th>Cost</th><th>Time</th><th>Why</th></tr>${turns}</table>${found}</td></tr>`;
+  }).join("");
+}
+function scenarioBody(r) {
+  const groups = [["success", "Success"], ["heldout", "Held-out · written after tuning, never edited"], ["failure", r.reader === "nano" ? "Keyword failures, re-run with Nano" : "Failure, with reason codes"], ["false_claim", "False claims"]];
+  const tables = groups.map(([kind, title]) => {
+    const rows = r.scenarios.filter(s => s.kind === kind); if (!rows.length) return "";
+    return `<h2>${title}</h2><div class="card"><table><tr><th>Scenario</th><th>Result</th><th>Codes</th></tr>${scenarioRows(rows)}</table></div>`;
+  }).join("");
+  const st = r.self_test;
+  return strategyBars(r) + tables + `<h2>Injected false claims</h2><div class="card"><b class="${st.caught === st.total ? "ok" : "bad"}">${st.caught}/${st.total} caught</b>
+    <table>${st.cases.map(([n, ok]) => `<tr><td>${esc(n)}</td><td class="${ok ? "ok" : "bad"}">${ok ? "caught" : "missed"}</td></tr>`).join("")}</table></div>`
+    + (r.reader === "nano" ? readerCard() : "");
+}
+function compareBody(c) {
+  const cases = c.results.map(r => `<div class="case"><b>${esc(r.id)}</b> · said ${esc(r.stated)}, does ${esc(r.observed)} · winner: <b>${esc(r.outcome)}</b><div class="note"><q>${esc(r.message)}</q></div>
+    ${Object.entries(r.answers).map(([t, a]) => `<div class="note" style="margin-top:6px"><span class="pill ${esc(t)}">${esc(t)}</span> ${esc(a.model)} · ${a.words} words · ${a.output_tokens} tokens · ${(a.latency_ms / 1000).toFixed(1)} s · ${money(a.cost_usd)}</div><div class="ans">${esc(a.text)}</div>`).join("")}
+    ${r.verdicts.map(v => `<div class="note" style="margin-top:4px">Judge (${esc(v.A)} first): ${esc(v.winner)} · ${esc(v.why)}</div>`).join("")}</div>`).join("");
+  return compareCard(c) + `<h2>Every case</h2><div class="card">${cases}</div>`;
+}
+async function openReport(id) {
+  $("rsheet").innerHTML = `<div class="note">Loading…</div>`; $("rmodal").hidden = false;
+  try {
+    const w = await api("/reports/" + encodeURIComponent(id));
+    $("rsheet").innerHTML = `<div class="rd-head"><div><div class="title">${esc(w.title)}</div>
+        <div class="note"><span class="src ${esc(w.source)}">${SRC[w.source] || esc(w.source)}</span> ${esc(stamp(w.created))} · ${esc(w.description)}</div>
+        <div class="note">${Object.entries(w.models || {}).map(([t, m]) => `${esc(t)}: ${esc(m)}`).join(" · ")}${w.reader ? ` · reader: ${esc(w.reader)}` : ""}</div></div>
+        <button class="btn" data-rclose>Close</button></div>${w.kind === "compare" ? compareBody(w.report) : scenarioBody(w.report)}`;
+  } catch (e) { $("rsheet").innerHTML = `<div class="note bad">${esc(e.message)}</div><button class="btn" data-rclose>Close</button>`; }
+}
+const closeReport = () => { $("rmodal").hidden = true; };
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeReport(); });
+document.addEventListener("click", e => {
+  const card = e.target.closest("[data-report]"), rf = e.target.closest("[data-rf]"), row = e.target.closest("[data-srow]");
+  if (card) openReport(card.dataset.report);
+  else if (rf) { rfilter = rf.dataset.rf; renderEvidence(); }
+  else if (row) { const d = row.nextElementSibling; d.hidden = !d.hidden; }
+  else if (e.target.closest("[data-rclose]") || e.target.id === "rmodal") closeReport();
+  const tile = e.target.closest("[data-go]");
+  if (tile) tile.dataset.go === "reports" ? setView("proof") : showSection(tile.dataset.go);
+});
+
+/* ---------- settings overview: a dashboard that fills the page ---------- */
+const IC = {
+  wallet: '<path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-3v3M16 13.5h2"/>',
+  box: '<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/>',
+  note: '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',
+  shield: '<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+  chip: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  cloud: '<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9.5 4.3 4.3 0 0 1 17.5 18z"/>',
+  laptop: '<rect x="4" y="5" width="16" height="11" rx="2"/><path d="M2 20h20"/>',
+};
+const ico = n => `<svg class="ico" viewBox="0 0 24 24">${IC[n]}</svg>`;
+let noteList = [];
+function renderTiles() {
+  const box = $("tiles"); if (!box) return;
+  const lim = wallet.limit_usd, spent = wallet.spent_usd, pct = lim ? Math.min(100, 100 * spent / lim) : 0;
+  const kept = memory.items.filter(i => i.kept).length;
+  const tiers = health ? Object.entries(health.tiers) : [];
+  const cloud = tiers.filter(([, v]) => v.provider !== "ollama").length;
+  const rep = reports || [];
+  const kpi = (go, icon, k, v, s, accent) => `<button class="kpi ${accent}" data-go="${go}"><span class="ib">${ico(icon)}</span>
+    <span class="kt"><span class="k">${k}</span><span class="v">${v}</span><span class="s">${s}</span></span></button>`;
+  const panel = (go, icon, title, body, more) => `<section class="pn"><header>${ico(icon)}<b>${title}</b>
+    <button class="more" data-go="${go}">${more || "Open"} ${ico("arrow")}</button></header>${body}</section>`;
+  const soon = memory.items.filter(i => !i.kept).sort((a, b) => a.days_left - b.days_left).slice(0, 3);
+  box.innerHTML = `
+    <div class="idstrip">${ico("user")}<span class="note">Session</span><code>${esc(user)}</code>
+      <button class="more" data-go="profile">Manage ${ico("arrow")}</button></div>
+    <div class="kpis">
+      ${kpi("budget", "wallet", "Budget", lim ? usd(Math.max(0, lim - spent)) : "No limit", lim ? `left of ${usd(lim)}` : `${usd(spent)} spent so far`, lim && pct > 75 ? "amber" : "green")}
+      ${kpi("memory", "box", "Memory", memory.items.length, `${kept} kept · rest delete after ${days(memory.retention_days)}`, "blue")}
+      ${kpi("notes", "note", "Notes", noteCount, "learned about you, zero tokens", "green")}
+      ${kpi("reports", "shield", "Reports", rep.length, `${rep.filter(r => r.source === "local").length} local · ${rep.filter(r => r.source === "api").length} Token Factory`, "pink")}
+    </div>
+    <div class="pgrid">
+      ${panel("models", "chip", "Models", tiers.length ? tiers.map(([t, v]) => `<div class="mrow"><span class="pill ${t}">${t}</span><span class="mn">${esc(v.model)}</span>
+          <span class="where">${ico(v.provider === "ollama" ? "laptop" : "cloud")}${v.provider === "ollama" ? "this computer" : "Token Factory"}</span>
+          <span class="think ${v.reasoning === "off" ? "off" : "on"}">${v.reasoning === "off" ? "thinking off" : "thinking on"}</span></div>`).join("")
+          + `<p class="note" style="margin:8px 0 0">${cloud ? `${cloud} of ${tiers.length} tiers use the cloud: those calls spend credits.` : "All local: no cloud calls, no credits used."}</p>` : `<p class="note">Server not reachable.</p>`)}
+      ${panel("budget", "wallet", "Budget", lim
+        ? `<div class="gauge"><i style="width:${pct}%" class="${pct > 75 ? "hot" : ""}"></i></div><div class="gl"><span>${usd(spent)} spent</span><span>${usd(Math.max(0, lim - spent))} left</span></div>
+           <p class="note" style="margin:8px 0 0">A simulated wallet: the router plans every answer inside it.</p>`
+        : `<p class="note">No limit set. Add one and the router plans every answer within it.</p>`, "Set limit")}
+      ${panel("notes", "note", "Latest notes", noteList.length ? noteList.slice(0, 4).map(x => `<div class="lrow"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><span>${esc(x.text)}</span></div>`).join("")
+        : `<p class="note">Nothing yet. Notes appear as it learns how you like answers.</p>`)}
+      ${panel("memory", "box", "Next to be deleted", soon.length ? soon.map(i => `<div class="lrow"><span class="tag ${i.days_left <= 3 ? "soon" : "later"}">${days(i.days_left)}</span><span>${esc(i.title)}</span></div>`).join("")
+        : `<p class="note">${memory.items.length ? "Everything saved is kept." : "No saved chats. Press ＋ New chat to save one here."}</p>`)}
+      ${panel("reports", "shield", "Latest reports", rep.length ? rep.slice(0, 3).map(r => `<div class="lrow"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span><span>${esc(r.title)} · <b>${esc(r.headline)}</b></span></div>`).join("")
+        : `<p class="note">No saved reports yet.</p>`, "See all")}
+      ${panel("about", "info", "How it works", `<p class="note" style="margin:0">It keeps two profiles: what you <b>say</b> you prefer and what you <b>do</b>. When they clash it uses a stronger model and tells you why.</p>`, "Read more")}
+    </div>`;
+}
+
+/* ---------- memory: past conversations (10 days unless kept) ---------- */
+const days = d => d < 1 ? `${Math.max(1, Math.round(d * 24))} h` : `${Math.round(d)} day${Math.round(d) === 1 ? "" : "s"}`;
+const kb = b => b < 1024 ? b + " B" : (b / 1024).toFixed(1) + " KB";
+let memory = { items: [], reminders: [], retention_days: 10 };
+async function loadMemory() {
+  const mine = gen;
+  try { const m = await api("/memory/" + encodeURIComponent(user)); if (mine !== gen) return; memory = m; }
+  catch (e) { $("mem-list").innerHTML = `<div class="card note bad">${esc(e.message)}</div>`; return; }
+  renderMemory(); remindMaybe(); renderTiles();
+}
+function renderMemory() {
+  $("mem-intro").innerHTML = `Each <b>＋ New chat</b> saves the conversation before it here, compressed. It's deleted after ${days(memory.retention_days)}
+    unless you press <b>Keep</b>: the file and the message text both go (only routing numbers like tier and score stay).
+    Reminders come from dates, not from an AI call, so they cost no tokens.`;
+  const kept = memory.items.filter(i => i.kept).length, soon = memory.items.filter(i => !i.kept && i.days_left <= 3).length;
+  $("mem-stats").innerHTML = [["box", "Saved", memory.items.length, "blue"], ["shield", "Kept", kept, "green"], ["note", "Deleting within 3 days", soon, soon ? "amber" : "green"]]
+    .map(([ic, k, v, a]) => `<div class="kpi ${a}" style="cursor:default"><span class="ib">${ico(ic)}</span><span class="kt"><span class="k">${k}</span><span class="v">${v}</span></span></div>`).join("");
+  $("mem-list").innerHTML = memory.items.length ? memory.items.map(i => {
+    const when = new Date(i.archived_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+    const status = i.kept ? `<span class="tag kept">kept</span>`
+      : `<span class="tag ${i.days_left <= 3 ? "soon" : "later"}">deletes in ${days(i.days_left)}</span>`;
+    return `<div class="card" data-mem="${Number(i.id)}"><div class="mem"><div class="main">
+        <div class="title">${esc(i.title)}${status}</div>
+        <div class="note">${esc(when)} · ${i.turns} message${i.turns === 1 ? "" : "s"} · ${kb(i.bytes)} compressed</div></div>
+      <div class="acts2">
+        <button class="btn ${i.kept ? "ghost" : "primary"}" data-keep="${i.kept ? 0 : 1}">${i.kept ? "Unkeep" : "Keep"}</button>
+        <button class="btn" data-open>Open</button>
+        <a class="btn" href="/memory/${encodeURIComponent(user)}/${Number(i.id)}/download" download style="text-decoration:none">Download</a>
+        <button class="btn ghost" data-del>Delete</button></div></div></div>`;
+  }).join("") : `<div class="card note">Nothing here yet. Press <b>＋ New chat</b> and the conversation you leave is saved here.</div>`;
+}
+// "At times": at most once a day per session, only when something is about to be deleted.
+function remindMaybe() {
+  const due = memory.reminders || [], box = $("remind");
+  if (!due.length || store.get("dr-remind-" + user) === new Date().toDateString()) { box.innerHTML = ""; return; }
+  const soonest = Math.min(...due.map(i => i.days_left));
+  box.innerHTML = `<div class="ask"><span class="t">📦 ${due.length} past conversation${due.length === 1 ? "" : "s"} will be deleted in ${days(soonest)} unless you keep ${due.length === 1 ? "it" : "them"}.</span>
+    <button class="btn primary" data-goto="memory">Review in Memory</button><button class="btn ghost" data-remind-later>Not now</button></div>`;
+}
+async function newChat() {
+  if (busy) return;
+  const btn = $("newchat"); btn.disabled = true;
+  try {
+    const r = await api("/conversations/new", { user_id: user });
+    $("undo").innerHTML = ""; thread.innerHTML = "";
+    if (!LAYOUTS[view].a.includes("chatBlock")) setView("chat");
+    if (r.archived) add(`📦 Saved “${esc(r.archived.title)}” to Memory. It's deleted in ${days(r.archived.days_left)} unless you keep it.
+      <a href="#" data-keep-id="${Number(r.archived.id)}">Keep it</a> · <a href="#" data-goto="memory">Open Memory</a>`, "note-line");
+    else emptyState();
+    await refresh(); loadMemory();
+  } catch (e) { add(esc(e.message), "note-line err"); }
+  finally { btn.disabled = false; }
+}
+async function memoryAction(e) {
+  const card = e.target.closest("[data-mem]");
+  const keepLink = e.target.closest("[data-keep-id]");
+  if (keepLink) {
+    e.preventDefault();
+    await api("/memory/keep", { user_id: user, conversation_id: Number(keepLink.dataset.keepId), kept: true });
+    keepLink.replaceWith(Object.assign(document.createElement("b"), { textContent: "Kept ✓" }));
+    return loadMemory();
+  }
+  if (e.target.closest("[data-remind-later]")) { store.set("dr-remind-" + user, new Date().toDateString()); $("remind").innerHTML = ""; return; }
+  if (!card) return;
+  const id = Number(card.dataset.mem);
+  const keep = e.target.closest("[data-keep]");
+  if (keep) { await api("/memory/keep", { user_id: user, conversation_id: id, kept: keep.dataset.keep === "1" }); return loadMemory(); }
+  if (e.target.closest("[data-del]")) {
+    if (!confirm("Delete this conversation now? The file and the message text are erased; this can't be undone.")) return;
+    const res = await fetch(`/memory/${encodeURIComponent(user)}/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Delete failed (" + res.status + ")");
+    return loadMemory();
+  }
+  if (e.target.closest("[data-open]")) {
+    const open = card.querySelector(".transcript");
+    if (open) { open.remove(); return; }
+    const t = await api(`/memory/${encodeURIComponent(user)}/${id}`);
+    card.insertAdjacentHTML("beforeend", `<div class="transcript">${t.turns.map(x =>
+      `<div class="q">You: ${esc(x.user_message)}</div><div class="a"><span class="pill ${esc(x.model_used)}">${esc(x.model_used)}</span> ${esc(x.agent_response || "(no answer)")}</div>`).join("")}</div>`);
+  }
+}
+
+/* ---------- note bot: zero-token notes ---------- */
+const NOTE_ICONS = { said: "🗣", learned: "👀", faded: "🍂", contradiction: "⚡", accepted: "✅", feedback: "👎", routing: "↗", budget: "💰", memory: "📦" };
+const when = ts => { if (!ts) return ""; const d = new Date(/[zZ]|[+-]\d\d:\d\d$/.test(ts) ? ts : ts.replace(" ", "T") + "Z");
+  return d.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }); };
+async function loadNotes(seen) {
+  const mine = gen;
+  let n;
+  try { n = await api("/notes/" + encodeURIComponent(user)); } catch (e) { return; }
+  if (mine !== gen) return;
+  const key = "dr-notes-seen-" + user;
+  if (seen) store.set(key, String(n.count));
+  const fresh = n.count - Number(store.get(key) || 0);
+  noteCount = n.count; noteList = n.notes; renderTiles();
+  $("nb-badge").hidden = fresh <= 0; $("nb-badge").textContent = fresh > 9 ? "9+" : fresh;
+  $("notes-summary").innerHTML = n.summary.map(l => `<p style="margin:4px 0">${esc(l)}</p>`).join("");
+  $("notes-list").innerHTML = n.notes.length
+    ? n.notes.map(x => `<div class="notes-row"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><time>${esc(when(x.at))}</time><span>${esc(x.text)}</span></div>`).join("")
+    : `<div class="note">No notes yet. They appear as you set preferences, ask for things, and react to answers.</div>`;
+}
+
+/* ---------- layout ---------- */
+// `top`: show the evaluation banner and stat cards. The chat view stays clean (one meter line).
+const LAYOUTS = {
+  chat:     { cols: "1.3fr 1fr", a: ["chatBlock"], b: ["mirrorBlock", "storyBlock"], top: false },
+  both:     { cols: "1fr 1.2fr", a: ["chatBlock"], b: ["storyBlock", "evidenceBlock"], top: true },
+  proof:    { cols: "1fr 1.2fr", a: ["storyBlock", "mirrorBlock"], b: ["evidenceBlock"], top: true },
+  settings: { cols: "1fr", a: ["settingsBlock"], b: [], top: false },
+};
+const BLOCKS = Object.fromEntries(["chatBlock", "mirrorBlock", "storyBlock", "evidenceBlock", "settingsBlock"].map(id => [id, $(id)]));
+// Settings is a mode: the sidebar's View section is replaced by these sections, one shown at a time.
+const SECTIONS = { overview: "Overview", profile: "Profile", budget: "Budget · simulated wallet", models: "Models", memory: "Memory · past conversations", notes: "Notes · what I've learned", about: "About" };
+let view = "chat", lastMain = "chat", section = "overview";
+function setView(v, sec) {
+  if (v === "memory" || SECTIONS[v]) { sec = SECTIONS[v] ? v : "memory"; v = "settings"; }   // old links: "memory" or a section name
+  if (!LAYOUTS[v]) v = "chat";
+  if (v !== "settings") lastMain = v;          // remember where "close settings" should return to
+  if (sec && SECTIONS[sec]) section = sec;
+  const l = LAYOUTS[v]; view = v; $("main").style.gridTemplateColumns = l.cols;
+  $("parking").append(...Object.values(BLOCKS));
+  for (const [col, ids] of [["colA", l.a], ["colB", l.b]]) {
+    $(col).replaceChildren(...ids.map(id => BLOCKS[id])); $(col).classList.toggle("fit", ids.includes("chatBlock"));
+    $(col).hidden = !ids.length;
+  }
+  $("top").hidden = !l.top;
+  const inSettings = v === "settings";
+  $("nav-main").hidden = inSettings; $("nav-settings").hidden = !inSettings;
+  document.querySelectorAll("#nav-main [data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  $("gear").classList.toggle("on", inSettings);
+  $("gear-label").innerHTML = inSettings ? "Close settings<small>back to the main page</small>" : "Settings<small>profile, budget, memory</small>";
+  $("gear").title = inSettings ? "Close settings" : "Settings";
+  if (inSettings) showSection(section);
+  store.set("dr-view", v === "settings" ? lastMain : v); thread.scrollTop = thread.scrollHeight;
+}
+function showSection(sec) {
+  section = sec;
+  document.querySelectorAll("#settingsBlock [data-panel]").forEach(p => p.hidden = p.dataset.panel !== sec);
+  document.querySelectorAll("#nav-settings [data-sec]").forEach(b => b.classList.toggle("on", b.dataset.sec === sec));
+  $("sec-title").textContent = SECTIONS[sec];
+  if (sec === "overview") renderTiles();
+  if (sec === "memory") loadMemory();
+  if (sec === "notes") loadNotes(true);
+  if (sec === "budget") loadBudget();
+  store.set("dr-section", sec);
+}
+// The gear opens Settings, and closes it again (back to wherever you were).
+function toggleSettings() { view === "settings" ? setView(lastMain) : setView("settings", section); }
+function setCollapsed(on) {
+  $("shell").classList.toggle("collapsed", on);
+  $("collapse").textContent = on ? "›" : "‹";
+  $("collapse").title = $("collapse").ariaLabel = on ? "Expand the sidebar" : "Collapse the sidebar";
+  store.set("dr-collapsed", on ? "1" : "0");
+}
+// Click a decision: show the chat and scroll to the message that started it.
+function jumpTo(id) {
+  if (!LAYOUTS[view].a.includes("chatBlock")) setView("chat");
+  const el = thread.querySelector(`.msg.you[data-id="${Number(id)}"]`);
+  if (!el) return;
+  el.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+}
+function renderSettings() {
+  if (!health) { $("models").innerHTML = `<div class="pn note">The server didn't answer.</div>`; return; }
+  const roles = { nano: "Fast and cheap: handles most answers.", super: "Balanced: a first contradiction or a tight budget.", ultra: "Deep reasoning: strong or repeated contradictions." };
+  const tiers = Object.entries(health.tiers), local = tiers.every(([, v]) => v.provider === "ollama");
+  $("models").innerHTML = `<div class="tiercards">${tiers.map(([t, v]) => `<div class="tiercard ${esc(t)}"><span class="pill ${esc(t)}" style="align-self:flex-start">${esc(t)}</span>
+      <div class="mn">${esc(v.model)}</div><div class="role">${esc(roles[t] || "")}</div>
+      <div class="row">${ico(v.provider === "ollama" ? "laptop" : "cloud")}${v.provider === "ollama" ? "Runs on this computer (Ollama)" : "Nebius Token Factory"}</div>
+      <div class="row">${ico("chip")}Thinking ${v.reasoning === "off" ? "off" : "on"}</div></div>`).join("")}</div>
+    <section class="pn"><header>${ico("note")}<b>Signal reader</b></header><p class="note" style="margin:0"><b>${esc(health.signal_reader)}</b>${health.signal_reader === "nano" ? ": Nemotron Nano reads each message with thinking off, keywords as the fallback." : ": keyword matching, no model call."}
+      ${local ? "All models run locally: no cloud calls, no credits used." : "Some tiers use the cloud: those calls spend credits."}</p></section>`;
+}
+
+/* ---------- boot and events ---------- */
+async function load() {
+  $("user").value = user; $("undo").innerHTML = "";
+  const mine = gen, list = await refresh();
+  if (mine !== gen) return;                        // a newer user switch already took over
+  loadMemory();                                    // also decides whether to remind about expiring chats
+  thread.innerHTML = "";
+  if (!list.length) return emptyState();
+  const chrono = [...list].reverse();              // replay the saved conversation, oldest first
+  chrono.forEach((d, i) => {
+    add(esc(d.user_message), "msg you").dataset.id = d.id;
+    if (d.agent_response) add(botHtml({ model_chosen: d.model_used, routing_reason: d.routing_reason, response: d.agent_response, unverified_sources: d.unverified_sources },
+                                      d.id, d.feedback, i === chrono.length - 1), "msg");
+  });
+}
+function setUser(id) {
+  user = id; store.set("dr-user", id); gen++;
+  Object.assign(session, { calls: 0, inp: 0, out: 0, cost: 0, ultraCost: 0, tps: [], ttft: [], think: 0, reads: 0, readCost: 0 });
+  accuracy = []; loadBudget();
+  return load();
+}
+async function playDemo() {
+  if (busy) return;
+  const btn = $("demo"); btn.disabled = true; btn.textContent = "Playing…";
+  try {
+    setView("chat");
+    await setUser(newId());
+    renderMirror(await api("/update-style", { user_id: user, dimension: "length", value: "concise" }));
+    thread.innerHTML = "";
+    add("Demo: you said you prefer <b>concise</b> answers (the ring on Length). Now you keep asking for detail…", "note-line");
+    await send("Explain attention in transformers, in more detail please");
+    await send("Can you elaborate on the softmax step?");
+    add("That's the contradiction: you said concise, you keep asking for detail. Accept the suggestion below, or use 👍 / 👎 on an answer: what you do counts too.", "note-line");
+  } catch (e) { add(esc(e.message), "note-line err"); }
+  finally { btn.disabled = false; btn.textContent = "▶ Play the demo"; }
+}
+const grow = () => { const t = $("input"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 160) + "px"; };
+$("form").addEventListener("submit", e => {
+  e.preventDefault();
+  if (busy) return;                                // keep the text until the current answer is in
+  const t = $("input").value; $("input").value = ""; grow(); send(t);
+});
+$("input").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("form").requestSubmit(); } });
+$("input").addEventListener("input", grow);
+$("user").addEventListener("change", e => { const v = e.target.value.trim(); if (/^[\w.-]{1,64}$/.test(v)) setUser(v); else e.target.value = user; });
+$("fresh").addEventListener("click", () => setUser(newId()));
+$("demo").addEventListener("click", playDemo);
+document.querySelectorAll("#nav-main [data-v]").forEach(b => b.addEventListener("click", () => setView(b.dataset.v)));
+document.querySelectorAll("#nav-settings [data-sec]").forEach(b => b.addEventListener("click", () => showSection(b.dataset.sec)));
+$("gear").addEventListener("click", toggleSettings);
+$("home").addEventListener("click", () => setView("chat"));            // the title always goes home, to the main chat page
+$("collapse").addEventListener("click", () => setCollapsed(!$("shell").classList.contains("collapsed")));
+$("newchat").addEventListener("click", newChat);
+$("notebot").addEventListener("click", () => setView("notes"));
+document.addEventListener("click", e => memoryAction(e).catch(err => add(esc(err.message), "note-line err")));
+$("budget-save").addEventListener("click", () => saveBudget(false).catch(e => $("budget-view").innerHTML = `<div class="note bad">${esc(e.message)}</div>`));
+document.querySelectorAll("[data-preset]").forEach(b => b.addEventListener("click", () => { $("budget-limit").value = b.dataset.preset; saveBudget(false).catch(e => $("budget-view").innerHTML = `<div class="note bad">${esc(e.message)}</div>`); }));
+$("budget-reset").addEventListener("click", () => { accuracy = []; saveBudget(true).catch(e => $("budget-view").innerHTML = `<div class="note bad">${esc(e.message)}</div>`); });
+$("budget-limit").addEventListener("keydown", e => { if (e.key === "Enter") $("budget-save").click(); });
+document.addEventListener("click", e => { const go = e.target.closest("[data-goto]"); if (go) { e.preventDefault(); setView(go.dataset.goto); } });
+$("side-log").addEventListener("click", e => { const run = e.target.closest("[data-jump]"); if (run) jumpTo(run.dataset.jump); });
+
+async function sendFeedback(acts, kind, reason) {
+  const r = await api("/feedback", { user_id: user, interaction_id: Number(acts.dataset.id), kind, reason: reason || "" });
+  renderMirror(r); noteUpdates(r.observed_updates); refresh();
+}
+
+document.addEventListener("click", async e => {
+  if (e.target.closest("#forget")) {
+    try { $("undo").innerHTML = ""; renderMirror(await api("/forget-observed/" + encodeURIComponent(user), {})); refresh(); }
+    catch (err) { $("reason").textContent = err.message; }
+    return;
+  }
+  const pole = e.target.closest(".pole");
+  if (pole) {
+    try { $("undo").innerHTML = ""; renderMirror(await api("/update-style", { user_id: user, dimension: pole.dataset.dim, value: pole.dataset.value })); loadNotes(false); }
+    catch (err) { $("reason").textContent = err.message; }
+    return;
+  }
+  const acts = e.target.closest(".acts");
+  const fb = e.target.closest("[data-fb]"), why = e.target.closest("[data-reason]");
+  if (acts && fb && fb.dataset.fb === "up") {
+    try { await sendFeedback(acts, "up"); acts.querySelectorAll("[data-fb]").forEach(b => b.classList.toggle("on", b === fb)); acts.querySelector(".reasons")?.remove(); }
+    catch (err) { add(esc(err.message), "note-line err"); }
+    return;
+  }
+  if (acts && fb && fb.dataset.fb === "down") {      // ask why: the reason is what makes the click useful evidence
+    const open = acts.querySelector(".reasons");
+    if (open) { open.remove(); return; }
+    acts.insertAdjacentHTML("beforeend", `<div class="reasons" style="flex-basis:100%">${REASONS.map(([k, l]) => `<button class="act" data-reason="${k}">${l}</button>`).join("")}</div>`);
+    return;
+  }
+  if (acts && why) {
+    try {
+      await sendFeedback(acts, "down", why.dataset.reason);
+      acts.querySelectorAll("[data-fb]").forEach(b => b.classList.toggle("on", b.dataset.fb === "down"));
+      acts.querySelector(".reasons")?.remove();
+      acts.querySelectorAll(".acts > .note").forEach(n => n.remove());
+      acts.insertAdjacentHTML("beforeend", `<span class="note">${esc(REASON_LABEL[why.dataset.reason])}</span>`);
+    } catch (err) { add(esc(err.message), "note-line err"); }
+    return;
+  }
+  const copy = e.target.closest("[data-copy]");
+  if (acts && copy) {
+    try { await navigator.clipboard.writeText(acts.parentElement.querySelector(".body").innerText); } catch (err) {}
+    copy.textContent = "Copied";
+    try { await sendFeedback(acts, "copy"); } catch (err) { add(esc(err.message), "note-line err"); }
+    return;
+  }
+  const regen = e.target.closest("[data-regen]");
+  if (regen) {
+    if (busy) return;
+    const msg = regen.closest(".msg"), mine = gen; busy = true; $("send").disabled = true; regen.disabled = true; regen.textContent = "Trying again…";
+    try {
+      const r = await api("/regenerate", { user_id: user });
+      if (mine !== gen) return;
+      msg.innerHTML = botHtml(r, r.interaction_id, [{ kind: "regenerate" }], true);
+      countStats(r); noteUpdates(r.observed_updates);
+    } catch (err) { regen.disabled = false; regen.textContent = "↻ Try again"; add(esc(err.message), "note-line err"); }
+    finally { busy = false; $("send").disabled = false; if (mine === gen) refresh(); }
+    return;
+  }
+  const accept = e.target.closest("[data-accept]");
+  if (accept) {
+    // The confirmation goes in #undo: #suggest is redrawn by renderMirror and would wipe it.
+    const dim = accept.dataset.accept; accept.disabled = true;
+    try {
+      const p = await api("/accept", { user_id: user, dimension: dim });
+      $("undo").innerHTML = `<div class="ask"><span class="t">Updated. Your ${esc(dim)} preference is now <b>${esc(p.stated_profile[dim])}</b>.</span>
+        <button class="btn ghost" data-undo="${esc(dim)}" data-previous="${esc(p.previous)}">Undo</button></div>`;
+      renderMirror(p); refresh();
+    } catch (err) { accept.disabled = false; add(esc(err.message), "note-line err"); }
+    return;
+  }
+  const undo = e.target.closest("[data-undo]");
+  if (undo) {
+    const dim = undo.dataset.undo, previous = undo.dataset.previous; undo.disabled = true;
+    try {
+      const p = await api("/update-style", { user_id: user, dimension: dim, value: previous });
+      $("undo").innerHTML = `<div class="ask"><span class="t">Undone. Your ${esc(dim)} preference is back to <b>${esc(previous === "balanced" ? "no preference" : previous)}</b>.</span></div>`;
+      renderMirror(p); refresh();
+    } catch (err) { undo.disabled = false; add(esc(err.message), "note-line err"); }
+  }
+});
+
+// /?view=chat|both|proof opens a given view (handy for linking someone straight to the proof)
+const wanted = new URLSearchParams(location.search).get("view") || store.get("dr-view");
+const first = LAYOUTS[wanted] || SECTIONS[wanted] || wanted === "memory" ? wanted : "chat";
+setView(first, SECTIONS[store.get("dr-section")] ? store.get("dr-section") : "overview");
+setCollapsed(store.get("dr-collapsed") === "1");
+renderStats();
+(async () => {
+  const [p, h, rp] = await Promise.all([api("/proof").catch(() => null), api("/health").catch(() => null), api("/reports").catch(() => null)]);
+  proof = p; health = h; reports = rp && rp.reports;
+  if (h && h.public_demo) {                        // public link: private random ids, no typing someone else's
+    $("user").readOnly = true; $("public-note").hidden = false;
+    if (user.length < 12) { user = newId(); store.set("dr-user", user); }
+  }
+  renderSettings(); renderTiles(); loadBudget(); loadMemory(); loadNotes(false);
+  load();
+  try { renderBanner(); renderEvidence(); }
+  catch (e) { $("banner").className = "banner amber"; $("banner").innerHTML = `<b class="warn">The evaluation report couldn't be read</b><span class="m">${esc(e.message)}</span>`; }
+  $("status").textContent = h ? "● online" : "● backend unreachable"; $("status").className = "pill " + (h ? "ok" : "bad");
+})();
+</script>
+</body>
+</html>

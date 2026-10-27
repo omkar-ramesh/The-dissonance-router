@@ -55,6 +55,9 @@ class Scenarios:
              "Ultra's job is to serve both sides of the contradiction: a one-line TL;DR for the 'concise' "
              "preference, then the depth the user keeps asking for. Checks the Ultra answer from the step above.",
              self.tldr),
+            ("live::quick_message_stays_nano", "A quick 'thanks' stays on Nano while the conflict is open",
+             "Guideline 4: a thank-you has no style choices to make, so it should not cost an Ultra call even "
+             "though the length contradiction is still open.", self.quick),
             ("live::accepting_returns_nano", "Accepting the suggestion returns to Nano",
              "Once the user accepts 'update my preference to detailed', the contradiction is resolved and "
              "the next request should go back to Nano.", self.accepts),
@@ -112,6 +115,15 @@ class Scenarios:
         ok = bool(TLDR_RE.match(text))
         detail = ("starts with TL;DR: " if ok else "did not lead with TL;DR: ") + _snippet(text, 160)
         return ok, detail, None
+
+    def quick(self):
+        r = self._ask("conflict", "thanks!")
+        problems = []
+        if r["model_chosen"] != "nano":
+            problems.append(f"expected nano for a quick message, got {r['model_chosen']}")
+        if not r["suggestion"]:
+            problems.append("the open conflict's suggestion disappeared")
+        return self._verdict(problems, "quick message stayed on nano; the conflict is still open", r)
 
     def accepts(self):
         self.agent.accept_observed("conflict", "length")
