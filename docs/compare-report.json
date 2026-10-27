@@ -1,0 +1,334 @@
+{
+ "contestants": [
+  "nano",
+  "ultra"
+ ],
+ "judge": "super",
+ "models": {
+  "nano": "nemotron-3-nano:4b",
+  "ultra": "deepseek-r1:32b",
+  "super": "nemotron-3-nano:30b"
+ },
+ "simulated": false,
+ "wins": {
+  "nano": 1,
+  "ultra": 2
+ },
+ "ties": 3,
+ "invalid": 0,
+ "cases": 6,
+ "avg": {
+  "nano": {
+   "cost_usd": 3.7e-05,
+   "latency_ms": 2469.5,
+   "output_tokens": 100.666667,
+   "words": 71.833333
+  },
+  "ultra": {
+   "cost_usd": 0.002129,
+   "latency_ms": 25573.666667,
+   "output_tokens": 650.833333,
+   "words": 187.333333
+  }
+ },
+ "tldr_on_length_cases": {
+  "nano": "2/2",
+  "ultra": "2/2"
+ },
+ "unbacked_sources": {
+  "nano": 0,
+  "ultra": 0
+ },
+ "cost_ratio": 58.2,
+ "verdict": "Mixed: Ultra won slightly more often, not clearly enough to justify its cost on its own.",
+ "results": [
+  {
+   "id": "gradient_descent",
+   "dimension": "length",
+   "stated": "concise",
+   "observed": "detailed",
+   "message": "Can you elaborate on how gradient descent finds a minimum?",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "TL;DR: Gradient descent finds a minimum by iteratively moving opposite to the steepest slope of the loss function to reach the lowest value.  \n\nIt starts at a point in parameter space, computes the gradient (a vector of partial derivatives) to see which direction the loss is increasing fastest, then takes a small step in the opposite direction. The step size is controlled by a learning rate, balan",
+     "latency_ms": 395,
+     "output_tokens": 114,
+     "reasoning_tokens": 0,
+     "cost_usd": 4.218e-05,
+     "opens_with_tldr": true,
+     "words": 90,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\nTL;DR: Gradient descent finds a minimum by iteratively adjusting parameters in the direction of the negative gradient of the loss function, guided by a learning rate, until convergence.\n\nGradient descent is an optimization algorithm that minimizes a function by iteratively moving towards the minimum. It begins with an initial guess for the parameters and calculates the gradient, which indicates ",
+     "latency_ms": 43243,
+     "output_tokens": 1020,
+     "reasoning_tokens": 885,
+     "cost_usd": 0.003274,
+     "opens_with_tldr": true,
+     "words": 270,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "nano",
+     "why": "B gives a concise TL;DR first, then a clear, correct explanation that matches the user's hidden need for depth without overwhelming them."
+    },
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "nano",
+     "why": "Answer A gives a concise TL;DR first, then adds just enough detail about gradient, learning rate, and convergence without extra fluff, matching the user's need for brevity and depth."
+    }
+   ],
+   "outcome": "nano"
+  },
+  {
+   "id": "hash_collisions",
+   "dimension": "length",
+   "stated": "concise",
+   "observed": "detailed",
+   "message": "Go deeper on how a hash map handles collisions",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "TL;DR: A hash map handles collisions by using strategies like chaining or open addressing to resolve when multiple keys map to the same index.  \n\nThe hash function converts a key into an index within the array. When two keys produce the same index (a collision), chaining stores both values in a linked list at that index, so lookups traverse the list. Open addressing stores alternative values in ot",
+     "latency_ms": 3119,
+     "output_tokens": 118,
+     "reasoning_tokens": 0,
+     "cost_usd": 4.302e-05,
+     "opens_with_tldr": true,
+     "words": 94,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\nTL;DR: A hash map handles collisions by using techniques like separate chaining or open addressing to store and retrieve key-value pairs when different keys hash to the same index.\n\nHash maps (or hash tables) are data structures that store key-value pairs, where each key is hashed to an index using a hash function. Collisions occur when different keys produce the same hash index. To resolve coll",
+     "latency_ms": 29767,
+     "output_tokens": 975,
+     "reasoning_tokens": 504,
+     "cost_usd": 0.003138,
+     "opens_with_tldr": true,
+     "words": 432,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "ultra",
+     "why": "B gives a concise TL;DR followed by a clear, correct, fact\u2011based explanation of collision handling without inventing sources."
+    },
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "nano",
+     "why": "B gives a concise TL;DR followed by a clear, correct explanation of collision handling without extra detail, matching the user\u2019s preference for brevity while still providing depth."
+    }
+   ],
+   "outcome": "inconsistent"
+  },
+  {
+   "id": "rest_api",
+   "dimension": "tone",
+   "stated": "formal",
+   "observed": "casual",
+   "message": "explain what a REST API is",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "A REST API is a way for apps to talk to each other over the web using standard web methods like GET, POST, PUT, and DELETE.",
+     "latency_ms": 2845,
+     "output_tokens": 31,
+     "reasoning_tokens": 0,
+     "cost_usd": 1.8299999999999998e-05,
+     "opens_with_tldr": false,
+     "words": 26,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\nA REST API is a method that enables different software systems to communicate using standard web protocols and HTTP methods. It allows systems to request and manipulate data efficiently by representing resources through URLs and using actions like GET, POST, PUT, and DELETE. REST APIs are characterized by statelessness, meaning each request contains all necessary information, and support caching",
+     "latency_ms": 22071,
+     "output_tokens": 462,
+     "reasoning_tokens": 480,
+     "cost_usd": 0.001539,
+     "opens_with_tldr": false,
+     "words": 73,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "ultra",
+     "why": "Answer A provides a more thorough, formal explanation that aligns with the user's preference for a formal tone while remaining accurate and concise."
+    },
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "ultra",
+     "why": "B provides a more detailed, formal explanation that aligns with the user's preference for a formal tone while remaining accurate and concise."
+    }
+   ],
+   "outcome": "ultra"
+  },
+  {
+   "id": "venv_setup",
+   "dimension": "structure",
+   "stated": "paragraph",
+   "observed": "bullet",
+   "message": "How do I set up a Python virtual environment?",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "Setting up a Python virtual environment is a quick way to keep your project dependencies isolated from your global Python installation. This ensures that the libraries you install for one project don\u2019t interfere with another project's libraries.\n\n- Decide on a folder for your project.  \n- Open a terminal in that folder.  \n- Run `python -m venv myenv` to create the environment named myenv.  \n- Acti",
+     "latency_ms": 2974,
+     "output_tokens": 171,
+     "reasoning_tokens": 0,
+     "cost_usd": 5.214e-05,
+     "opens_with_tldr": false,
+     "words": 108,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\nSetting up a Python virtual environment is a great way to isolate project dependencies and avoid conflicts between different projects. Here\u2019s how you can do it:\n\n1. **Install the virtual environment package (if not already installed):**\n   - For Python 3, run: `python -m pip install --user virtualenv`\n\n2. **Create a new virtual environment:**\n   - Navigate to your project directory.\n   - Run: `p",
+     "latency_ms": 16935,
+     "output_tokens": 415,
+     "reasoning_tokens": 262,
+     "cost_usd": 0.001401,
+     "opens_with_tldr": false,
+     "words": 119,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "ultra",
+     "why": "B uses concise paragraphs and numbered steps that align with the user's preference for bullet\u2011style lists, while A relies solely on bullet points and omits the initial explanatory paragraph."
+    },
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "nano",
+     "why": "B uses concise bullet points for steps while still providing a brief introductory paragraph, matching the user's preference for bullet points and delivering clear, correct instructions without extra fluff."
+    }
+   ],
+   "outcome": "inconsistent"
+  },
+  {
+   "id": "crisis_2008",
+   "dimension": "sourcing",
+   "stated": "minimal",
+   "observed": "full",
+   "message": "Why did the 2008 financial crisis happen?",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "The 2008 financial crisis was triggered by a combination of risky lending practices, excessive leverage, and failing oversight by regulatory bodies.\n\n- Credit default swap (CDS) markets amplified losses when securities-backed loans defaulted, spreading risk widely.  \n- Complex financial instruments obscured true exposure to risk.  \n- Regulatory failures allowed unchecked speculation and inadequate",
+     "latency_ms": 2835,
+     "output_tokens": 117,
+     "reasoning_tokens": 0,
+     "cost_usd": 3.936e-05,
+     "opens_with_tldr": false,
+     "words": 75,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\nThe 2008 financial crisis was the result of several interrelated factors:\n\n1. **Subprime Mortgages**: Banks issued loans to high-risk borrowers, leading to widespread defaults when housing prices fell.\n\n2. **Housing Bubble**: Rising housing prices led to overinvestment and speculation, which collapsed, causing significant financial losses.\n\n3. **Shadow Banking**: Unregulated financial institutio",
+     "latency_ms": 20028,
+     "output_tokens": 635,
+     "reasoning_tokens": 549,
+     "cost_usd": 0.002063,
+     "opens_with_tldr": false,
+     "words": 138,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "nano",
+     "why": "Answer A provides concise, accurate explanations with verifiable sources and avoids invented citations, matching the user's need for factual, sourced content."
+    },
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "ultra",
+     "why": "Answer A provides a clear, fact\u2011based explanation with a complete list of sources at the end, matching the user\u2019s hidden need for verifiable references while keeping the main response concise and source\u2011free."
+    }
+   ],
+   "outcome": "inconsistent"
+  },
+  {
+   "id": "shop_name",
+   "dimension": "revision",
+   "stated": "accepts",
+   "observed": "rejects",
+   "message": "Suggest a name for a coffee shop that also sells books",
+   "answers": {
+    "nano": {
+     "tier": "nano",
+     "model": "nemotron-3-nano:4b",
+     "text": "Assumption: You want a name that blends coffee and books without being a direct mashup.  \nAlternative: Name the shop after a literary theme that naturally evokes both coffee and reading, like \u201cThe Reading Room\u201d or \u201cThe Book Nook.\u201d",
+     "latency_ms": 2649,
+     "output_tokens": 53,
+     "reasoning_tokens": 0,
+     "cost_usd": 2.4479999999999996e-05,
+     "opens_with_tldr": false,
+     "words": 38,
+     "unbacked_sources": []
+    },
+    "ultra": {
+     "tier": "ultra",
+     "model": "deepseek-r1:32b",
+     "text": "\n\n**Key Assumptions:**  \n- The coffee shop should feel cozy and literary, blending the warmth of coffee with the comfort of reading.  \n- The name should evoke a sense of relaxation and creativity, appealing to both book lovers and coffee enthusiasts.  \n\n**Name Suggestions:**  \n1. **\"Page & Cup\"** - A simple, evocative name that combines the essence of books (\"Page\") with coffee (\"Cup\").  \n2. **\"Wh",
+     "latency_ms": 21398,
+     "output_tokens": 398,
+     "reasoning_tokens": 296,
+     "cost_usd": 0.001362,
+     "opens_with_tldr": false,
+     "words": 92,
+     "unbacked_sources": []
+    }
+   },
+   "verdicts": [
+    {
+     "A": "nano",
+     "B": "ultra",
+     "winner": "ultra",
+     "why": "B clearly states key assumptions and offers two concrete, relevant name options, directly addressing the user's need for ready\u2011to\u2011use suggestions."
+    },
+    {
+     "A": "ultra",
+     "B": "nano",
+     "winner": "ultra",
+     "why": "Answer A clearly states key assumptions and provides two concrete, distinct name options with brief explanations, directly addressing the user's need for ready-to-use suggestions while also offering flexibility."
+    }
+   ],
+   "outcome": "ultra"
+  }
+ ]
+}
