@@ -38,7 +38,7 @@ def main():
         from src.eval import reports
         stamp = __import__("datetime").datetime.now().strftime("%Y%m%d-%H%M")
         place = "simulated" if report["simulated"] else ("api" if reports.where(config.TIER_PROVIDERS) == "api" else "local")
-        print("saved:", reports.save(report, f"scenarios-{args.reader}-{place}-{stamp}", config.TIER_PROVIDERS))
+        print("saved:", reports.save(report, f"scenarios-{args.only.replace(',', '+') + '-' if args.only else ''}{args.reader}-{place}-{stamp}", config.TIER_PROVIDERS))
 
     print(("simulated run" if report["simulated"] else "live run") + f", reader: {args.reader}")
     for r in report["scenarios"]:

@@ -4,10 +4,11 @@
 """
 import asyncio
 import logging
+import re
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 
 from src import config
@@ -61,6 +62,18 @@ WEB_PAGE = Path(__file__).parent / "web" / "index.html"
 def home() -> FileResponse:
     """The product page: chat, the mirror (stated vs observed), router and decision log."""
     return FileResponse(WEB_PAGE)
+
+
+TUTORIAL_DIR = WEB_PAGE.parent / "tutorials"
+
+
+@app.get("/tutorials/{name}", include_in_schema=False)
+def tutorial_image(name: str) -> FileResponse:
+    """Screenshots for the Tutorials window (src/web/tutorials/<entry>.webp)."""
+    path = TUTORIAL_DIR / name
+    if not re.fullmatch(r"[a-z0-9-]{1,60}\.(webp|png)", name) or not path.is_file():
+        raise HTTPException(status_code=404, detail="No such tutorial image.")
+    return FileResponse(path)
 
 
 @app.exception_handler(BudgetExceeded)

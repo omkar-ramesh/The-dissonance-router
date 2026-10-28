@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The Dissonance Router</title>
 <style>
-:root{--bg:#0b0e14;--panel:#131822;--line:#232b3a;--text:#d7deea;--muted:#7d889c;
+:root{--bg:#0b0e14;--panel:#131822;--line:#232b3a;--text:#d7deea;--muted:#97a3b8;
   --green:#3ddc84;--red:#ff5d6c;--amber:#ffb020;--blue:#5aa9ff;--purple:#b48cff;--pink:#ff7ad9}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 /* dark, thin scrollbars everywhere (standard properties first, WebKit as the fallback) */
@@ -41,7 +41,7 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 #collapse:hover{color:var(--text);border-color:var(--blue)}
 .view-btn{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:1px solid transparent;color:var(--muted);border-radius:8px;padding:8px 10px;margin-bottom:4px;font:inherit;cursor:pointer}
 .view-btn:hover{border-color:var(--line)}.view-btn.on{background:var(--panel);border-color:var(--line);color:var(--text)}
-.view-btn small{display:block;color:var(--muted);font-size:10px}
+.view-btn small{display:block;color:var(--muted);font-size:11px}
 .view-btn svg{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .collapsed aside.side{width:58px}
 .collapsed .side-inner{padding:14px 8px}.collapsed .side-foot{padding:8px}
@@ -56,7 +56,7 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 @media(prefers-reduced-motion:reduce){aside.side{transition:none}.msg.flash{animation:none;box-shadow:0 0 0 2px var(--blue)}}
 /* settings */
 .settings{max-width:none;width:100%}.settings [data-panel]{max-width:none;width:100%}#colA:has(.settings:not([hidden])){padding:16px 22px}
-.sechead{display:flex;gap:14px;align-items:center;margin-bottom:14px}.sechead h3{margin:0;font-size:16px}.sechead p{margin:3px 0 0;color:var(--muted);font-size:12px;max-width:760px;line-height:1.5}
+.sechead{display:flex;gap:14px;align-items:center;margin-bottom:14px}.sechead h3{margin:0;font-size:16px}.sechead p{margin:3px 0 0;color:var(--muted);font-size:13px;max-width:760px;line-height:1.5}
 .ib{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;flex:none;background:#7d889c1f;color:var(--muted)}.ib .ico{width:22px;height:22px}
 .ib.green{background:#3ddc8420;color:var(--green)}.ib.blue{background:#5aa9ff20;color:var(--blue)}.ib.amber{background:#ffb02020;color:var(--amber)}.ib.pink{background:#ff7ad920;color:var(--pink)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.two.wide-right{grid-template-columns:1fr 2fr}
@@ -123,7 +123,7 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .kpi .ib .ico{width:22px;height:22px}
 .kpi.green .ib{background:#3ddc8420;color:var(--green)}.kpi.blue .ib{background:#5aa9ff20;color:var(--blue)}.kpi.amber .ib{background:#ffb02020;color:var(--amber)}.kpi.pink .ib{background:#ff7ad920;color:var(--pink)}
 .kt{display:flex;flex-direction:column;min-width:0}.kt .k{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.kt .v{font-size:26px;font-weight:700;line-height:1.15}.kt .s{font-size:11px;color:var(--muted)}
+.kt .v{font-size:26px;font-weight:700;line-height:1.15}.kt .s{font-size:12px;color:var(--muted)}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .pn{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
 .pn header{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--muted)}.pn header b{color:var(--text);font-size:13px}
@@ -143,7 +143,7 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .rcard{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--text);font:inherit;cursor:pointer;min-height:170px}
 .rcard:hover,.rcard:focus-visible{border-color:var(--blue);outline:none}
 .rcard .t{font-weight:700;font-size:13px}.rcard .h{font-size:20px;font-weight:700;color:var(--green)}.rcard .h.warn{color:var(--amber)}
-.rcard .d{font-size:11px;color:var(--muted);line-height:1.45;flex:1}.rcard .f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
+.rcard .d{font-size:12px;color:var(--muted);line-height:1.45;flex:1}.rcard .f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
 .src{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:1px 8px;border-radius:99px;font-weight:700}
 .src.ok{color:var(--green);background:#3ddc8422}.src.bad{color:var(--red);background:#ff5d6c22}.src.warn{color:var(--amber);background:#ffb02022}.rcard.k-ok{border-top:3px solid var(--green)}.rcard.k-bad{border-top:3px solid var(--red)}.rcard.k-warn{border-top:3px solid var(--amber)}
 .plist{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}.pgrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
@@ -155,8 +155,38 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .rgroup{margin-bottom:22px}.rgroup>header{display:flex;align-items:center;gap:10px;margin:0 2px 10px;flex-wrap:wrap}.rgroup>header b{font-size:14px}
 .rgroup>header .runon{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
 .mcard{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.rsq{grid-template-columns:repeat(5,minmax(0,1fr))}
+.mcard.sq{aspect-ratio:1/1;overflow:hidden;padding:12px;gap:6px}
+.mcard.sq .t{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.mcard.sq .kv{font-size:12px}.mcard.sq .kv dt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcard.sq .foot{font-size:11px}
+.mcard .foot .acts{display:flex;gap:6px;align-items:center}
+.sqb{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer;display:grid;place-items:center;font-size:14px;line-height:1;padding:0}
+.sqb:hover{color:var(--text);border-color:var(--blue)}.sqb.on{color:var(--pink)}
+.rctl{margin-left:auto;display:flex;align-items:center;gap:12px}
+.rview{display:flex;gap:6px}.rview .sqb.on{color:var(--blue);border-color:var(--blue)}
+.rsize{display:flex;align-items:center;gap:6px}
+.rlist{display:flex;flex-direction:column;gap:8px}
+.mcard.rrow{flex-direction:row;align-items:center;gap:16px;padding:10px 14px}
+.rrow .rr-main{flex:1 1 220px;min-width:0}.rrow .rr-main .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rrow .rr-main .f{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+.rrow>.h{flex:0 0 190px;font-size:16px}
+.rrow .rr-kv{flex:1.4 1 260px;min-width:0;margin:0;font-size:12px}
+.rrow .acts{display:flex;gap:6px;align-items:center;flex:none}
+@media(max-width:1100px){.mcard.rrow{flex-wrap:wrap}.rrow>.h,.rrow .rr-kv{flex:1 1 100%}}
+.rsize select{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;font:inherit;font-size:12px;padding:3px 6px}
+.rpager{display:flex;justify-content:center;gap:6px;margin:14px 0 4px}
+.rpager .sqb:disabled{opacity:.35;cursor:default}
+.rpager .sqb.on{color:var(--blue);border-color:var(--blue)}
+.flag{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;font-size:12px;font-weight:700;vertical-align:middle;margin-left:6px;border:1px solid currentColor}
+.flag.bad{color:var(--red)}.flag.warn{color:var(--amber)}
+.mcard .t-in{width:100%;background:var(--bg);border:1px solid var(--blue);border-radius:8px;color:var(--text);font:inherit;font-weight:700;font-size:13px;padding:4px 8px;outline:none}
+@media(max-width:1500px){.rsq{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1200px){.rsq{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:820px){.rsq{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.rsq{grid-template-columns:1fr}}
 .mcard .t{font-weight:700;font-size:13px}.mcard .h{font-size:18px;font-weight:700;color:var(--green)}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:11px;margin:0}.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:12px;margin:0}.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
 .mcard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:auto}
 .md h1{font-size:20px;margin:0 0 6px}.md h2{font-size:12px;margin:18px 0 6px;color:var(--muted)}.md p,.md li{font-size:13px;line-height:1.6}
 .md table{border-collapse:collapse;font-size:12px;margin:6px 0}.md td,.md th{border:1px solid var(--line);padding:5px 10px;text-align:left}.md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
@@ -165,7 +195,12 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .src.local{color:var(--blue);background:#5aa9ff22}.src.api{color:var(--pink);background:#ff7ad922}
 #rmodal{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:4vh 16px;overflow:auto}
 #rmodal[hidden]{display:none}
-#rmodal .sheet{background:var(--bg);border:1px solid var(--line);border-radius:14px;width:min(980px,100%);padding:18px 20px}
+#rmodal .sheet{background:var(--bg);border:1px solid var(--line);border-radius:14px;width:min(1200px,100%);padding:18px 20px}
+.rd-wrap{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;align-items:start}
+.rd-side{position:sticky;top:0;display:flex;flex-direction:column;gap:12px;border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--panel)}
+.rd-side .kv{font-size:12.5px}.rd-side .kv dt{white-space:normal}
+.rd-body{max-height:78vh;overflow-y:auto;padding-right:8px;scrollbar-gutter:stable}
+@media(max-width:860px){.rd-wrap{grid-template-columns:1fr}.rd-side{position:static}.rd-body{max-height:none;overflow:visible}}
 .rd-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
 .rd-head .title{font-size:16px;font-weight:700}
 .srow{cursor:pointer}.srow:hover td{background:#1a2130}.sdetail td{background:#0e131c;padding:8px 12px}
@@ -190,7 +225,7 @@ main{flex:1;min-height:0;display:grid}
 .col{min-height:0;overflow:auto;padding:14px 16px}.col+.col{border-left:1px solid var(--line)}
 .col.fit{overflow:hidden}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:12px}
-.note{color:var(--muted);font-size:12px}
+.note{color:var(--muted);font-size:12.5px;line-height:1.5}
 /* banner + stat groups */
 .banner{border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;background:var(--panel);padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin-bottom:12px}
 .banner.amber{border-left-color:var(--amber)}.banner b{font-size:14px;white-space:nowrap}.banner .m{color:var(--muted);font-size:12px}
@@ -205,8 +240,8 @@ main{flex:1;min-height:0;display:grid}
 .msg .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px;margin-bottom:3px}
 .msg .why{color:var(--muted);font-size:12px;margin:2px 0 6px}
 /* answers: a reading font, a comfortable line length and clear structure */
-.msg .body{font:14px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:74ch;color:#e3e8f2}
-.msg .body p{margin:.55em 0}.msg .body ul,.msg .body ol{margin:.5em 0;padding-left:1.4em}.msg .body li{margin:.25em 0}
+.msg .body{font:15px/1.75 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;max-width:78ch;color:#e3e8f2;text-align:justify;text-justify:inter-word;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
+.msg .body p{margin:.8em 0}.msg .body pre,.msg .body table,.msg .body h4,.msg .body code{text-align:left;hyphens:none}.msg .body ul,.msg .body ol{margin:.5em 0;padding-left:1.4em}.msg .body li{margin:.25em 0}
 .msg .body h4{margin:1em 0 .35em;font-size:14.5px;color:#fff;padding-bottom:3px;border-bottom:1px solid var(--line)}
 .msg .body strong{color:#fff}
 .msg .body code{font:12.5px ui-monospace,Consolas,monospace;background:#1c2434;padding:1px 5px;border-radius:4px}
@@ -247,12 +282,31 @@ main{flex:1;min-height:0;display:grid}
 .basis{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 [data-panel=accessibility] .acc-tour{grid-column:span 5}[data-panel=accessibility] .acc-soon{grid-column:span 7}
 .acc-tour .btn{align-self:flex-start}.readme{max-height:none;font:14px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}.readme h1{font-size:20px}.readme h2{font-size:16px}
-[data-panel=accessibility]>.acc-tour{grid-column:span 5;justify-content:space-between}[data-panel=accessibility]>.acc-soon{grid-column:span 7}
+.settings [data-panel=accessibility]:not([hidden])>.acc-tile{grid-column:span 4;display:flex;flex-direction:column;gap:10px}
+[data-panel=accessibility]>.acc-tile .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.settings [data-panel=accessibility]:not([hidden])>.acc-wide{grid-column:span 12}
+[data-panel=accessibility] .acc-tile .btn.on{border-color:var(--blue);color:var(--blue)}
 [data-panel=accessibility] .acc-soon .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-[data-panel=accessibility] .acc-soon .facts div{background:var(--bg2,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:12px;padding:12px 14px;gap:3px;min-height:68px}
-@media(max-width:900px){[data-panel=accessibility]>.acc-tour,[data-panel=accessibility]>.acc-soon{grid-column:span 12}}
+[data-panel=accessibility] .acc-soon .facts div{min-height:0;background:var(--bg2,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:12px;padding:12px 14px;gap:3px;min-height:68px}
+@media(max-width:1100px){.settings [data-panel=accessibility]:not([hidden])>.acc-tile{grid-column:span 12}}
+.example{opacity:.55;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}
+.example .ex-tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);margin-bottom:6px;display:block}
+.flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}
+.flow>div{position:relative;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+.flow>div b{color:var(--text);font-size:13px}.flow>div:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.flow .tiers{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.rsum{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px;font-size:13px;color:var(--muted)}.rsum b{color:var(--text)}
+@media(max-width:900px){.flow{grid-template-columns:1fr 1fr}.flow>div::after{display:none}}
 .docs>header{cursor:pointer}.docs .chev{transition:transform .2s}.docs.open .chev{transform:rotate(180deg)}
 #tour{position:fixed;inset:0;z-index:80}
+#tutHint{position:fixed;z-index:60;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 8px;background:#141a26;border:1px solid var(--green);border-radius:14px;box-shadow:0 10px 30px #0008;animation:hintin .35s ease}
+#tutHint::before{content:"";position:absolute;top:-6px;left:var(--arrow,50%);width:10px;height:10px;background:#141a26;border-left:1px solid var(--green);border-top:1px solid var(--green);transform:translateX(-50%) rotate(45deg)}
+#tutHint .go{background:none;border:0;color:var(--green);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:5px 8px;border-radius:8px}
+#tutHint .go:hover{background:#3ddc8422}
+#tutHint .x{width:24px;height:24px;border-radius:7px;border:0;background:none;color:var(--muted);cursor:pointer;line-height:1}
+#tutHint .x:hover{color:var(--text)}
+@keyframes hintin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){#tutHint{animation:none}}
 .tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px #05070cb8,0 0 0 2px var(--blue);transition:all .35s cubic-bezier(.3,.7,.2,1);pointer-events:none}
 .tour-hole.none{box-shadow:0 0 0 9999px #05070cd0;width:0!important;height:0!important;left:50%!important;top:50%!important}
 .tour-card{position:fixed;width:min(400px,calc(100vw - 32px));background:#141a26;border:1px solid #2a3448;border-radius:22px;padding:20px 22px 18px;
@@ -316,6 +370,56 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
 .bars .row{display:grid;grid-template-columns:100px 1fr 70px;align-items:center;gap:10px;margin:7px 0;font-size:12px}
 .bar{height:9px;border-radius:5px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;border-radius:5px}
 @media(max-width:900px){#collapse{display:none}.collapsed aside.side{width:auto}body{overflow:auto}.shell,main{display:block;overflow:visible}.groups{grid-template-columns:1fr}aside.side{width:auto;border-right:0;border-bottom:1px solid var(--line)}.col{overflow:visible}.col.fit{overflow:visible}.chat{height:75vh}}
+
+/* ---------- Tutorials: a library inside Settings → Accessibility (list left, picture + explanation right) ---------- */
+#tut{grid-column:span 12}
+#tut[hidden]{display:none!important}
+#tut{scroll-margin-top:0;margin-bottom:40px!important}
+.tut-win{height:calc(100vh - 92px);min-height:600px;display:grid;grid-template-columns:58px 300px minmax(0,1fr);background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tut-rail{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;background:var(--bg);border-right:1px solid var(--line)}
+.tut-rail button{width:40px;height:40px;border-radius:10px;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;display:grid;place-items:center;position:relative}
+.tut-rail button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tut-rail button:hover{color:var(--text);background:#ffffff08}
+.tut-rail button.on{color:var(--blue);background:#5aa9ff1a;border-color:#5aa9ff55}
+.tut-rail button .dot{position:absolute;top:5px;right:5px}
+.tut-list{display:flex;flex-direction:column;min-height:0;padding:18px 12px 14px 14px;border-right:1px solid var(--line)}
+.tut-crumb{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:2px 4px 14px}
+.tut-search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;margin-bottom:10px;background:var(--bg)}
+.tut-search:focus-within{border-color:var(--blue)}
+.tut-search input{flex:1;background:none;border:0;color:var(--text);font:inherit;font-size:13px;outline:none}
+.tut-search svg{width:15px;height:15px;fill:none;stroke:var(--muted);stroke-width:2}
+.tut-items{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:2px 6px 2px 2px}
+.tut-item{position:relative;text-align:left;border:1px solid transparent;border-radius:10px;padding:11px 28px 11px 14px;background:none;color:var(--text);font:inherit;font-size:13px;cursor:pointer;line-height:1.3}
+.tut-item:hover{background:#ffffff08}
+.tut-item.on{background:#5aa9ff14;border-color:#5aa9ff55}
+.tut-item.on::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--blue)}
+.tut-item .dot{position:absolute;top:50%;right:10px;transform:translateY(-50%)}
+.tut-item small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--red)}
+.tut-main{display:flex;flex-direction:column;min-height:0;padding:18px 28px 20px;overflow-y:auto}
+.tut-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.tut-head b{font-size:14px}.tut-head .count{margin-left:auto;font-size:12px;color:var(--muted)}
+.tut-x{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font-size:15px;cursor:pointer;line-height:1}
+.tut-x:hover{color:var(--text);border-color:var(--red)}
+.tut-shot{position:relative;flex:1 1 280px;min-height:240px;border-radius:12px;border:1px solid var(--line);background:var(--bg);display:grid;place-items:center;overflow:hidden}
+.tut-shot img{width:100%;height:100%;object-fit:contain}
+.tut-ph{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);text-align:center;padding:20px;font-size:12.5px}
+.tut-ph svg{width:40px;height:40px;fill:none;stroke:var(--line);stroke-width:1.5}
+.tut-ph b{color:var(--text);font-size:14px}
+.tut-title{text-align:center;font-size:19px;margin:22px 0 10px}
+.tut-body{font-size:14.5px;line-height:1.7;color:var(--text);max-width:780px;margin:0 auto;text-align:center}
+.tut-body b{color:var(--blue)}
+.tut-points{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:16px auto 0;max-width:820px;padding:0;list-style:none}
+.tut-points li{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 12px 3px 3px}
+.tut-points li i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#5aa9ff22;color:var(--blue);font-size:11px;font-weight:700}
+.tut-nav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.tut-nav .btn{min-width:120px}.tut-nav .btn:disabled{opacity:.35;cursor:default}
+.tut-flash{animation:tutflash 2.2s ease}
+@keyframes tutflash{0%,50%{box-shadow:0 0 0 2px var(--blue),0 0 22px #5aa9ff55}100%{box-shadow:0 0 0 2px transparent}}
+@media(prefers-reduced-motion:reduce){.tut-flash{animation:none;outline:2px solid var(--blue)}}
+@media(max-width:900px){.tut-win{grid-template-columns:1fr;grid-template-rows:auto auto minmax(0,1fr);height:auto;min-height:0}
+  .tut-rail{flex-direction:row;justify-content:center;border-right:0;border-bottom:1px solid var(--line);padding:8px}
+  .tut-list{border-right:0;border-bottom:1px solid var(--line);max-height:34vh}.tut-shot{min-height:200px}.tut-nav .btn{min-width:0}}
 </style>
 </head>
 <body>
@@ -323,6 +427,7 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
   <h1 id="home" title="Back to the main page">THE DISSONANCE ROUTER<span class="tag">WHAT YOU SAY <i>VS</i> WHAT YOU DO</span></h1>
   <span class="pill ok" id="status">● connecting…</span>
   <div class="spacer"></div>
+  <button class="btn" id="tutOpen" title="Tutorials: every button and feature, explained">? Tutorials</button>
   <button class="btn" id="newchat" title="Archive this conversation to Memory and start a new one (your profile stays)">＋ New chat</button>
   <button class="btn primary" id="demo" title="Starts a fresh session and plays the say-concise, ask-for-detail contradiction with real model calls">▶ Play the demo</button>
 </header>
@@ -386,7 +491,7 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
   <section class="chat" id="chatBlock">
     <h2>Chat</h2>
     <div class="thread" id="thread"></div>
-    <div id="suggest"></div><div id="undo"></div><div id="remind"></div>
+    <div id="undo"></div><div id="remind"></div>
     <form class="composer" id="form">
       <div class="notebot"><button type="button" class="nb" id="notebot" aria-label="Note bot: open notes" aria-describedby="nb-pop"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nb-badge" id="nb-badge" hidden></span></button>
         <div class="nb-pop" id="nb-pop" role="tooltip"><b>Note bot</b>
@@ -400,7 +505,9 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
     <h2>The mirror</h2>
     <div class="legend"><span><i style="border:2px solid var(--blue)"></i>what you said (set it below)</span><span><i style="background:var(--amber)"></i>what you do (learned)</span></div>
     <div id="dims"></div>
-    <div class="field"><button class="btn ghost" id="forget" title="Clears what the app learned from how you ask and rate answers. What you said stays.">Forget what I do</button></div>
+    <div class="field"><button class="btn ghost" id="forget" title="Clears what the app learned from how you ask and rate answers. What you said stays.">Forget what I do</button>
+      <button class="btn ghost" id="resetsaid" title="Sets everything you said back to no preference. What the app learned from how you ask stays.">Reset what I said</button></div>
+    <div id="suggest"></div>
     <h2 style="margin-top:14px">Next answer goes to <span class="note" id="score"></span></h2>
     <div class="lamps" id="lamps"></div><div class="note" id="reason" style="margin:0 4px 14px"></div>
   </section>
@@ -436,12 +543,13 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
       <div class="two">
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><b>Limit</b></header>
           <div class="field"><span class="note">Limit $</span>
-            <input class="user" id="budget-limit" type="number" min="0" max="100" step="0.001" style="width:120px" aria-label="Budget limit in dollars">
+            <input class="user" id="budget-limit" type="number" min="0" max="100" step="0.001" style="width:120px" placeholder="No limit" aria-label="Budget limit in dollars">
             <button class="btn primary" id="budget-save">Update</button>
             <button class="btn ghost" id="budget-reset">Reset spent</button></div>
           <div class="field" style="margin-top:10px"><span class="note">Quick set</span>
             <button class="chipbtn" data-preset="0.01">$0.01 · try it</button><button class="chipbtn" data-preset="0.1">$0.10</button>
-            <button class="chipbtn" data-preset="1">$1</button><button class="chipbtn" data-preset="10">$10</button><button class="chipbtn" data-preset="100">$100</button><button class="chipbtn" data-preset="0">No limit</button></div></section>
+            <button class="chipbtn" data-preset="1">$1</button><button class="chipbtn" data-preset="10">$10</button><button class="chipbtn" data-preset="100">$100</button><button class="chipbtn" data-preset="0">No limit</button></div>
+          <div class="note" style="margin-top:12px">For scale, at list prices: a typical Nano answer is about <b>$0.0001</b> and an Ultra answer about <b>$0.002</b>, so $1 covers roughly 10,000 Nano or 400 Ultra answers. Estimates; the real figure is measured per answer.</div></section>
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v9l6 3"/><circle cx="12" cy="12" r="9"/></svg><b>Spent so far</b></header>
           <div id="budget-view"></div></section>
       </div>
@@ -450,15 +558,15 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
         <div><i>2</i><b>Thinking off, shorter answers</b><span>once under 25% is left.</span></div>
         <div><i>3</i><b>Never overspends</b><span>an answer can't cost more than what's left; at zero it stops.</span></div>
       </div>
-      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 8-9"/></svg><b>Live usage <span class="note">· updates after every answer</span></b></header>
+      <section class="pn" hidden><header><svg class="ico" viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 8-9"/></svg><b>Live usage <span class="note">· updates after every answer</span></b></header>
         <div id="budget-graph"></div></section>
-      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg><b>Predicted vs measured</b></header>
+      <section class="pn" hidden><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg><b>Predicted vs measured</b></header>
         <div id="budget-acc"></div></section></div>
 
     <div data-panel="models">
       <div class="sechead"><span class="ib pink"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>
         <div><h3>Models</h3><p>Which model serves each tier, where it runs, and whether it thinks before answering. Change them in <b>models.toml</b>.</p></div>
-        <div class="modesw" id="modeSwitch" role="group" aria-label="Where the models run"><button data-mode="offline">Offline · local</button><button data-mode="online">Online · Token Factory</button></div></div>
+        <div class="modesw" id="modeSwitch" role="group" aria-label="Where the models run"><button data-mode="offline">Local · Ollama</button><button data-mode="online">Token Factory</button></div></div>
       <div class="note modenote" id="modeNote" hidden></div>
       <div id="models"></div></div>
 
@@ -484,9 +592,16 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
         <div><h3>About</h3><p>The Dissonance Router keeps two profiles: what you say you prefer and what you actually do. When they clash, it uses a stronger model and tells you why.</p></div></div>
       <div class="steps">
         <div><i>1</i><b>You say</b><span>Set how you like answers in the mirror: tone, length, sourcing, structure, revision.</span></div>
-        <div><i>2</i><b>You do</b><span>It learns from what you ask for and what you 👍 or 👎, with a quote as evidence.</span></div>
+        <div><i>2</i><b>You do</b><span>It learns from what you ask for and how you rate answers (helpful or not), with a quote as evidence.</span></div>
         <div><i>3</i><b>It routes</b><span>The bigger the gap, the stronger the model: Nano, Super or Ultra, with the reason logged.</span></div>
       </div>
+      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 12h12M12 6l6 6-6 6"/></svg><b>One message, start to finish</b></header>
+        <div class="flow">
+          <div><b>1 · Read</b>Nano reads the message for style requests and quotes your words as evidence.</div>
+          <div><b>2 · Compare</b>Stated vs observed, per dimension: a conflict score from 0 to 1.</div>
+          <div><b>3 · Route</b>The strongest conflict picks the tier.<span class="tiers"><span class="pill nano">nano &lt; 0.4</span><span class="pill super">super 0.4–0.7</span><span class="pill ultra">ultra ≥ 0.7</span></span></div>
+          <div><b>4 · Explain</b>The answer says why it escalated; the decision is logged and you can update what you said.</div>
+        </div></section>
       <div class="two">
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><b>Honest by design</b></header>
           <p class="note" style="margin:0">Failures are shown with reason codes, simulated numbers are labelled, links the agent can't verify are flagged, and the "right tier" in reports is our own annotation.</p></section>
@@ -502,14 +617,40 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
     <div data-panel="accessibility">
       <div class="sechead"><span class="ib blue"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M4 8.5l8 1.5 8-1.5M12 10v5M12 15l-3.5 6M12 15l3.5 6"/></svg></span>
         <div><h3>Accessibility</h3><p>Replay the tour, read the README, and (soon) adjust how the app looks and moves.</p></div></div>
-      <section class="pn acc-tour"><header><svg class="ico" viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z"/></svg><b>Tutorial</b></header>
-        <p class="note">A short tour of every part of the app, in plain words. About two minutes.</p>
-        <button class="btn primary" id="tourReplay">▶ Replay the tutorial</button></section>
-      <section class="pn acc-soon"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Coming next</b></header>
+      <section class="pn acc-tour acc-tile"><header><svg class="ico" viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z"/></svg><b>Tutorial</b></header>
+        <p class="note" style="margin:0">Every button and feature explained, with a <b>Try it</b> that takes you there. Or replay the two-minute tour.</p>
+        <div class="acts"><button class="btn primary" data-tut-open id="tutTile">Open the tutorials</button>
+          <button class="btn" id="tourReplay">▶ Replay the tour</button></div></section>
+      <section class="pn acc-readme acc-tile"><header><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b></header>
+        <p class="note" style="margin:0">The project README: what it does, how to run it and how it was tested. Same file as the repository.</p>
+        <div class="acts"><button class="btn" id="readmeHead" aria-expanded="false" aria-controls="readmeWrap">Open the README</button></div></section>
+      <section class="pn acc-soon acc-tile"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Coming next</b></header>
         <div class="facts"><div><b>Text size</b><span>Small, normal, large.</span></div><div><b>Reduce motion</b><span>Turn off animations.</span></div>
           <div><b>Plain font</b><span>Swap the cyber font for an easier read.</span></div><div><b>High contrast</b><span>Stronger borders and text.</span></div></div></section>
-      <section class="pn docs"><header role="button" tabindex="0" aria-expanded="false" aria-controls="readme" id="readmeHead"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b><span class="note" style="margin-left:auto">README.md · same file as the repo</span><span class="chev" aria-hidden="true">▾</span></header>
-        <div class="md readme" id="readme" hidden><div class="note">Loading…</div></div></section></div>
+      <section id="tut" class="acc-wide" hidden aria-label="Tutorials">
+  <div class="tut-win">
+    <nav class="tut-rail" id="tutRail" aria-label="Tutorial categories"></nav>
+    <div class="tut-list">
+      <div class="tut-crumb" id="tutCrumb">Tutorials / All</div>
+      <label class="tut-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="tutSearch" type="search" placeholder="Search tutorials" aria-label="Search tutorials"></label>
+      <div class="tut-items" id="tutItems" role="listbox" aria-label="Tutorial entries"></div>
+    </div>
+    <div class="tut-main">
+      <div class="tut-head"><b>Tutorials</b><span class="count" id="tutCount"></span><button class="tut-x" id="tutClose" aria-label="Close the tutorials" title="Close">✕</button></div>
+      <div class="tut-shot" id="tutShot"></div>
+      <h3 class="tut-title" id="tutTitle"></h3>
+      <div class="tut-body" id="tutBody"></div>
+      <ol class="tut-points" id="tutPoints"></ol>
+      <div class="tut-nav"><button class="btn" id="tutPrev">‹ Previous</button>
+        <button class="btn primary" id="tutTry">Try it</button>
+        <button class="btn" id="tutNext">Next ›</button></div>
+    </div>
+  </div>
+</section>
+      <section class="pn acc-wide" id="readmeWrap" hidden><header><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b><span class="note" style="margin-left:auto">README.md · same file as the repo</span>
+          <button class="tut-x" id="readmeClose" aria-label="Close the README" title="Close">✕</button></header>
+        <div class="md readme" id="readme"><div class="note">Loading…</div></div></section></div>
   </section>
 </div>
 
@@ -555,8 +696,11 @@ async function api(path, body) {
 }
 
 // Minimal, safe markdown: escape first, then add a few tags.
-function md(text) {
-  const inline = s => s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+const slugOf = t => t.toLowerCase().replace(/<[^>]+>|&[a-z#0-9]+;|[^\w\s-]/g, "").trim().replace(/\s+/g, "-");
+function md(text, links) {     // links: only for our own README (headings get ids, [text](url) become links); model answers never get clickable links
+  const link = s => !links ? s : s.replace(/\[([^\]]+)\]\((#[\w-]+|https:\/\/[^\s)]+)\)/g, (m, t, u) =>
+    u[0] === "#" ? `<a href="${u}" data-anchor="${u.slice(1)}">${t}</a>` : `<a href="${u}" target="_blank" rel="noopener">${t}</a>`);
+  const inline = s => link(s.replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>"));
   let html = "", inList = false, code = null, table = null;
   const cells = l => l.trim().replace(/^\||\|$/g, "").split("|").map(c => inline(c.trim()));
   const flushTable = () => {                        // | a | b | rows, with an optional |---| separator
@@ -582,7 +726,7 @@ function md(text) {
     if (item) { if (!inList) { html += "<ul>"; inList = true; } html += `<li>${inline(item[1])}</li>`; continue; }
     if (inList) { html += "</ul>"; inList = false; }
     const head = line.match(/^#{1,4}\s+(.*)/);
-    if (head) html += `<h4>${inline(head[1])}</h4>`;
+    if (head) html += `<h4${links ? ` id="rm-${slugOf(head[1])}"` : ""}>${inline(head[1])}</h4>`;
     else if (/^\s*-{3,}\s*$/.test(line)) html += "<hr>";
     else if (line.trim()) html += `<p>${inline(line)}</p>`;
   }
@@ -686,7 +830,8 @@ let wallet = { limit_usd: 0, spent_usd: 0 }, accuracy = [];
 const usd = v => "$" + (v < 0.01 ? v.toFixed(5) : v.toFixed(4));
 function renderBudget() {
   const { limit_usd: limit, spent_usd: spent } = wallet;
-  if (document.activeElement !== $("budget-limit")) $("budget-limit").value = limit || 0;
+  if (document.activeElement !== $("budget-limit")) $("budget-limit").value = limit || "";
+  ["budget-graph", "budget-acc"].forEach(id => { $(id).closest("section").hidden = !accuracy.length; });
   const pct = limit ? Math.min(100, 100 * spent / limit) : 0;
   $("budget-view").innerHTML = limit
     ? `<div class="bar" style="height:10px"><i style="width:${pct}%;background:${pct > 75 ? "var(--amber)" : "var(--green)"}"></i></div>
@@ -837,11 +982,11 @@ function renderBanner() {
   const all = r.scenarios.every(s => s.as_expected) && r.self_test.caught === r.self_test.total;
   const part = (k, label, field = "ok") => by[k] ? `<span class="${by[k][field] === by[k].n ? "ok" : "warn"}">${by[k][field]}/${by[k].n}</span> ${label}` : "";
   b.className = "banner" + (all ? "" : " amber");
-  b.innerHTML = `<b>Evaluation</b><span class="m">${[part("success", "success cases"), part("heldout", "held-out (written after tuning)", "pass"),
-      r.reader === "nano" ? part("failure", "keyword failures re-run") : part("failure", "known failures reproduced"),
-      `<span class="${r.self_test.caught === r.self_test.total ? "ok" : "bad"}">${r.self_test.caught}/${r.self_test.total}</span> injected false claims caught`].filter(Boolean).join(" · ")}</span>`
-    + `<span class="m">· ${r.simulated ? "simulated model answers and tokens" : "real model answers (local stand-ins)"} · ideal tiers are our own annotation</span>`
-    + `<span class="spacer"></span><span class="m">${tierLine()}</span>`;
+  b.innerHTML = `<b>Evaluation</b><span class="m">${[part("success", "success"), part("heldout", "held-out", "pass"),
+      r.reader === "nano" ? part("failure", "failures re-run") : part("failure", "known failures"),
+      `<span class="${r.self_test.caught === r.self_test.total ? "ok" : "bad"}">${r.self_test.caught}/${r.self_test.total}</span> false claims caught`].filter(Boolean).join(" · ")}</span>`
+    + `<span class="spacer"></span><span class="m">${r.simulated ? "simulated answers" : "real answers · local stand-ins"}</span>`;
+  b.title = `Held-out cases were written after tuning. Ideal tiers are our own annotation. Models: ${tierLine()}`;
 }
 const LABEL_CLASS = { PASS: "ok", CAUGHT: "ok", FIXED: "ok", "KNOWN GAP": "warn", "STILL FAILS": "warn" };
 const cell = s => `<td class="${LABEL_CLASS[s.label] || "bad"}">${esc(s.label)}</td>`;
@@ -877,13 +1022,13 @@ const stamp = iso => new Date(iso).toLocaleString([], { dateStyle: "medium", tim
 function renderEvidence() {
   const box = $("evidenceBlock");
   if (reports === null) { box.innerHTML = `<h2>Reports</h2><div class="card note">Couldn't reach the server for the saved reports.</div>`; return; }
-  const inF = (r, k) => k === "archived" ? r.archived : !r.archived && (k === "all" || r.source === k);
+  const inF = (r, k) => k === "archived" ? r.archived : (k === "all" || r.source === k);
   const n = k => reports.filter(r => inF(r, k)).length;
   const shown = reports.filter(r => inF(r, rfilter));
   const filters = [["all", "All"], ["local", "Local · while building"], ["api", "Token Factory runs"], ["archived", "Archived"]]
     .map(([k, l]) => `<button class="chipbtn ${rfilter === k ? "on" : ""}" data-rf="${k}">${l} · ${n(k)}</button>`).join("");
   const cardHtml = r => `<button class="rcard" data-report="${esc(r.id)}">
-      <div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span><span>${esc(stamp(r.created))}</span></div>
+      <div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span>${r.archived ? `<span class="src">archived</span>` : ""}<span>${esc(stamp(r.created))}</span></div>
       <div class="t">${esc(r.title)}</div><div class="h">${esc(r.headline)}</div>
       <div class="d">${esc(r.description)}</div>
       <div class="f">${Object.entries(r.models || {}).map(([t, m]) => `<span>${esc(t)}: ${esc(m)}</span>`).join("")}</div>
@@ -893,25 +1038,45 @@ function renderEvidence() {
        : `<div class="card note">${reports.length ? "No reports in this filter yet." : "No saved reports yet. Run <code>python -m src.eval --save</code> and the card appears here."}${rfilter === "api" ? " Token Factory runs appear once the cloud models have been used." : ""}</div>`)
     + `<div class="note" style="margin:0 4px 12px">Local = runs made while building, on local stand-in models (or the simulator). Token Factory = runs on the real Nemotron models. The "right tier" for each turn is our own annotation.</div>`;
 }
+const STARTER_FAVS = ["scenarios-classic_contradiction-nano-local-20261028-1917", "scenarios-aligned_user-nano-local-20261028-1915", "scenarios-invented_source-nano-local-20261028-1931", "scenarios-ho_receipts-nano-local-20261028-1931", "compare-hash_collisions-nano-vs-ultra-local-20261028-1938",
+  "scenarios-classic_contradiction-nano-api-20261028-2020", "scenarios-aligned_user-nano-api-20261028-2019", "scenarios-invented_source-nano-api-20261028-2037", "scenarios-ho_receipts-nano-api-20261028-2037", "compare-hash_collisions-nano-vs-ultra-api-20261028-2038"];
+let rsize = [10, 20, 30].includes(+store.get("rsize")) ? +store.get("rsize") : 10;
+const rpage = {};
+const API_TARGET = 512;      // planned Token Factory runs; the target label hides itself once the count reaches it
+let rview = store.get("rview") === "list" ? "list" : "grid";
+const flagIcon = r => r.flag === "fail" ? ` <span class="flag bad" title="This test failed or hit a known limit" aria-label="Failed">⚠</span>` : r.flag === "fake" ? ` <span class="flag warn" title="A false claim was planted and caught" aria-label="False claim">?</span>` : "";
+const rmeta = () => { try { const v = store.get("rmeta"); return v === null ? Object.fromEntries(STARTER_FAVS.map(id => [id, { fav: true }])) : JSON.parse(v || "{}"); } catch (e) { return {}; } };
+const rname = r => (rmeta()[r.id] || {}).name || r.title, rfav = r => !!(rmeta()[r.id] || {}).fav;
+function rset(id, patch) { const m = rmeta(); m[id] = { ...m[id], ...patch }; if (!m[id].name) delete m[id].name; if (!m[id].fav) delete m[id].fav; if (!Object.keys(m[id]).length) delete m[id]; store.set("rmeta", JSON.stringify(m)); }
 function renderReportsPanel() {
   const box = $("rpanel"); if (!box) return;
   if (reports === null) { box.innerHTML = `<div class="pn note">Couldn't reach the server for the saved reports.</div>`; return; }
-  const mc = r => `<div class="mcard"><div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span>${r.simulated ? `<span class="src warn">simulated</span>` : ""}<span>${esc(stamp(r.created))}</span></div>
-      <div class="t">${esc(r.title)}</div><div class="h">${esc(r.headline)}</div>
-      ${r.personas ? `<div class="f">${r.personas.map(n => `<span class="src local">${esc(n)}</span>`).join("")}</div>` : ""}
-      <dl class="kv">${Object.entries(r.models || {}).map(([t, m]) => `<dt>${esc(t)}</dt><dd>${esc(m)}</dd>`).join("")}</dl>
-      <dl class="kv" style="border-top:1px solid var(--line);padding-top:6px">${(r.metrics || []).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
-      <div class="foot"><span>${esc(r.run_on || "")}</span><button class="btn" data-report="${esc(r.id)}">More details</button></div></div>`;
+  const acts = r => `<div class="acts"><button class="sqb" data-redit="${esc(r.id)}" title="Rename this report" aria-label="Rename this report">✎</button><button class="sqb${rfav(r) ? " on" : ""}" data-rfav="${esc(r.id)}" title="${rfav(r) ? "Remove from favourites" : "Add to favourites"}" aria-label="Favourite" aria-pressed="${rfav(r)}">${rfav(r) ? "♥" : "♡"}</button><button class="btn" data-report="${esc(r.id)}">Details</button></div>`;
+  const tags = r => `<span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span>${r.simulated ? `<span class="src warn">simulated</span>` : ""}${r.archived ? `<span class="src">archived</span>` : ""}`;
+  const lr = r => `<div class="mcard rrow" data-rid="${esc(r.id)}"><div class="rr-main"><div class="t">${esc(rname(r))}</div><div class="f">${tags(r)}<span>${esc(stamp(r.created))}</span></div></div>
+      <div class="h">${esc(r.headline)}${flagIcon(r)}</div>
+      <dl class="kv rr-kv">${(r.metrics || []).slice(0, 4).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>${acts(r)}</div>`;
+  const mc = r => `<div class="mcard sq" data-rid="${esc(r.id)}"><div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span>${r.simulated ? `<span class="src warn">simulated</span>` : ""}${r.archived ? `<span class="src">archived</span>` : ""}</div>
+      <div class="t">${esc(rname(r))}</div><div class="h">${esc(r.headline)}${flagIcon(r)}</div>
+      <dl class="kv">${(r.metrics || []).slice(0, 3).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+      <div class="foot"><span>${esc(stamp(r.created))}</span><div class="acts"><button class="sqb" data-redit="${esc(r.id)}" title="Rename this report" aria-label="Rename this report">✎</button><button class="sqb${rfav(r) ? " on" : ""}" data-rfav="${esc(r.id)}" title="${rfav(r) ? "Remove from favourites" : "Add to favourites"}" aria-label="Favourite" aria-pressed="${rfav(r)}">${rfav(r) ? "♥" : "♡"}</button><button class="btn" data-report="${esc(r.id)}">Details</button></div></div></div>`;
   const grp = (src, title, runon, empty) => {
-    const list = reports.filter(r => src === "archived" ? r.archived : !r.archived && r.source === src);
-    return `<section class="rgroup"><header><b>${title}</b><span class="runon">${runon}</span><span class="note">${list.length} run${list.length === 1 ? "" : "s"}</span></header>
-      ${list.length ? `<div class="rgrid">${list.map(mc).join("")}</div>` : `<div class="pn note">${empty}</div>`}</section>`;
+    const list = reports.filter(r => src === "archived" ? r.archived : !r.archived && r.source === src).sort((a, b) => rfav(b) - rfav(a));
+    const pages = Math.max(1, Math.ceil(list.length / rsize)), pg = Math.min(rpage[src] || 1, pages);
+    const view = `<span class="rview" role="group" aria-label="Layout"><button class="sqb${rview === "grid" ? " on" : ""}" data-rview="grid" title="Square cards" aria-label="Square cards">▦</button><button class="sqb${rview === "list" ? " on" : ""}" data-rview="list" title="List with details" aria-label="List with details">☰</button></span>`;
+    const sel = `<label class="rsize note">Show <select data-rsize aria-label="Reports per page">${[10, 20, 30].map(n => `<option${n === rsize ? " selected" : ""}>${n}</option>`).join("")}</select></label>`;
+    const nav = pages > 1 ? `<nav class="rpager" aria-label="Pages"><button class="sqb" data-rpage="${src}:${pg - 1}" ${pg === 1 ? "disabled" : ""} aria-label="Previous page">‹</button>${Array.from({ length: pages }, (_, i) => i + 1).filter(n => n === 1 || n === pages || Math.abs(n - pg) <= 2).map((n, i, a) => (i && n - a[i - 1] > 1 ? `<span class="note">…</span>` : "") + `<button class="sqb${n === pg ? " on" : ""}" data-rpage="${src}:${n}">${n}</button>`).join("")}<button class="sqb" data-rpage="${src}:${pg + 1}" ${pg === pages ? "disabled" : ""} aria-label="Next page">›</button></nav>` : "";
+    return `<section class="rgroup"><header><b>${title}</b><span class="runon">${runon}</span><span class="note">${list.length} run${list.length === 1 ? "" : "s"}${src === "api" && list.length < API_TARGET ? ` · target ${API_TARGET}` : ""}</span>${list.length ? `<div class="rctl">${view}${list.length > 10 ? sel : ""}</div>` : ""}</header>
+      ${list.length ? `<div class="${rview === "list" ? "rlist" : "rgrid rsq"}">${list.slice((pg - 1) * rsize, pg * rsize).map(rview === "list" ? lr : mc).join("")}</div>${nav}` : `<div class="pn note">${empty}</div>`}</section>`;
   };
   const hw = (health && health.hardware) || "local GPU";
-  box.innerHTML = grp("api", "Token Factory · real Nemotron models", `Nebius Token Factory API${health && health.nebius_key_set ? " · key set" : ""}`,
+  const cnt = f => reports.filter(f).length, arch = cnt(r => r.archived);
+  const sum = `<div class="rsum"><b>${reports.length} saved run${reports.length === 1 ? "" : "s"}</b><span>·</span><span>${cnt(r => r.source === "local")} local</span><span>·</span><span>${cnt(r => r.source === "api")} Token Factory</span>${arch ? `<span>·</span><span>${arch} archived</span>` : ""}<span class="note" style="margin-left:auto">Token Factory runs appear after the live run on the Nemotron models.</span></div>`;
+  const localEmpty = arch ? `No new local runs since the last archive. The ${arch} earlier local run${arch === 1 ? " is" : "s are"} under <b>Archived</b> below.` : "No local runs saved yet.";
+  box.innerHTML = sum + grp("api", "Token Factory · real Nemotron models", `Nebius Token Factory API${health && health.nebius_key_set ? " · key set" : ""}`,
       "No Token Factory runs yet. They appear here after the live run on the Nemotron models.")
-    + grp("local", "Local · while building", `${esc(hw)} · Ollama`, "No local runs saved yet.")
-    + grp("archived", "Archived · older runs", "kept as evidence", "Nothing archived.");
+    + grp("local", "Local · while building", `${esc(hw)} · Ollama`, localEmpty)
+    + grp("archived", "Archived · earlier local runs", "kept as evidence", "Nothing archived.");
 }
 /* ---------- demo profiles: scripted, real answers, graded from what happened ---------- */
 let demoList = [];
@@ -1003,17 +1168,41 @@ async function openReport(id) {
   $("rsheet").innerHTML = `<div class="note">Loading…</div>`; $("rmodal").hidden = false;
   try {
     const w = await api("/reports/" + encodeURIComponent(id));
-    $("rsheet").innerHTML = `<div class="rd-head"><div><div class="title">${esc(w.title)}</div>
-        <div class="note"><span class="src ${esc(w.source)}">${SRC[w.source] || esc(w.source)}</span> ${esc(stamp(w.created))} · ${esc(w.description)}</div>
-        <div class="note">${Object.entries(w.models || {}).map(([t, m]) => `${esc(t)}: ${esc(m)}`).join(" · ")}${w.reader ? ` · reader: ${esc(w.reader)}` : ""}</div></div>
-        <button class="btn" data-rclose>Close</button></div>${w.kind === "compare" ? compareBody(w.report) : w.kind === "demos" ? w.report.demos.map(d => `<h2>${esc(d.title)}</h2>` + demoBody(d)).join("") : scenarioBody(w.report)}`;
+    const full = w.kind === "compare" ? compareBody(w.report) : w.kind === "demos" ? w.report.demos.map(d => `<h2>${esc(d.title)}</h2>` + demoBody(d)).join("") : scenarioBody(w.report);
+    $("rsheet").innerHTML = `<div class="rd-head"><div class="title">${esc(rmeta()[id]?.name || w.title)}</div><button class="btn" data-rclose>Close</button></div>
+      <div class="rd-wrap">
+        <aside class="rd-side">
+          <div><span class="src ${esc(w.source)}">${SRC[w.source] || esc(w.source)}</span>${w.simulated ? ` <span class="src warn">simulated</span>` : ""}${w.archived ? ` <span class="src">archived</span>` : ""}</div>
+          <div class="h" style="font-size:18px;font-weight:700;color:var(--green)">${esc(w.headline)}</div>
+          <div class="note">${esc(w.description)}</div>
+          <dl class="kv">${(w.metrics || []).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+          <dl class="kv" style="border-top:1px solid var(--line);padding-top:8px">${Object.entries(w.models || {}).map(([t, m]) => `<dt>${esc(t)}</dt><dd>${esc(m)}</dd>`).join("")}</dl>
+          <div class="note">${esc(stamp(w.created))}${w.reader ? ` · reader: ${esc(w.reader)}` : ""}</div>
+          <div class="note">${esc(w.run_on || "")}</div>
+        </aside>
+        <div class="rd-body">${full}</div>
+      </div>`;
   } catch (e) { $("rsheet").innerHTML = `<div class="note bad">${esc(e.message)}</div><button class="btn" data-rclose>Close</button>`; }
 }
 const closeReport = () => { $("rmodal").hidden = true; };
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeReport(); });
 document.addEventListener("click", e => {
   const card = e.target.closest("[data-report]"), rf = e.target.closest("[data-rf]"), row = e.target.closest("[data-srow]");
-  if (card) openReport(card.dataset.report);
+  const vw = e.target.closest("[data-rview]");
+  if (vw) { rview = vw.dataset.rview; store.set("rview", rview); renderReportsPanel(); return; }
+  const fv = e.target.closest("[data-rfav]"), ed = e.target.closest("[data-redit]"), pgb = e.target.closest("[data-rpage]");
+  if (pgb) { const [g, n] = pgb.dataset.rpage.split(":"); rpage[g] = +n; renderReportsPanel(); }
+  else if (fv) { rset(fv.dataset.rfav, { fav: !rmeta()[fv.dataset.rfav]?.fav }); renderReportsPanel(); }
+  else if (ed) {
+    const id = ed.dataset.redit, t = ed.closest(".mcard").querySelector(".t"), r = reports.find(x => x.id === id);
+    const inp = document.createElement("input"); inp.className = "t-in"; inp.value = rname(r); inp.maxLength = 80; inp.setAttribute("aria-label", "Report name");
+    t.replaceWith(inp); inp.focus(); inp.select();
+    let done = false;
+    const end = save => { if (done) return; done = true; if (save) rset(id, { name: inp.value.trim() === r.title ? "" : inp.value.trim() }); renderReportsPanel(); };
+    inp.onkeydown = ev => { if (ev.key === "Enter") end(true); else if (ev.key === "Escape") { ev.stopPropagation(); end(false); } };
+    inp.onblur = () => end(true);
+  }
+  else if (card) openReport(card.dataset.report);
   else if (rf) { rfilter = rf.dataset.rf; renderEvidence(); }
   else if (row) { const d = row.nextElementSibling; d.hidden = !d.hidden; }
   else if (e.target.closest("[data-rclose]") || e.target.id === "rmodal") closeReport();
@@ -1105,7 +1294,9 @@ function renderMemory() {
         <button class="btn" data-open>Open</button>
         <a class="btn" href="/memory/${encodeURIComponent(user)}/${Number(i.id)}/download" download style="text-decoration:none">Download</a>
         <button class="btn ghost" data-del>Delete</button></div></div></div>`;
-  }).join("") : `<div class="card note">Nothing here yet. Press <b>＋ New chat</b> and the conversation you leave is saved here.</div>`;
+  }).join("") : `<div class="card note">Nothing here yet. Press <b>＋ New chat</b> and the conversation you leave is saved here.
+      <div class="example" aria-hidden="true"><span class="ex-tag">Example</span><b style="color:var(--text)">Conversation 1</b> · 6 messages · Nano, Ultra · deletes in 10 days
+        <div style="display:flex;gap:6px;margin-top:8px"><span class="btn">Keep</span><span class="btn">Open</span><span class="btn">Download</span><span class="btn">Delete</span></div></div></div>`;
 }
 // "At times": at most once a day per session, only when something is about to be deleted.
 function remindMaybe() {
@@ -1162,7 +1353,7 @@ async function memoryAction(e) {
 async function loadLessons() {
   let l; try { l = await api("/lessons"); } catch (e) { return; }
   const names = (demoList.length ? demoList.map(d => d.name) : Object.keys(l.personas).map(n => n[0].toUpperCase() + n.slice(1)));
-  $("lessons").innerHTML = `<header>${ico("shield")}<b>Team lessons · what each persona taught Hope</b><span class="note" style="margin-left:auto">${l.rules} reader rule${l.rules === 1 ? "" : "s"} kept · zero tokens</span></header>
+  $("lessons").innerHTML = `<header>${ico("shield")}<b>Team lessons · what each persona taught Hope</b><span class="note" style="margin-left:auto">${l.rules ? `${l.rules} reader rule${l.rules === 1 ? "" : "s"} kept` : "No rules kept yet"} · zero tokens</span></header>
     <div class="lgrid">${names.map(n => { const c = l.personas[n.toLowerCase()] || { pass: 0, fail: 0 };
       const mine = l.lessons.filter(x => x.persona === n.toLowerCase()).slice(0, 3);
       return `<div class="lcard"><b>${esc(n)}</b><span class="note">${c.pass} passed · ${c.fail} failed</span>
@@ -1209,7 +1400,11 @@ function renderNoteList() {
     + saved.map(x => editSaved ? noteRow(x, "s", selS.has(x.key)) : `<div class="notes-row"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><time>${esc(when(x.at))}</time><span>${esc(x.text)}</span></div>`).join("") + `</div>` : "";
   $("notes-list").innerHTML = savedBox + (rest.length
     ? noteTools(rest.map(x => x.key), "n", "Save", true) + rest.map(x => noteRow(x, "n", selN.has(x.key))).join("")
-    : `<div class="note">${saved.length ? "No other notes." : "No notes yet. They appear as you set preferences, ask for things, and react to answers."}</div>`);
+    : `<div class="note">${saved.length ? "No other notes." : "No notes yet. They appear as you set preferences, ask for things, and react to answers."}</div>`
+      + (saved.length ? "" : `<div class="example" aria-hidden="true"><span class="ex-tag">Example</span>
+        <div class="notes-row"><span class="ic">•</span><time>10:02</time><span>You said you prefer short answers.</span></div>
+        <div class="notes-row"><span class="ic">•</span><time>10:05</time><span>Learned: you keep wanting detailed answers. Latest sign: "Can you elaborate…"</span></div>
+        <div class="notes-row"><span class="ic">•</span><time>10:06</time><span>Contradiction on length: answers moved up to Ultra.</span></div></div>`));
 }
 function toast(msg, onUndo) {
   const t = document.createElement("div"); t.className = "toast";
@@ -1219,6 +1414,7 @@ function toast(msg, onUndo) {
 }
 async function markNotes(marks) { await api("/notes/mark", { user_id: user, marks }); await loadNotes(); }
 document.addEventListener("change", e => {
+  if (e.target.matches("[data-rsize]")) { rsize = +e.target.value; store.set("rsize", rsize); Object.keys(rpage).forEach(k => delete rpage[k]); renderReportsPanel(); return; }
   const all = e.target.closest("[data-nall]"), one = e.target.closest("[data-nk]");
   if (all) { const sel = all.dataset.nall === "s" ? selS : selN, list = allNotes.filter(x => all.dataset.nall === "s" ? x.saved : !x.saved);
     sel.clear(); if (all.checked) list.forEach(x => sel.add(x.key)); renderNoteList(); }
@@ -1235,7 +1431,7 @@ document.addEventListener("click", async e => {
 });
 
 function showStatus(h) {
-  $("status").textContent = !h ? "● backend unreachable" : h.mode === "online" ? "● online" : "● offline";
+  $("status").textContent = !h ? "● backend unreachable" : h.mode === "online" ? "● online · Token Factory" : "● online · local";
   $("status").className = "pill " + (!h ? "bad" : h.mode === "online" ? "warn" : "ok");
 }
 function renderMode() {
@@ -1334,6 +1530,159 @@ $("tourNext").onclick = () => tourAt === TOUR.length - 1 ? tourEnd(false) : tour
 $("tourBack").onclick = () => tourAt > 0 && tourShow(tourAt - 1);
 $("tourSkip").onclick = () => tourEnd(true);
 $("tourReplay").onclick = tourStart;
+/* ---------- Tutorials: every button and feature, explained ---------- */
+const TCAT = {
+  all: ["All", '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'],
+  start: ["Getting started", '<path d="M5 4l14 8-14 8z"/>'],
+  chat: ["Chat", '<path d="M4 5h16v11H9l-5 4z"/>'],
+  mirror: ["The mirror", '<circle cx="12" cy="12" r="8"/><path d="M12 4v16"/>'],
+  routing: ["Routing", '<path d="M4 12h6l4-6h6M14 18h6M10 12l4 6"/>'],
+  proof: ["Proof and reports", '<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'],
+  settings: ["Settings", '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/>'],
+};
+const TUT = [
+  { id: "what-it-is", cat: "start", title: "What this app does", go: { view: "chat" },
+    body: "Most assistants believe what you <b>say</b> you like. This one also watches what you <b>do</b>. When the two disagree, it sends your question to a stronger model and tells you why.",
+    points: ["What you say: set in the mirror", "What you do: learned from your messages", "A bigger gap means a stronger model"] },
+  { id: "three-views", cat: "start", title: "The three views", go: { view: "chat", at: "#nav-main" },
+    body: "The left sidebar switches what you see. <b>Chat</b> is the conversation with the mirror. <b>Chat + Proof</b> puts the evidence beside it. <b>Proof</b> shows the test results on their own.",
+    points: ["Chat", "Chat + Proof", "Proof"] },
+  { id: "status-pill", cat: "start", title: "Local or Token Factory", go: { view: "chat", at: "#status" },
+    body: "The pill next to the title shows where the models run. <b>Local</b> means on this computer, with no cost. <b>Token Factory</b> means Nebius, which spends credits.",
+    points: ["Green: local", "Amber: Token Factory", "Red: the server can't be reached"] },
+  { id: "send", cat: "chat", title: "Sending a message", go: { view: "chat", at: "#form" },
+    body: "Type in the box at the bottom and press <b>Send</b> or Enter. Each answer is tagged with the model that wrote it and how long it took.",
+    points: ["Message box", "Send", "Model tag on every answer"] },
+  { id: "answer-actions", cat: "chat", title: "Rating an answer", go: { view: "chat", at: "#thread" },
+    body: "Under each answer: <b>thumbs up</b>, <b>thumbs down</b> (pick a reason such as \"too long\"), <b>Copy</b> and <b>Try again</b>. Every click counts as what you do, so it teaches the app.",
+    points: ["Thumbs up", "Thumbs down with a reason", "Copy", "Try again"] },
+  { id: "note-bot", cat: "chat", title: "The note bot", go: { view: "chat", at: "#notebot" },
+    body: "The square button left of the message box keeps plain notes on what the app has learned about you, and why. It uses no AI and no tokens, so it can't make anything up.",
+    points: ["Badge: new notes", "Click: open your notes"] },
+  { id: "new-chat", cat: "chat", title: "New chat", go: { view: "chat", at: "#newchat" },
+    body: "<b>New chat</b> saves the current conversation to Memory and starts a clean one. Your preferences stay, because a new chat isn't a new person.",
+    points: ["Saves to Memory", "Keeps your profile"] },
+  { id: "mirror-rows", cat: "mirror", title: "Reading the mirror", go: { view: "chat", at: "#mirrorBlock" },
+    body: "Five rows: tone, length, sourcing, structure and revision. The <b>ring</b> is what you said; the <b>dot</b> is what you do. The line between them glows as the gap grows.",
+    points: ["Ring: what you said", "Dot: what you do", "Glow: the gap"] },
+  { id: "mirror-set", cat: "mirror", title: "Setting a preference", go: { view: "chat", at: "#mirrorBlock" },
+    body: "Click a word in any row, for example <b>concise</b> in Length, to say how you like answers. Click <b>no preference</b> to clear that row.",
+    points: ["Click a word to set it", "No preference clears it"] },
+  { id: "mirror-reset", cat: "mirror", title: "Forget and reset", go: { view: "chat", at: "#forget" },
+    body: "<b>Forget what I do</b> clears what the app learned from your behaviour. <b>Reset what I said</b> sets every row back to no preference. Press both for a completely clean start.",
+    points: ["Forget what I do", "Reset what I said"] },
+  { id: "update-offer", cat: "mirror", title: "The update offer", go: { view: "chat", at: "#mirrorBlock" },
+    body: "When you keep doing the opposite of what you said, the mirror asks whether to update your setting. Nothing changes unless you press <b>Yes, update it</b>.",
+    points: ["Appears after a repeated clash", "Yes, update it", "Ignore it to keep your setting"] },
+  { id: "tiers", cat: "routing", title: "Nano, Super and Ultra", go: { view: "chat", at: "#mirrorBlock" },
+    body: "<b>Nano</b> is fast and cheap and answers when you are consistent. <b>Super</b> steps in when a new habit is forming. <b>Ultra</b> reasons deeply when what you say and do clearly clash.",
+    points: ["Nano: under 0.4", "Super: 0.4 to 0.7", "Ultra: 0.7 and above"] },
+  { id: "dissonance", cat: "routing", title: "The dissonance score", go: { view: "chat", at: "#mirrorBlock" },
+    body: "Each row gets a score from 0 to 1. Opposites, such as saying concise but asking for detail, start at 0.70 and rise each time it repeats. The highest row picks the model.",
+    points: ["0: no clash", "0.70: a clear clash", "Repeats push it higher"] },
+  { id: "why-escalated", cat: "routing", title: "Why it escalated", go: { view: "chat", at: "#storyBlock" },
+    body: "Every time an answer moves up a tier, this box explains it in plain words, for example: \"you said concise but keep asking for detailed, seen 3 times\".",
+    points: ["The reason", "How often it was seen", "The score"] },
+  { id: "play-demo", cat: "proof", title: "Play the demo", go: { view: "chat", at: "#demo" },
+    body: "The green button runs the core story in about a minute with real model calls: say short, keep asking for detail, and watch the router escalate.",
+    points: ["One click", "Real model answers"] },
+  { id: "personas", cat: "proof", title: "The five personas", go: { view: "proof", at: "#evidenceBlock" },
+    body: "Scripted test users you can replay with <b>Run</b>. Two show success, two show known gaps, and one plants a fake source to prove it gets caught.",
+    points: ["Hope and Jordan: success", "Casey and Sam: known gaps", "Kai: a fake source"] },
+  { id: "hope-review", cat: "proof", title: "Hope's review", go: { view: "proof", at: "#evidenceBlock" },
+    body: "When a persona fails, Hope explains why and proposes a fix, checked without calling any model (zero tokens). A kept fix teaches the reader from then on.",
+    points: ["Why it failed", "The proposed fix", "Apply to keep it"] },
+  { id: "reports", cat: "proof", title: "Reports", go: { view: "settings", sec: "reports" },
+    body: "Every saved test run, as a card. <b>Details</b> opens a summary on the left and the full report on the right. Older runs sit under <b>Archived</b>.",
+    points: ["Token Factory runs", "Local runs", "Archived"] },
+  { id: "budget", cat: "settings", title: "Budget", go: { view: "settings", sec: "budget" },
+    body: "A pretend wallet. Set a limit and the router plans every answer inside it: it steps down a tier, turns thinking off, or stops before overspending.",
+    points: ["Quick set", "Steps down a tier", "Never overspends"] },
+  { id: "models", cat: "settings", title: "Models", go: { view: "settings", sec: "models" },
+    body: "Which model answers for each tier. The switch picks <b>Offline</b> (this computer) or <b>Online</b> (Token Factory). Online stays locked until the model ids are confirmed.",
+    points: ["Offline / Online switch", "Tier cards", "Signal reader"] },
+  { id: "memory", cat: "settings", title: "Memory", go: { view: "settings", sec: "memory" },
+    body: "Saved conversations are deleted after 10 days unless you press <b>Keep</b>. Team lessons show what each persona taught Hope.",
+    points: ["Keep", "Open or download", "Team lessons"] },
+  { id: "notes", cat: "settings", title: "Notes", go: { view: "settings", sec: "notes" },
+    body: "Everything the note bot wrote. Tick notes to save or delete them; a mistaken delete can be undone for 10 seconds.",
+    points: ["Tick boxes", "Save", "Delete with undo"] },
+];
+const TIMG = new Set([]);                     // entry ids that have a screenshot in src/web/tutorials/
+let tutCat = "all", tutIdx = 0, tutRead = new Set();
+try { tutRead = new Set(JSON.parse(store.get("dr-tut-read") || "[]")); } catch (e) {}
+const tutList = () => { const q = $("tutSearch").value.trim().toLowerCase();
+  return TUT.filter(t => (tutCat === "all" || t.cat === tutCat) && (!q || (t.title + " " + t.body).toLowerCase().includes(q))); };
+function tutRender() {
+  const list = tutList(); tutIdx = Math.max(0, Math.min(tutIdx, list.length - 1));
+  $("tutRail").innerHTML = Object.entries(TCAT).map(([k, [name, path]]) => {
+    const unread = TUT.some(t => (k === "all" || t.cat === k) && !tutRead.has(t.id));
+    return `<button class="${k === tutCat ? "on" : ""}" data-tcat="${k}" title="${name}" aria-label="${name}"><svg viewBox="0 0 24 24">${path}</svg>${unread ? '<span class="dot"></span>' : ""}</button>`; }).join("");
+  $("tutCrumb").textContent = "Tutorials / " + TCAT[tutCat][0];
+  $("tutCount").textContent = `Entries read: ${TUT.filter(t => tutRead.has(t.id)).length} of ${TUT.length}`;
+  $("tutItems").innerHTML = list.length ? list.map((t, i) => `<button class="tut-item ${i === tutIdx ? "on" : ""}" role="option" aria-selected="${i === tutIdx}" data-ti="${i}">${esc(t.title)}<small>${TCAT[t.cat][0]}</small>${tutRead.has(t.id) ? "" : '<span class="dot"></span>'}</button>`).join("")
+    : `<div class="note" style="padding:8px">No tutorials match that search.</div>`;
+  const t = list[tutIdx];
+  if (!t) { ["tutShot", "tutBody", "tutPoints"].forEach(id => $(id).innerHTML = ""); $("tutTitle").textContent = ""; return; }
+  tutRead.add(t.id); store.set("dr-tut-read", JSON.stringify([...tutRead]));
+  $("tutShot").innerHTML = TIMG.has(t.id) ? `<img src="/tutorials/${t.id}.webp" alt="${esc(t.title)}">`
+    : `<div class="tut-ph"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg><b>${esc(t.title)}</b><span>Screenshot coming. Press <b>Try it</b> to see it in the app.</span></div>`;
+  $("tutTitle").textContent = t.title;
+  $("tutBody").innerHTML = t.body;
+  $("tutPoints").innerHTML = (t.points || []).map((p, i) => `<li><i>${i + 1}</i>${esc(p)}</li>`).join("");
+  $("tutPrev").disabled = tutIdx === 0; $("tutNext").disabled = tutIdx >= list.length - 1;
+  $("tutItems").querySelector(".tut-item.on")?.scrollIntoView({ block: "nearest" });
+  if ($("tut").contains(document.activeElement) && document.activeElement.classList.contains("tut-item")) $("tutItems").querySelector(".tut-item.on")?.focus();
+}
+function tutOpen(id) {
+  if (id) { tutCat = "all"; $("tutSearch").value = ""; tutIdx = Math.max(0, TUT.findIndex(t => t.id === id)); }
+  setView("settings", "accessibility"); showSection("accessibility");
+  toggleReadme(false, true); $("tut").hidden = false; tutLabel(); tutRender();
+  requestAnimationFrame(() => setTimeout(() => { $("tut").scrollIntoView({ block: "start", behavior: "smooth" }); $("tutItems").querySelector(".tut-item.on")?.focus({ preventScroll: true }); }, 60));
+}
+const tutLabel = () => { const o = !$("tut").hidden; $("tutTile").classList.toggle("on", o); $("tutTile").textContent = o ? "Close the tutorials" : "Open the tutorials"; $("tutTile").setAttribute("aria-expanded", o); };
+const toTop = () => setTimeout(() => document.querySelector("[data-panel=accessibility] .sechead")?.scrollIntoView({ block: "start", behavior: "smooth" }), 60);
+// quiet = another window is taking over, so don't scroll back up
+const tutClose = quiet => { const was = !$("tut").hidden; $("tut").hidden = true; tutLabel(); if (was && !quiet) toTop(); };
+function tutTry() {
+  const t = tutList()[tutIdx]; if (!t) return;
+  tutClose(true); setView(t.go.view, t.go.sec);
+  if (t.go.view === "settings" && t.go.sec) showSection(t.go.sec);
+  if (!t.go.at) return;
+  setTimeout(() => { const el = document.querySelector(t.go.at); if (!el) return;
+    el.scrollIntoView({ block: "center", behavior: "smooth" }); el.classList.remove("tut-flash"); void el.offsetWidth; el.classList.add("tut-flash"); }, 250);
+}
+$("tutOpen").onclick = () => { tutHint(false); tutOpen(); };
+function tutHint(show) {
+  let h = $("tutHint");
+  if (!show) { if (h) h.remove(); return; }
+  h = document.createElement("div"); h.id = "tutHint"; h.setAttribute("role", "status");
+  h.innerHTML = `<button class="go" type="button">Start tutorial</button><button class="x" type="button" aria-label="Dismiss">✕</button>`;
+  document.body.appendChild(h);
+  const place = () => { const r = $("tutOpen").getBoundingClientRect(); h.style.top = r.bottom + 12 + "px"; h.style.left = Math.max(8, Math.min(innerWidth - h.offsetWidth - 8, r.left + r.width / 2 - h.offsetWidth / 2)) + "px"; h.style.setProperty("--arrow", Math.round(r.left + r.width / 2 - parseFloat(h.style.left)) + "px"); };
+  place(); addEventListener("resize", place);
+  h.querySelector(".go").onclick = () => { tutHint(false); tourStart(); };
+  h.querySelector(".x").onclick = () => tutHint(false);
+}
+setTimeout(() => { tutHint(true); setTimeout(() => tutHint(false), 30000); }, 700);
+$("tutClose").onclick = () => tutClose();
+$("tutPrev").onclick = () => { tutIdx--; tutRender(); };
+$("tutNext").onclick = () => { tutIdx++; tutRender(); };
+$("tutTry").onclick = tutTry;
+$("tutSearch").oninput = () => { tutIdx = 0; tutRender(); };
+$("tut").addEventListener("click", e => {
+  const c = e.target.closest("[data-tcat]"), it = e.target.closest("[data-ti]");
+  if (c) { tutCat = c.dataset.tcat; tutIdx = 0; tutRender(); }
+  else if (it) { tutIdx = +it.dataset.ti; tutRender(); }
+});
+document.addEventListener("click", e => { if (e.target.closest("[data-tut-open]")) { if ($("tut").hidden) tutOpen(); else tutClose(); } });
+document.addEventListener("keydown", e => {
+  if ($("tut").hidden || !$("tut").contains(document.activeElement)) return;
+  if (e.key === "Escape") { e.preventDefault(); tutClose(); }
+  else if (e.target.id !== "tutSearch" && (e.key === "ArrowDown" || e.key === "ArrowRight") && tutIdx < tutList().length - 1) { e.preventDefault(); tutIdx++; tutRender(); }
+  else if (e.target.id !== "tutSearch" && (e.key === "ArrowUp" || e.key === "ArrowLeft") && tutIdx > 0) { e.preventDefault(); tutIdx--; tutRender(); }
+});
+
 document.addEventListener("click", e => { if (e.target.closest("[data-tour-acc]")) { $("tourToast").hidden = true; setView("settings", "accessibility"); } });
 document.addEventListener("keydown", e => {
   if (tourAt < 0) return;
@@ -1345,16 +1694,23 @@ document.addEventListener("keydown", e => {
 });
 addEventListener("resize", () => tourAt >= 0 && tourPlace(TOUR[tourAt]));
 let readmeLoaded = false;
-function toggleReadme() {
-  const head = $("readmeHead"), open = $("readme").hidden;
-  $("readme").hidden = !open; head.setAttribute("aria-expanded", open); head.parentElement.classList.toggle("open", open);
-  if (open) loadReadme();
+function toggleReadme(force, quiet) {
+  const open = force === undefined ? $("readmeWrap").hidden : force, was = !$("readmeWrap").hidden;
+  if (open) tutClose(true);
+  $("readmeWrap").hidden = !open; $("readmeHead").setAttribute("aria-expanded", open);
+  $("readmeHead").classList.toggle("on", open); $("readmeHead").textContent = open ? "Close the README" : "Open the README";
+  if (open) { loadReadme(); setTimeout(() => $("readmeWrap").scrollIntoView({ block: "start", behavior: "smooth" }), 60); }
+  else if (was && !quiet) toTop();
 }
-document.addEventListener("click", e => { if (e.target.closest("#readmeHead")) toggleReadme(); });
-document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.id === "readmeHead") { e.preventDefault(); toggleReadme(); } });
+$("readmeHead").onclick = () => toggleReadme();
+$("readme").addEventListener("click", e => {          // contents links jump to the heading inside the README
+  const a = e.target.closest("[data-anchor]"); if (!a) return;
+  e.preventDefault(); document.getElementById("rm-" + a.dataset.anchor)?.scrollIntoView({ block: "start", behavior: "smooth" });
+});
+$("readmeClose").onclick = () => toggleReadme(false);
 async function loadReadme() {
   if (readmeLoaded) return;
-  try { $("readme").innerHTML = md((await api("/readme")).markdown); readmeLoaded = true; }
+  try { $("readme").innerHTML = md((await api("/readme")).markdown, true); readmeLoaded = true; }
   catch (e) { $("readme").innerHTML = `<div class="note bad">${esc(e.message)}</div>`; }
 }
 
@@ -1448,8 +1804,8 @@ async function load() {
   if (mine !== gen) return;                        // a newer user switch already took over
   loadMemory();                                    // also decides whether to remind about expiring chats
   thread.innerHTML = "";
-  if (!list.length) return emptyState();
-  const chrono = [...list].reverse();              // replay the saved conversation, oldest first
+  if (!list.some(d => d.user_message)) return emptyState();
+  const chrono = [...list].reverse().filter(d => d.user_message);   // replay the saved conversation, oldest first; erased chats have no words left
   chrono.forEach((d, i) => {
     add(esc(d.user_message), "msg you").dataset.id = d.id;
     if (d.agent_response) add(botHtml({ model_chosen: d.model_used, routing_reason: d.routing_reason, response: d.agent_response, unverified_sources: d.unverified_sources },
@@ -1578,6 +1934,14 @@ async function sendFeedback(acts, kind, reason) {
 }
 
 document.addEventListener("click", async e => {
+  if (e.target.closest("#resetsaid")) {
+    try {
+      $("undo").innerHTML = ""; let m;
+      for (const dim of ["tone", "length", "sourcing", "structure", "revision"]) m = await api("/update-style", { user_id: user, dimension: dim, value: "balanced" });
+      renderMirror(m); loadNotes(false); refresh();
+    } catch (err) { $("reason").textContent = err.message; }
+    return;
+  }
   if (e.target.closest("#forget")) {
     try { $("undo").innerHTML = ""; renderMirror(await api("/forget-observed/" + encodeURIComponent(user), {})); refresh(); }
     catch (err) { $("reason").textContent = err.message; }

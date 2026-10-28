@@ -5,6 +5,7 @@ Where a run happened is read from the tier providers: any tier on Nebius makes i
 everything else (Ollama, or the simulator) is local, i.e. what we did while building.
 """
 import gzip
+import os
 import json
 import re
 import sys
@@ -15,7 +16,7 @@ from src import config
 
 REPORTS_DIR = Path(__file__).resolve().parents[2] / "docs" / "reports"
 ARCHIVE_DIR = REPORTS_DIR / "archive"        # older runs: kept as evidence, hidden from the default lists
-ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,80}$")
+ID_RE = re.compile(r"^[a-z0-9][a-z0-9_+-]{0,80}$")
 
 
 def where(providers: dict | None) -> str:
@@ -47,11 +48,13 @@ def _scenario_card(report: dict, providers) -> dict:
     sim = report["simulated"]
     return {
         "kind": "scenarios",
-        "title": f"{len(sc)} scenarios · {'Nemotron Nano' if reader == 'nano' else 'keyword'} reader",
+        "title": (f"{sc[0]['id'].replace('_', ' ')} · " if len(sc) == 1 else f"{len(sc)} scenarios · ") + f"{'Nemotron Nano' if reader == 'nano' else 'keyword'} reader",
         "description": ("Routing and grading are real; model answers and tokens are simulated." if sim else
                         "Real model answers on every scenario, graded by the same checks as the simulated run."),
         "headline": f"{ok}/{len(sc)} as expected",
         "chips": [f"{st['caught']}/{st['total']} false claims caught", "simulated" if sim else "real answers"],
+        "flag": ("fail" if any(not x["as_expected"] or x["label"] in ("FAIL", "KNOWN GAP") for x in sc)
+                 else "fake" if len(sc) == 1 and sc[0]["kind"] == "false_claim" else ""),
         "cost_usd": cost, "simulated": sim, "reader": reader, "metrics": _scenario_metrics(report),
         "models": report.get("models", {}), "source": where(providers),
     }
@@ -61,7 +64,7 @@ def _compare_card(report: dict, providers) -> dict:
     a, b = report["contestants"]
     return {
         "kind": "compare",
-        "title": f"Is Ultra worth it? · {a} vs {b}",
+        "title": f"Is Ultra worth it? · {a} vs {b}" + (f" · {report['results'][0]['id']}" if report.get("cases") == 1 and report.get("results") else ""),
         "description": "Blind answer comparison: a judge model sees the answers without names, in both orders.",
         "headline": f"{report['wins'][a]}–{report['wins'][b]} · {report['ties']} tied",
         "chips": [f"{report['cases']} cases", f"cost ×{report['cost_ratio']}"],
@@ -86,6 +89,7 @@ def _demos_card(report: dict, providers) -> dict:
         "headline": " · ".join(f"{r['label']}" for r in res),
         "chips": [f"{good}/{len(res)} behaved as documented"], "cost_usd": 0, "simulated": False, "reader": "",
         "personas": [r.get("name", r["id"]) for r in res],
+        "flag": "fail" if any(r["label"] == "KNOWN GAP" for r in res) else "fake" if len(res) == 1 and res[0]["label"] == "CAUGHT" else "",
         "metrics": [[r.get("name", r["id"]), f"{r['label']} · {' > '.join(t['tier'] for t in r['turns'])}"] for r in res]
         + [["Latency / answer", _ms(sum(t["latency_ms"] for r in res for t in r["turns"]) / max(1, sum(len(r["turns"]) for r in res)))],
            ["Tokens (total)", f"{sum(t['tokens'].get('total_tokens', 0) for r in res for t in r['turns']):,}"]],
@@ -96,6 +100,9 @@ def _demos_card(report: dict, providers) -> dict:
 def build(report: dict, name: str, providers: dict | None = None, created: str | None = None) -> dict:
     card = (_compare_card if "contestants" in report else _demos_card if "demos" in report else _scenario_card)(report, providers)
     src = card["source"]
+    run_n = os.environ.get("RUN_N")                    # repeat runs of the same test get "· run N" in the title
+    if run_n:
+        card["title"] += f" · run {run_n}"
     card["run_on"] = ("Simulator · no model calls" if card["simulated"] else
                       f"Nebius Token Factory · {config.NEBIUS_BASE_URL or 'api.tokenfactory.nebius.com'}" if src == "api"
                       else f"Local · {config.HARDWARE} · Ollama")
@@ -105,6 +112,8 @@ def build(report: dict, name: str, providers: dict | None = None, created: str |
 
 def save(report: dict, name: str, providers: dict | None = None, out: Path = REPORTS_DIR, created=None) -> Path:
     out.mkdir(parents=True, exist_ok=True)
+    if os.environ.get("RUN_N"):
+        name += f"-r{os.environ['RUN_N']}"
     path = out / f"{name}.json.gz"
     path.write_bytes(gzip.compress(json.dumps(build(report, name, providers or config.TIER_PROVIDERS, created)).encode("utf-8")))
     return path

@@ -191,7 +191,7 @@ def main(argv):
         from src import config
         from src.eval import reports
         place = reports.where(config.TIER_PROVIDERS)
-        print("saved:", reports.save(rep, f"compare-{'-vs-'.join(rep['contestants'])}-{place}-{datetime.now():%Y%m%d-%H%M}",
+        print("saved:", reports.save(rep, f"compare-{args.only.replace(',', '+') + '-' if args.only else ''}{'-vs-'.join(rep['contestants'])}-{place}-{datetime.now():%Y%m%d-%H%M}",
                                      config.TIER_PROVIDERS))
     print(rep["verdict"])
     print(f"  wins {a} {rep['wins'][a]} / {b} {rep['wins'][b]} / ties {rep['ties']} / invalid {rep['invalid']}")

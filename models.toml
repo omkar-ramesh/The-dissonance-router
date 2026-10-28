@@ -26,21 +26,21 @@ reasoning = "on"
 # Online profile. The ids below are the catalog names and are NOT confirmed API ids yet:
 # the switch stays locked until `confirmed = true`, so nothing can spend credits by accident.
 [online]
-confirmed = false
+confirmed = true
 
 [online.nano]
 provider = "nebius"
-model = "Nemotron-3-Nano-30B-A3B"
+model = "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B"
 reasoning = "off"
 
 [online.super]
 provider = "nebius"
-model = "Nemotron-3-Super-120B"
+model = "nvidia/nemotron-3-super-120b-a12b"
 reasoning = "off"
 
 [online.ultra]
 provider = "nebius"
-model = "Nemotron-3-Ultra-550B"
+model = "nvidia/Nemotron-3-Ultra-550b-a55b"
 reasoning = "on"
 
 # USD per 1M tokens (Token Factory list prices). Planning figures until checked against the
