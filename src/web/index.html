@@ -247,6 +247,11 @@ main{flex:1;min-height:0;display:grid}
 .basis{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
 [data-panel=accessibility] .acc-tour{grid-column:span 5}[data-panel=accessibility] .acc-soon{grid-column:span 7}
 .acc-tour .btn{align-self:flex-start}.readme{max-height:none;font:14px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}.readme h1{font-size:20px}.readme h2{font-size:16px}
+[data-panel=accessibility]>.acc-tour{grid-column:span 5;justify-content:space-between}[data-panel=accessibility]>.acc-soon{grid-column:span 7}
+[data-panel=accessibility] .acc-soon .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+[data-panel=accessibility] .acc-soon .facts div{background:var(--bg2,rgba(255,255,255,.03));border:1px solid var(--line);border-radius:12px;padding:12px 14px;gap:3px;min-height:68px}
+@media(max-width:900px){[data-panel=accessibility]>.acc-tour,[data-panel=accessibility]>.acc-soon{grid-column:span 12}}
+.docs>header{cursor:pointer}.docs .chev{transition:transform .2s}.docs.open .chev{transform:rotate(180deg)}
 #tour{position:fixed;inset:0;z-index:80}
 .tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px #05070cb8,0 0 0 2px var(--blue);transition:all .35s cubic-bezier(.3,.7,.2,1);pointer-events:none}
 .tour-hole.none{box-shadow:0 0 0 9999px #05070cd0;width:0!important;height:0!important;left:50%!important;top:50%!important}
@@ -324,9 +329,9 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
 <div class="shell" id="shell">
   <aside class="side">
     <div class="side-inner">
-     <h2>Profile</h2>
+     <div id="side-id"><h2>Profile</h2>
      <button class="view-btn" id="side-profile" title="Switch profile"></button>
-     <div style="height:12px"></div>
+     <div style="height:12px"></div></div>
      
      <div id="nav-main">
       <h2>View</h2>
@@ -503,8 +508,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
       <section class="pn acc-soon"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Coming next</b></header>
         <div class="facts"><div><b>Text size</b><span>Small, normal, large.</span></div><div><b>Reduce motion</b><span>Turn off animations.</span></div>
           <div><b>Plain font</b><span>Swap the cyber font for an easier read.</span></div><div><b>High contrast</b><span>Stronger borders and text.</span></div></div></section>
-      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b><span class="note" style="margin-left:auto">README.md · same file as the repo</span></header>
-        <div class="md readme" id="readme"><div class="note">Loading…</div></div></section></div>
+      <section class="pn docs"><header role="button" tabindex="0" aria-expanded="false" aria-controls="readme" id="readmeHead"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b><span class="note" style="margin-left:auto">README.md · same file as the repo</span><span class="chev" aria-hidden="true">▾</span></header>
+        <div class="md readme" id="readme" hidden><div class="note">Loading…</div></div></section></div>
   </section>
 </div>
 
@@ -872,9 +877,10 @@ const stamp = iso => new Date(iso).toLocaleString([], { dateStyle: "medium", tim
 function renderEvidence() {
   const box = $("evidenceBlock");
   if (reports === null) { box.innerHTML = `<h2>Reports</h2><div class="card note">Couldn't reach the server for the saved reports.</div>`; return; }
-  const n = k => reports.filter(r => k === "all" || r.source === k).length;
-  const shown = reports.filter(r => rfilter === "all" || r.source === rfilter);
-  const filters = [["all", "All"], ["local", "Local · while building"], ["api", "Token Factory runs"]]
+  const inF = (r, k) => k === "archived" ? r.archived : !r.archived && (k === "all" || r.source === k);
+  const n = k => reports.filter(r => inF(r, k)).length;
+  const shown = reports.filter(r => inF(r, rfilter));
+  const filters = [["all", "All"], ["local", "Local · while building"], ["api", "Token Factory runs"], ["archived", "Archived"]]
     .map(([k, l]) => `<button class="chipbtn ${rfilter === k ? "on" : ""}" data-rf="${k}">${l} · ${n(k)}</button>`).join("");
   const cardHtml = r => `<button class="rcard" data-report="${esc(r.id)}">
       <div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span><span>${esc(stamp(r.created))}</span></div>
@@ -897,14 +903,15 @@ function renderReportsPanel() {
       <dl class="kv" style="border-top:1px solid var(--line);padding-top:6px">${(r.metrics || []).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
       <div class="foot"><span>${esc(r.run_on || "")}</span><button class="btn" data-report="${esc(r.id)}">More details</button></div></div>`;
   const grp = (src, title, runon, empty) => {
-    const list = reports.filter(r => r.source === src);
+    const list = reports.filter(r => src === "archived" ? r.archived : !r.archived && r.source === src);
     return `<section class="rgroup"><header><b>${title}</b><span class="runon">${runon}</span><span class="note">${list.length} run${list.length === 1 ? "" : "s"}</span></header>
       ${list.length ? `<div class="rgrid">${list.map(mc).join("")}</div>` : `<div class="pn note">${empty}</div>`}</section>`;
   };
   const hw = (health && health.hardware) || "local GPU";
   box.innerHTML = grp("api", "Token Factory · real Nemotron models", `Nebius Token Factory API${health && health.nebius_key_set ? " · key set" : ""}`,
       "No Token Factory runs yet. They appear here after the live run on the Nemotron models.")
-    + grp("local", "Local · while building", `${esc(hw)} · Ollama`, "No local runs saved yet.");
+    + grp("local", "Local · while building", `${esc(hw)} · Ollama`, "No local runs saved yet.")
+    + grp("archived", "Archived · older runs", "kept as evidence", "Nothing archived.");
 }
 /* ---------- demo profiles: scripted, real answers, graded from what happened ---------- */
 let demoList = [];
@@ -1338,6 +1345,13 @@ document.addEventListener("keydown", e => {
 });
 addEventListener("resize", () => tourAt >= 0 && tourPlace(TOUR[tourAt]));
 let readmeLoaded = false;
+function toggleReadme() {
+  const head = $("readmeHead"), open = $("readme").hidden;
+  $("readme").hidden = !open; head.setAttribute("aria-expanded", open); head.parentElement.classList.toggle("open", open);
+  if (open) loadReadme();
+}
+document.addEventListener("click", e => { if (e.target.closest("#readmeHead")) toggleReadme(); });
+document.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.id === "readmeHead") { e.preventDefault(); toggleReadme(); } });
 async function loadReadme() {
   if (readmeLoaded) return;
   try { $("readme").innerHTML = md((await api("/readme")).markdown); readmeLoaded = true; }
@@ -1369,7 +1383,7 @@ function setView(v, sec) {
   }
   $("top").hidden = !l.top;
   const inSettings = v === "settings";
-  $("nav-main").hidden = inSettings; $("nav-settings").hidden = !inSettings;
+  $("side-id").hidden = inSettings; $("nav-main").hidden = inSettings; $("nav-settings").hidden = !inSettings;
   document.querySelectorAll("#nav-main [data-v]").forEach(b => b.classList.toggle("on", b.dataset.v === v));
   $("gear").classList.toggle("on", inSettings);
   $("gear-label").innerHTML = inSettings ? "Close settings<small>back to the main page</small>" : "Settings<small>profile, budget, memory</small>";
@@ -1386,7 +1400,7 @@ function showSection(sec) {
   if (sec === "memory") loadMemory();
   if (sec === "notes") loadNotes(true);
   if (sec === "budget") loadBudget();
-  if (sec === "accessibility") loadReadme();
+
   store.set("dr-section", sec);
 }
 // The gear opens Settings, and closes it again (back to wherever you were).

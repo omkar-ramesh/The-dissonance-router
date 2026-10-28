@@ -4,6 +4,14 @@ A personal AI agent that notices when **what you say you want** doesn't match **
 
 Built for the Nebius x NVIDIA Global AI Hackathon (track: Best Apps and Agents). Runs on NVIDIA Nemotron models.
 
+## Contents
+
+- **Understand it:** [The idea](#the-idea) · [How it works](#how-it-works) · [Design guidelines](#design-guidelines) · [Nemotron and Nebius Token Factory](#nemotron-and-nebius-token-factory)
+- **Run it:** [Quick start](#quick-start) · [The app](#the-app) · [Settings and the tutorial](#settings-and-the-tutorial) · [Models, offline and online](#models-offline-and-online) · [Public demo mode](#public-demo-mode)
+- **Features:** [Personas, Hope and the team lessons](#personas-hope-and-the-team-lessons) · [Note bot](#note-bot) · [Memory](#memory-past-conversations) · [Budget limiter](#budget-limiter)
+- **Evidence:** [Evaluation](#evaluation) · [Reports](#reports) · [Known limitations](#known-limitations)
+- **Reference:** [HTTP API](#http-api) · [Dev dashboard](#dev-dashboard) · [Efficiency choices](#efficiency-choices) · [Project layout](#project-layout)
+
 ## The idea
 
 Most assistants store "I prefer short answers" and treat it as fact. People often do the opposite: they keep asking for more detail, ask for rewrites, or ignore the brief reply. The assistant keeps missing, and nobody tells it.
@@ -167,6 +175,10 @@ python -m src.eval        # 13 scripted conversations; add --live for the real m
 
 It shows the three outcomes side by side: **success** (8 scenarios), **failure with a reason code** (4 known limits, e.g. `MISSED_SIGNAL`, `FALSE_SIGNAL`, `OVER_ROUTED`) and **false claims** (every explanation the agent gives is checked against its database; invented links are flagged; 7 of 7 injected false claims are caught). It also prices always-Nano vs always-Ultra vs the router. Method and limits: [docs/EVAL.md](docs/EVAL.md).
 
+## Reports
+
+Every evaluation run is saved as one file in [`docs/reports/`](docs/reports/) and shown as a card on the **Proof** page (what it was, which models, where it ran, the headline). Click a card for the full detail: every scenario with its turns, tiers, tokens, cost and reason codes, or for the blind comparison, every answer and the judge's reason. Filter by **Local** (runs made while building, on local stand-in models or the simulator) **Token Factory** (runs on the real Nemotron models) or **Archived** (older runs, moved to [`docs/reports/archive/`](docs/reports/archive/) and kept as evidence). Where a run happened is read from the tier providers, not typed in. Save new ones with `python -m src.eval --save` and `python -m src.eval compare --save`; `python -m src.eval.demos --save` writes one report per persona. The local test runs are also published on their own at [the-dissonance-router-local-runs](https://github.com/omkar-ramesh/the-dissonance-router-local-runs). API: `GET /reports`, `GET /reports/{id}`.
+
 ## Note bot
 
 The square **Note bot** button left of the message box keeps notes on what the agent learns about you and why: *"You said you prefer short answers"*, *"Learned: you keep wanting detailed answers. Latest sign: "Can you elaborate…""*, *"Contradiction on length… answers moved up to Ultra"*, *"You marked 2 answers as too long"*, *"The budget stepped down a tier once"*. Hover it for a description; **!** opens Settings → Notes, with a short "where things stand" summary on top. A badge counts new notes.
@@ -203,15 +215,16 @@ Each answer shows the cost **predicted** before the call next to the cost **meas
 
 ```
 src/agent/        profiles, conflict detection, routing, signals, prompts, LLM client, decision logger
+src/agent/hope.py zero-token failure review and kept reader rules
 src/api/          FastAPI routes, request schemas, dependencies
 src/main.py       app entry point (API + product page)
 src/web/          product page (single HTML file)
 src/db/           SQLite connection and schema
-src/agent/hope.py  zero-token failure review and kept reader rules
-models.toml       offline / online models per tier, with prices
-src/eval/         scenarios, grading with reason codes, false-claim checks, strategy pricing
+src/eval/         scenarios, grading with reason codes, false-claim checks, saved reports
 src/devdash/      local test dashboard (stdlib server + one HTML page)
 src/cli.py        terminal interface
+models.toml       offline / online models per tier, with prices
+docs/reports/     saved runs (.json.gz); older ones in docs/reports/archive/
 tests/            unit tests (no network)
 ```
 
@@ -224,7 +237,3 @@ tests/            unit tests (no network)
 ## License
 
 [MIT](LICENSE)
-
-## Reports
-
-Every evaluation run is saved as one file in [`docs/reports/`](docs/reports/) and shown as a card on the **Proof** page (what it was, which models, where it ran, the headline). Click a card for the full detail: every scenario with its turns, tiers, tokens, cost and reason codes, or for the blind comparison, every answer and the judge's reason. Filter by **Local** (runs made while building, on local stand-in models or the simulator) or **Token Factory** (runs on the real Nemotron models). Where a run happened is read from the tier providers, not typed in. Save new ones with `python -m src.eval --save` and `python -m src.eval compare --save`. API: `GET /reports`, `GET /reports/{id}`.

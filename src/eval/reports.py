@@ -14,6 +14,7 @@ from pathlib import Path
 from src import config
 
 REPORTS_DIR = Path(__file__).resolve().parents[2] / "docs" / "reports"
+ARCHIVE_DIR = REPORTS_DIR / "archive"        # older runs: kept as evidence, hidden from the default lists
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,80}$")
 
 
@@ -78,8 +79,10 @@ def _demos_card(report: dict, providers) -> dict:
     res = [{"name": BY_ID.get(r["id"], {}).get("name", r["id"])} | r for r in report["demos"]]
     good = sum(1 for r in res if r["label"] in ("PASS", "CAUGHT", "KNOWN GAP", "FIXED"))
     return {
-        "kind": "demos", "title": f"{len(res)} demo profiles · scripted",
-        "description": "Fixed scripts, real model answers: 2 success, 2 known failures, 1 planted false claim.",
+        "kind": "demos",
+        "title": f"{res[0]['name']} · scripted persona run" if len(res) == 1 else f"{len(res)} demo profiles · scripted",
+        "description": (f"Fixed script, real model answers: {res[0]['title']}." if len(res) == 1 else
+                        "Fixed scripts, real model answers: 2 success, 2 known failures, 1 planted false claim."),
         "headline": " · ".join(f"{r['label']}" for r in res),
         "chips": [f"{good}/{len(res)} behaved as documented"], "cost_usd": 0, "simulated": False, "reader": "",
         "personas": [r.get("name", r["id"]) for r in res],
@@ -114,19 +117,21 @@ def _read(path: Path) -> dict:
 
 def cards(out: Path = REPORTS_DIR) -> list[dict]:
     items = []
-    for path in sorted([*out.glob("*.json.gz"), *out.glob("*.json")]) if out.is_dir() else []:
-        try:
-            data = _read(path)
-        except (OSError, ValueError):
-            continue
-        items.append({k: v for k, v in data.items() if k != "report"})
+    for folder, archived in ((out, False), (out / "archive", True)):
+        for path in sorted([*folder.glob("*.json.gz"), *folder.glob("*.json")]) if folder.is_dir() else []:
+            try:
+                data = _read(path)
+            except (OSError, ValueError):
+                continue
+            items.append({k: v for k, v in data.items() if k != "report"} | {"archived": archived})
     return sorted(items, key=lambda c: c["created"], reverse=True)
 
 
 def get(report_id: str, out: Path = REPORTS_DIR) -> dict | None:
     if not ID_RE.match(report_id):
         return None
-    for path in (out / f"{report_id}.json.gz", out / f"{report_id}.json"):
+    for path in (out / f"{report_id}.json.gz", out / f"{report_id}.json",
+                 out / "archive" / f"{report_id}.json.gz", out / "archive" / f"{report_id}.json"):
         if path.is_file():
             return _read(path)
     return None

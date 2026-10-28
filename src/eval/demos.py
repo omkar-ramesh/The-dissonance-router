@@ -3,7 +3,7 @@
 Two show the router working, two reproduce known failures (with reason codes), one plants a
 false claim to show it gets caught. The script is fixed; the answers come from the real
 configured models, and the outcome is graded from what actually happened, not assumed.
-`python -m src.eval.demos [--save]` runs all five and can save them as a report.
+`python -m src.eval.demos [--save]` runs all five and saves one report per persona.
 """
 import secrets
 import sys
@@ -112,5 +112,7 @@ if __name__ == "__main__":
         from datetime import datetime
         from src.eval import reports
         place = reports.where(config.TIER_PROVIDERS)
-        print("saved:", reports.save({"demos": results, "models": config.MODEL_TIERS, "simulated": False},
-                                     f"demos-{place}-{datetime.now():%Y%m%d-%H%M}", config.TIER_PROVIDERS))
+        stamp = f"{datetime.now():%Y%m%d-%H%M}"
+        for res in results:
+            print("saved:", reports.save({"demos": [res], "models": config.MODEL_TIERS, "simulated": False},
+                                         f"demos-{res['name'].lower()}-{place}-{stamp}", config.TIER_PROVIDERS))
