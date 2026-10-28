@@ -56,6 +56,21 @@ PATTERNS = {
     for dim, rules in _RAW_PATTERNS.items()
 }
 
+BUILT_IN = {dim: list(rules) for dim, rules in PATTERNS.items()}
+
+
+def add_rule(dim: str, value: str, pattern: str) -> None:
+    """A rule learned from a reviewed failure. It goes first, so it can beat a built-in rule it corrects."""
+    compiled = re.compile(rf"\b(?:{pattern})(?!\w)", re.I)
+    if all(p.pattern != compiled.pattern for _, p in PATTERNS[dim]):
+        PATTERNS[dim].insert(0, (value, compiled))
+
+
+def reset_rules() -> None:
+    for dim, rules in BUILT_IN.items():
+        PATTERNS[dim] = list(rules)
+
+
 # Behavior: what the user did with an answer. Accepting it (thumbs up, copy) or rejecting it
 # (thumbs down, regenerate) is revision evidence; a thumbs-down reason adds the dimension it names.
 FEEDBACK_SIGNALS = {

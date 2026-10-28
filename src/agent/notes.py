@@ -44,11 +44,28 @@ class NoteBook:
                                (user_id,)).fetchone()
         return row[0] or 0
 
+    def mark(self, user_id: str, marks: dict) -> None:
+        """Set each note to 'hidden' (deleted), 'saved' (pinned) or 'none' (back to normal)."""
+        with closing(get_connection(self.db_path)) as conn:
+            with conn:
+                for key, st in marks.items():
+                    if st == "none":
+                        conn.execute("DELETE FROM note_marks WHERE user_id = ? AND note_key = ?", (user_id, key))
+                    else:
+                        conn.execute("INSERT INTO note_marks (user_id, note_key, state) VALUES (?, ?, ?) "
+                                     "ON CONFLICT(user_id, note_key) DO UPDATE SET state = excluded.state",
+                                     (user_id, key, st))
+
     def render(self, user_id: str, state: dict) -> dict:
         """Notes, newest first, plus a summary of where things stand now (`state` = Agent.inspect)."""
         with closing(get_connection(self.db_path)) as conn:
+            marks = {r["note_key"]: r["state"] for r in conn.execute(
+                "SELECT note_key, state FROM note_marks WHERE user_id = ?", (user_id,)).fetchall()}
+            pinned = [int(k[1:]) for k, st in marks.items() if st == "saved" and k[0] == "e" and k[1:].isdigit()]
             events = [dict(r) for r in conn.execute(
-                "SELECT * FROM events WHERE user_id = ? ORDER BY id DESC LIMIT 60", (user_id,)).fetchall()]
+                f"SELECT * FROM events WHERE user_id = ? AND (id IN ({','.join('?' * len(pinned))}) OR id IN "
+                "(SELECT id FROM events WHERE user_id = ? ORDER BY id DESC LIMIT 60)) ORDER BY id DESC",
+                (user_id, *pinned, user_id)).fetchall()]
             downs = conn.execute("SELECT reason, COUNT(*) AS n, MAX(created_at) AS at FROM feedback "
                                  "WHERE user_id = ? AND kind = 'down' AND reason != '' GROUP BY reason", (user_id,)).fetchall()
             tiers = conn.execute("SELECT model_used, COUNT(*) AS n, MAX(timestamp) AS at FROM interactions "
@@ -58,27 +75,27 @@ class NoteBook:
             saved = conn.execute("SELECT COUNT(*) AS n, SUM(saved) AS kept, MAX(archived_at) AS at FROM conversations "
                                  "WHERE user_id = ?", (user_id,)).fetchone()
 
-        notes = [self._sentence(e) for e in events]
+        notes = [{**self._sentence(e), "key": f"e{e['id']}"} for e in events]
         # Running totals: one note each, dated by the latest thing they count.
         for row in downs:
-            notes.append({"at": row["at"], "kind": "feedback",
+            notes.append({"at": row["at"], "kind": "feedback", "key": f"t:feedback:{row['reason']}",
                           "text": f"You marked {_times(row['n'], 'answer')} as {REASON_WORDS.get(row['reason'], row['reason'])}."})
         counts = {r["model_used"]: (r["n"], r["at"]) for r in tiers}
         up = sum(counts.get(t, (0, None))[0] for t in ("super", "ultra"))
         if up:
             latest = max(counts[t][1] for t in ("super", "ultra") if t in counts)
-            notes.append({"at": latest, "kind": "routing",
+            notes.append({"at": latest, "kind": "routing", "key": "t:routing",
                           "text": f"{_times(up, 'answer')} moved up to Super or Ultra because of a contradiction; "
                                   f"{_times(counts.get('nano', (0, None))[0], 'answer')} stayed on Nano."})
         if budget["n"]:
-            notes.append({"at": budget["at"], "kind": "budget",
+            notes.append({"at": budget["at"], "kind": "budget", "key": "t:budget",
                           "text": f"The budget stepped down a tier {_times(budget['n'], 'time')} to make the money last."})
         if saved["n"]:
-            notes.append({"at": saved["at"], "kind": "memory",
+            notes.append({"at": saved["at"], "kind": "memory", "key": "t:memory",
                           "text": f"{_times(saved['n'], 'conversation')} in Memory, {saved['kept'] or 0} kept for good."})
+        notes = [{**n, "saved": marks.get(n["key"]) == "saved"} for n in notes if marks.get(n["key"]) != "hidden"]
         notes.sort(key=lambda n: _sortable(n["at"]), reverse=True)
-        return {"summary": _summary(state), "notes": notes, "count": len(events) + len(downs) + bool(up)
-                + bool(budget["n"]) + bool(saved["n"]), "tokens_used": 0}
+        return {"summary": _summary(state), "notes": notes, "count": len(notes), "tokens_used": 0}
 
     @staticmethod
     def _sentence(e: dict) -> dict:

@@ -83,6 +83,8 @@ ollama pull nemotron-3-nano:30b
 ollama pull deepseek-r1:32b
 ```
 
+Step-by-step instructions for every test run and the report format: [docs/RUNNING.md](docs/RUNNING.md).
+
 Run the tests (no models needed):
 
 ```bash
@@ -143,6 +145,20 @@ python -m src.devdash      # opens http://127.0.0.1:8765
 
 The cost figures use Token Factory list prices taken from third-party listings (not confirmed on Nebius's own page) and token counts from the local models, so treat them as rough estimates. Prices can be overridden with `PRICE_*` variables in `.env`.
 
+## Personas, Hope and the team lessons
+
+Five scripted demo users, each replayable with one click (Proof, or Settings → Profile): **Hope** and **Jordan** are careful (one shows the router working, one a contradiction it catches), **Casey** and **Sam** are capable but slip (an implicit complaint and a negated request are known gaps), and **Kai** fakes it (a made-up source is planted and flagged; the card says it is a stand-in). The answers come from the real configured models; the script is fixed. Write-ups: [docs/personas/](docs/personas/).
+
+When a demo fails, **Hope reviews it** without calling a model (0 tokens): why it failed, a proposed fix, and a check that re-reads the failing message. A rule fix (for example "wall of text" means shorter answers) can be applied and is kept in the database, so the signal reader uses it from then on. Hope cannot write a better answer for free (that needs the model) and does not change the escalation thresholds. Each run is recorded as a lesson (a code and pass/fail per persona, never message text), shown under Settings → Memory. This shows a rule getting fixed, not a model getting smarter; fixes should be checked on held-out phrasings. API: `POST /hope/review`, `POST /hope/apply`, `GET /lessons`.
+
+## Models, offline and online
+
+[`models.toml`](models.toml) lists the model for each tier in an **offline** profile (local Ollama) and an **online** profile (Nebius Token Factory), with prices. Edit it and restart. The **Offline / Online** switch in Settings → Models picks a profile; online stays locked until the key is set and `confirmed = true`, asks for confirmation, and is never available in the public demo. Values in `.env` still override the file. Token counts are measured; prices are list prices until checked against Nebius billing, and the Budget page says which numbers are measured and which are estimated.
+
+## Settings and the tutorial
+
+Settings has Overview, Profile, Reports, Budget, Models, Memory, Notes, About and **Accessibility** (replay the tutorial, this README). A short guided tour starts on the first visit and walks through every view and settings tab; Skip tells you where to find it again.
+
 ## Evaluation
 
 ```bash
@@ -191,6 +207,8 @@ src/api/          FastAPI routes, request schemas, dependencies
 src/main.py       app entry point (API + product page)
 src/web/          product page (single HTML file)
 src/db/           SQLite connection and schema
+src/agent/hope.py  zero-token failure review and kept reader rules
+models.toml       offline / online models per tier, with prices
 src/eval/         scenarios, grading with reason codes, false-claim checks, strategy pricing
 src/devdash/      local test dashboard (stdlib server + one HTML page)
 src/cli.py        terminal interface

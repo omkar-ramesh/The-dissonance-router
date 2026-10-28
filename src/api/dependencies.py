@@ -2,6 +2,7 @@
 from functools import lru_cache
 
 from src import config
+from src.agent import hope
 from src.agent.core import Agent
 from src.agent.extractor import NanoExtractor
 from src.agent.llm_client import LLMClient
@@ -13,4 +14,6 @@ def get_agent() -> Agent:
     on every request until fixed, rather than cached."""
     llm = LLMClient.from_config()
     extractor = NanoExtractor(llm, config.DB_PATH) if config.SIGNAL_EXTRACTOR == "nano" else None
-    return Agent(config.DB_PATH, llm, extractor, config.MEMORY_DIR)
+    agent = Agent(config.DB_PATH, llm, extractor, config.MEMORY_DIR)
+    hope.load_rules(config.DB_PATH)     # rules Hope kept from earlier reviews
+    return agent

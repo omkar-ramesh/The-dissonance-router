@@ -19,7 +19,10 @@
 body{background:var(--bg);color:var(--text);font:13px/1.45 ui-monospace,"Cascadia Mono",Consolas,monospace;display:flex;flex-direction:column;overflow:hidden}
 .spacer{flex:1}
 header{display:flex;align-items:center;gap:14px;padding:10px 16px;border-bottom:1px solid var(--line);flex:none}
-header h1{font-size:13px;margin:0;font-weight:700}header h1 span{color:var(--muted);font-weight:400}
+header h1{margin:0;display:flex;align-items:center;gap:14px;cursor:pointer;color:#fff;font-size:17px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;white-space:nowrap;font-family:Orbitron,Bahnschrift,"Agency FB","Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;text-shadow:0 0 14px #ffffff30}
+header h1 .tag{font-size:10px;font-weight:500;letter-spacing:.24em;color:var(--muted);padding-left:14px;border-left:1px solid var(--line);text-shadow:none}
+header h1 .tag i{font-style:normal;color:#fff;opacity:.55}
+@media(max-width:700px){header h1 .tag{display:none}}
 h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 4px 8px;font-weight:600}
 .pill{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.06em;border-radius:99px;padding:1px 8px;text-transform:uppercase;margin-right:6px}
 .nano{color:var(--blue);background:#5aa9ff22}.super{color:var(--purple);background:#b48cff22}.ultra{color:var(--pink);background:#ff7ad922}
@@ -52,12 +55,17 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 @keyframes flash{0%,40%{box-shadow:0 0 0 2px var(--blue)}100%{box-shadow:0 0 0 2px transparent}}
 @media(prefers-reduced-motion:reduce){aside.side{transition:none}.msg.flash{animation:none;box-shadow:0 0 0 2px var(--blue)}}
 /* settings */
-.settings{max-width:none}.settings [data-panel]:not([data-panel=overview]){max-width:1280px}
+.settings{max-width:none;width:100%}.settings [data-panel]{max-width:none;width:100%}#colA:has(.settings:not([hidden])){padding:16px 22px}
 .sechead{display:flex;gap:14px;align-items:center;margin-bottom:14px}.sechead h3{margin:0;font-size:16px}.sechead p{margin:3px 0 0;color:var(--muted);font-size:12px;max-width:760px;line-height:1.5}
 .ib{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;flex:none;background:#7d889c1f;color:var(--muted)}.ib .ico{width:22px;height:22px}
 .ib.green{background:#3ddc8420;color:var(--green)}.ib.blue{background:#5aa9ff20;color:var(--blue)}.ib.amber{background:#ffb02020;color:var(--amber)}.ib.pink{background:#ff7ad920;color:var(--pink)}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.two.wide-right{grid-template-columns:1fr 2fr}
 .settings .pn p{margin:4px 0 10px}
+.maker{display:flex;align-items:center;gap:16px;flex-wrap:wrap;border-left:3px solid #f5a524}
+.mk-av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;letter-spacing:.06em;background:#1b2130;border:1px solid var(--line);color:#f5a524}
+.mk-body{display:flex;flex-direction:column;gap:3px;flex:1;min-width:220px}.mk-eye{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6}.mk-name{font-size:17px}
+.mk-side a.btn{text-decoration:none;color:var(--text)}.mk-side a.btn:hover{border-color:var(--blue);color:var(--blue)}
+.mk-side{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.mk-tag{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);opacity:.75}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
 .steps>div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
 .steps i{width:24px;height:24px;border-radius:50%;background:#5aa9ff22;color:var(--blue);display:grid;place-items:center;font-style:normal;font-weight:700;font-size:12px;margin-bottom:4px}.steps b{color:var(--text);font-size:13px}
@@ -70,7 +78,39 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .tiercard .role{font-size:11px;color:var(--muted)}
 #sec-title{display:none}
 @media(max-width:1000px){.two,.two.wide-right,.steps,.kpis3,.tiercards{grid-template-columns:1fr}}
-#tiles{display:grid;gap:14px}
+.settings .pn,.settings .kpi,.settings .idstrip,.settings .steps>div,.settings .tiercard{border-radius:16px}.settings .pn{padding:16px 18px}
+/* bento: one 12-column grid, cards of mixed sizes that interlock */
+#tiles{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:stretch}
+#tiles .idstrip{grid-column:span 12}
+#tiles .kpis,#tiles .pgrid{display:contents}
+#tiles .kpi{grid-column:span 3;min-height:96px}
+#tiles .pgrid>.pn:nth-child(1){grid-column:span 5;grid-row:span 2}
+#tiles .pgrid>.pn:nth-child(2){grid-column:span 3}
+#tiles .pgrid>.pn:nth-child(3){grid-column:span 4}
+#tiles .pgrid>.pn:nth-child(4){grid-column:span 3}
+#tiles .pgrid>.pn:nth-child(5){grid-column:span 4}
+#tiles .pgrid>.pn:nth-child(6){grid-column:span 12;background:linear-gradient(120deg,#5aa9ff14,#ff7ad912 60%,transparent),var(--panel)}
+#tiles .pn header{margin-bottom:12px}
+/* bento on every other settings page */
+.settings [data-panel]:not([data-panel=overview]):not([hidden]){display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-content:start}
+.settings [data-panel]:not([data-panel=overview])>*{grid-column:span 12;margin:0}
+.settings [data-panel] .two,.settings [data-panel] .steps,.settings [data-panel] .kpis3{display:contents}
+.settings [data-panel] .two>*,.settings [data-panel] .steps>*,.settings [data-panel] .kpis3>*{margin:0}
+[data-panel=profile] .two>:nth-child(1){grid-column:span 5}[data-panel=profile] .two>:nth-child(2){grid-column:span 7}
+[data-panel=budget] .two>:nth-child(1){grid-column:span 7}[data-panel=budget] .two>:nth-child(2){grid-column:span 5}
+[data-panel=budget] .steps>*,[data-panel=about] .steps>*{grid-column:span 4}
+[data-panel=budget]>.pn:nth-of-type(n){grid-column:span 6}
+[data-panel=budget]>.pn:nth-last-child(2){grid-column:span 7}[data-panel=budget]>.pn:last-child{grid-column:span 5}
+[data-panel=memory] .kpis3>*{grid-column:span 4}
+[data-panel=memory] #mem-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;align-items:start}
+[data-panel=notes] .two.wide-right>:nth-child(1){grid-column:span 4}[data-panel=notes] .two.wide-right>:nth-child(2){grid-column:span 8}
+[data-panel=about] .two>:nth-child(1){grid-column:span 7}[data-panel=about] .two>:nth-child(2){grid-column:span 5}
+#models{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px;align-items:start}
+#models>*{grid-column:span 12;margin:0}#models>:nth-child(2){grid-column:span 7}#models>:nth-child(3){grid-column:span 5}
+.rgrid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+@media(max-width:1000px){.settings [data-panel]:not([data-panel=overview])>*,.settings [data-panel] .two>*,.settings [data-panel] .steps>*,.settings [data-panel] .kpis3>*,#models>:nth-child(n){grid-column:span 12!important}}
+@media(max-width:1100px){#tiles .kpi{grid-column:span 6}#tiles .pgrid>.pn:nth-child(n){grid-column:span 6;grid-row:auto}#tiles .pgrid>.pn:nth-child(6){grid-column:span 12}}
+@media(max-width:700px){#tiles .kpi,#tiles .pgrid>.pn:nth-child(n){grid-column:span 12}}
 .ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .idstrip{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
 .idstrip code{color:var(--text);background:#0e131c;border:1px solid var(--line);border-radius:6px;padding:2px 8px;font-size:12px}
@@ -105,6 +145,23 @@ aside.side{width:220px;flex:none;border-right:1px solid var(--line);position:rel
 .rcard .t{font-weight:700;font-size:13px}.rcard .h{font-size:20px;font-weight:700;color:var(--green)}.rcard .h.warn{color:var(--amber)}
 .rcard .d{font-size:11px;color:var(--muted);line-height:1.45;flex:1}.rcard .f{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:11px;color:var(--muted)}
 .src{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:1px 8px;border-radius:99px;font-weight:700}
+.src.ok{color:var(--green);background:#3ddc8422}.src.bad{color:var(--red);background:#ff5d6c22}.src.warn{color:var(--amber);background:#ffb02022}.rcard.k-ok{border-top:3px solid var(--green)}.rcard.k-bad{border-top:3px solid var(--red)}.rcard.k-warn{border-top:3px solid var(--amber)}
+.plist{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}.pgrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.pdetail{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:0}.pdetail .hd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.pdetail .hd b{display:block;font-size:17px;margin-bottom:4px}.pdetail .acts{display:flex;gap:8px;margin:0 0 14px}.pdetail .acts .btn{flex:1;justify-content:center;display:inline-flex;align-items:center;gap:6px}
+.pdetail dl{margin:0;font-size:12px}.pdetail dt{color:var(--muted);font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin:12px 0 4px}.pdetail dd{margin:0;line-height:1.5}
+.pcard.sel{box-shadow:0 0 0 1px var(--blue) inset}
+@media(max-width:1100px){.plist{grid-template-columns:1fr}.pgrid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rgroup{margin-bottom:22px}.rgroup>header{display:flex;align-items:center;gap:10px;margin:0 2px 10px;flex-wrap:wrap}.rgroup>header b{font-size:14px}
+.rgroup>header .runon{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 10px}
+.mcard{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.mcard .t{font-weight:700;font-size:13px}.mcard .h{font-size:18px;font-weight:700;color:var(--green)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:11px;margin:0}.kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.mcard .foot{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px;margin-top:auto}
+.md h1{font-size:20px;margin:0 0 6px}.md h2{font-size:12px;margin:18px 0 6px;color:var(--muted)}.md p,.md li{font-size:13px;line-height:1.6}
+.md table{border-collapse:collapse;font-size:12px;margin:6px 0}.md td,.md th{border:1px solid var(--line);padding:5px 10px;text-align:left}.md hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.av{flex:none;display:inline-grid;place-items:center;border-radius:50%}.pcard{align-items:center;text-align:center;position:relative}.pcard .act{position:absolute;top:10px;right:12px;font-size:10px;letter-spacing:.06em;text-transform:uppercase}.pcard .t{font-size:16px}.pcard .d{text-align:center}
+.view-btn b{display:block;color:var(--text);font-size:13px}
 .src.local{color:var(--blue);background:#5aa9ff22}.src.api{color:var(--pink);background:#ff7ad922}
 #rmodal{position:fixed;inset:0;background:#000a;z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:4vh 16px;overflow:auto}
 #rmodal[hidden]{display:none}
@@ -175,7 +232,47 @@ main{flex:1;min-height:0;display:grid}
 .nb-more{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;border:1px solid var(--amber);background:none;color:var(--amber);font:inherit;font-weight:700;cursor:pointer;padding:0}
 .nb-more:hover{background:#ffb02022}
 .notes-row{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #1a2130;font:13px/1.5 system-ui,sans-serif}
-.notes-row:last-child{border-bottom:0}.notes-row .ic{flex:none;width:20px;text-align:center}.notes-row time{flex:none;color:var(--muted);font:11px ui-monospace,monospace;width:92px;padding-top:2px}
+.notes-row:last-child{border-bottom:0}
+.notes-row input[type=checkbox]{flex:none;width:16px;height:16px;margin:3px 2px 0 0;accent-color:var(--blue);cursor:pointer}.notes-row.on{background:#5aa9ff12}
+.ntools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid var(--line)}.ntools .sp{flex:1}
+.ntools label{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer}.ntools input{accent-color:var(--blue)}
+.hope{background:#5aa9ff0c;border:1px solid #5aa9ff40;border-left:3px solid var(--blue);border-radius:12px;padding:12px 14px;margin:0 0 12px;display:flex;flex-direction:column;gap:7px;font-size:13px}
+.hope .hh{display:flex;align-items:center;gap:10px}.hope .tok,.hope .chk{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}.hope .chk.ok{color:var(--green);border-color:#3ddc8455}.hope .chk.warn{color:var(--amber);border-color:#ffb02055}
+.hope .hr{display:grid;grid-template-columns:110px 1fr;gap:10px}.hope .hr>b{color:var(--muted);font-weight:600;font-size:12px}.hope .btn{align-self:flex-start}
+.modesw{margin-left:auto;display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;flex:none}
+.modesw button{background:var(--panel);border:0;color:var(--muted);font:inherit;font-size:12px;padding:9px 14px;cursor:pointer}.modesw button+button{border-left:1px solid var(--line)}
+.modesw button.on{background:#3ddc8420;color:var(--green)}.modesw button[data-mode=online].on{background:#ffb02022;color:var(--amber)}.modesw button:disabled{cursor:default}
+.modenote{margin:-6px 0 4px}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}.lcard{background:#0e131c;border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.basis{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+[data-panel=accessibility] .acc-tour{grid-column:span 5}[data-panel=accessibility] .acc-soon{grid-column:span 7}
+.acc-tour .btn{align-self:flex-start}.readme{max-height:none;font:14px/1.65 system-ui,-apple-system,"Segoe UI",sans-serif}.readme h1{font-size:20px}.readme h2{font-size:16px}
+#tour{position:fixed;inset:0;z-index:80}
+.tour-hole{position:fixed;border-radius:16px;box-shadow:0 0 0 9999px #05070cb8,0 0 0 2px var(--blue);transition:all .35s cubic-bezier(.3,.7,.2,1);pointer-events:none}
+.tour-hole.none{box-shadow:0 0 0 9999px #05070cd0;width:0!important;height:0!important;left:50%!important;top:50%!important}
+.tour-card{position:fixed;width:min(400px,calc(100vw - 32px));background:#141a26;border:1px solid #2a3448;border-radius:22px;padding:20px 22px 18px;
+  box-shadow:0 24px 60px #000a,0 0 0 1px #5aa9ff22;transition:left .35s cubic-bezier(.3,.7,.2,1),top .35s cubic-bezier(.3,.7,.2,1);font:14px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
+.tour-card.center{width:min(520px,calc(100vw - 32px));padding:28px 30px 22px}
+.tour-card h3{margin:6px 0 8px;font-size:17px;letter-spacing:.02em}.tour-card.center h3{font-size:21px}
+.tour-body p{margin:0 0 8px;color:#c9d1df}.tour-body code,.tour-body pre{font:12.5px/1.5 ui-monospace,Consolas,monospace;background:#0b0f17;border:1px solid var(--line);border-radius:10px;color:#9fd0ff}
+.tour-body code{padding:1px 6px}.tour-body pre{padding:10px 12px;margin:4px 0 10px;white-space:pre-wrap}
+.tour-top{display:flex;align-items:center;justify-content:space-between}.tour-step{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.tour-back{background:none;border:0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer;padding:2px 4px;border-radius:6px}.tour-back:hover{color:var(--text)}
+.tour-dots{display:flex;gap:5px;margin:12px 0 14px;flex-wrap:wrap}.tour-dots i{width:6px;height:6px;border-radius:99px;background:#2a3448;transition:all .2s}.tour-dots i.on{width:18px;background:var(--blue)}.tour-dots i.done{background:#5aa9ff66}
+.tour-btns{display:flex;justify-content:space-between;gap:10px}.tour-btns .btn{border-radius:12px;padding:8px 18px}
+#tourToast{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:85;background:#141a26;border:1px solid #2a3448;border-radius:16px;padding:11px 18px;font-size:13px;
+  box-shadow:0 12px 34px #0009;animation:tdrop .25s ease-out;white-space:nowrap}
+#tourToast button{background:#5aa9ff22;border:1px solid #5aa9ff66;color:var(--blue);font:inherit;font-weight:700;border-radius:8px;padding:2px 8px;cursor:pointer;margin:0 2px}
+@keyframes tdrop{from{opacity:0;transform:translate(-50%,-8px)}}
+@media(prefers-reduced-motion:reduce){.tour-hole,.tour-card{transition:none}#tourToast{animation:none}}
+.ibtn{width:34px;height:34px;display:inline-grid;place-items:center;border-radius:9px;background:var(--panel);border:1px solid var(--line);color:var(--text);cursor:pointer;padding:0}
+.ibtn:hover:not([disabled]){border-color:var(--blue);color:var(--blue)}.ibtn.danger:hover:not([disabled]){border-color:var(--red);color:var(--red)}.ibtn[disabled]{opacity:.35;cursor:default}
+.nct{font-size:12px;color:var(--muted)}.notes-row .nt{flex:1}.notes-row{cursor:pointer;align-items:flex-start}
+.nsaved{margin-bottom:12px;padding:10px 12px;border:1px solid #3ddc8433;border-radius:12px;background:#3ddc8408}.nsaved h4{margin:0 0 6px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+#toasts{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;background:#1b2130;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:13px;box-shadow:0 8px 28px #0008}
+.toast button{background:none;border:0;color:var(--blue);font:inherit;font-weight:700;cursor:pointer;padding:2px 6px}.toast i{position:absolute;left:0;bottom:0;height:3px;background:var(--blue);width:100%;animation:tshrink 10s linear forwards}
+@keyframes tshrink{to{width:0}}.notes-row .ic{flex:none;width:20px;text-align:center}.notes-row time{flex:none;color:var(--muted);font:11px ui-monospace,monospace;width:92px;padding-top:2px}
 .meter{font-size:11px;color:var(--muted);margin-top:6px;min-height:15px}
 .composer textarea{flex:1;resize:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--text);font:inherit;height:38px;max-height:160px}
 .composer textarea:focus,input.user:focus{outline:none;border-color:var(--blue)}
@@ -218,7 +315,7 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
 </head>
 <body>
 <header>
-  <h1 id="home" title="Back to the main page" style="cursor:pointer">The Dissonance Router <span>what you say vs what you do</span></h1>
+  <h1 id="home" title="Back to the main page">THE DISSONANCE ROUTER<span class="tag">WHAT YOU SAY <i>VS</i> WHAT YOU DO</span></h1>
   <span class="pill ok" id="status">● connecting…</span>
   <div class="spacer"></div>
   <button class="btn" id="newchat" title="Archive this conversation to Memory and start a new one (your profile stays)">＋ New chat</button>
@@ -227,6 +324,10 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
 <div class="shell" id="shell">
   <aside class="side">
     <div class="side-inner">
+     <h2>Profile</h2>
+     <button class="view-btn" id="side-profile" title="Switch profile"></button>
+     <div style="height:12px"></div>
+     
      <div id="nav-main">
       <h2>View</h2>
       <button class="view-btn on" data-v="chat" title="Chat, with the mirror">
@@ -246,6 +347,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="label">Overview<small>everything at a glance</small></span></button>
       <button class="view-btn" data-sec="profile" title="Profile">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg><span class="label">Profile<small>your session</small></span></button>
+      <button class="view-btn" data-sec="reports" title="Reports: saved test runs">
+        <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span class="label">Reports<small>saved test runs</small></span></button>
       <button class="view-btn" data-sec="budget" title="Budget">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.2c-.5-.8-1.4-1.2-2.5-1.2-1.5 0-2.5.8-2.5 1.9 0 2.7 5 1.4 5 4.1 0 1.1-1 2-2.5 2-1.2 0-2.2-.5-2.7-1.4M12 6.5V8m0 8v1.5"/></svg><span class="label">Budget<small>simulated wallet</small></span></button>
       <button class="view-btn" data-sec="models" title="Models">
@@ -256,6 +359,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
         <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="label">Notes<small>what I've learned</small></span></button>
       <button class="view-btn" data-sec="about" title="About">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="label">About<small>how it works</small></span></button>
+      <button class="view-btn" data-sec="accessibility" title="Accessibility: tutorial and README">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M4 8.5l8 1.5 8-1.5M12 10v5M12 15l-3.5 6M12 15l3.5 6"/></svg><span class="label">Accessibility<small>tutorial, README</small></span></button>
      </div>
     </div>
     <div class="side-foot">
@@ -302,6 +407,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
     <div data-panel="profile">
       <div class="sechead"><span class="ib blue"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/></svg></span>
         <div><h3>Profile</h3><p>Who the agent is learning. Everything it knows about you is filed under this id.</p></div></div>
+      <section class="pn" style="margin-bottom:14px"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c.8-3.6 3.5-5 7-5s6.2 1.4 7 5M17 5a3.5 3.5 0 0 1 0 7M18 15c2.2.5 3.5 2 4 5"/></svg><b>Who are you testing as?</b></header>
+        <p class="note">Each persona has a fixed personality, a write-up and its own saved reports. Click one to see it, then <b>Activate</b> to chat as them.</p><div class="plist"><div id="personas" class="pgrid3"></div><aside id="pdetail" class="pdetail"></aside></div></section>
       <div class="two">
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 0-3.5 6.5L4 21h3v-2h2v-2h2l1.5-1.5A4 4 0 0 0 15 7z"/></svg><b>Session id</b></header>
           <p class="note">Type an id to switch to that person's profile, or start fresh for a clean slate.</p>
@@ -314,6 +421,10 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
             <div><b>Yours to delete</b><span>Saved chats expire after 10 days unless you keep them.</span></div></div></section>
       </div></div>
 
+    <div data-panel="reports">
+      <div class="sechead"><span class="ib pink"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span>
+        <div><h3>Reports · saved test runs</h3><p>Every saved run: which models, which personas, where it ran and what it measured. Token Factory runs first, then local runs. <b>More details</b> opens the full record.</p></div></div>
+      <div id="rpanel"></div></div>
     <div data-panel="budget">
       <div class="sechead"><span class="ib green"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7l12-3v3M16 13.5h2"/></svg></span>
         <div><h3>Budget <span class="note">· simulated wallet, no real money</span></h3><p>Set a $ limit and the router plans every answer inside it. Costs are real token counts × Token Factory list prices.</p></div></div>
@@ -325,7 +436,7 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
             <button class="btn ghost" id="budget-reset">Reset spent</button></div>
           <div class="field" style="margin-top:10px"><span class="note">Quick set</span>
             <button class="chipbtn" data-preset="0.01">$0.01 · try it</button><button class="chipbtn" data-preset="0.1">$0.10</button>
-            <button class="chipbtn" data-preset="1">$1</button><button class="chipbtn" data-preset="0">No limit</button></div></section>
+            <button class="chipbtn" data-preset="1">$1</button><button class="chipbtn" data-preset="10">$10</button><button class="chipbtn" data-preset="100">$100</button><button class="chipbtn" data-preset="0">No limit</button></div></section>
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M12 3v9l6 3"/><circle cx="12" cy="12" r="9"/></svg><b>Spent so far</b></header>
           <div id="budget-view"></div></section>
       </div>
@@ -334,12 +445,16 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
         <div><i>2</i><b>Thinking off, shorter answers</b><span>once under 25% is left.</span></div>
         <div><i>3</i><b>Never overspends</b><span>an answer can't cost more than what's left; at zero it stops.</span></div>
       </div>
+      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 8-9"/></svg><b>Live usage <span class="note">· updates after every answer</span></b></header>
+        <div id="budget-graph"></div></section>
       <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg><b>Predicted vs measured</b></header>
         <div id="budget-acc"></div></section></div>
 
     <div data-panel="models">
       <div class="sechead"><span class="ib pink"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></span>
-        <div><h3>Models</h3><p>Which model serves each tier, where it runs, and whether it thinks before answering.</p></div></div>
+        <div><h3>Models</h3><p>Which model serves each tier, where it runs, and whether it thinks before answering. Change them in <b>models.toml</b>.</p></div>
+        <div class="modesw" id="modeSwitch" role="group" aria-label="Where the models run"><button data-mode="offline">Offline · local</button><button data-mode="online">Online · Token Factory</button></div></div>
+      <div class="note modenote" id="modeNote" hidden></div>
       <div id="models"></div></div>
 
     <div data-panel="memory">
@@ -348,7 +463,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
           10 days unless you press <b>Keep</b>: the file and the message text both go (only routing numbers like tier and score stay).
           Reminders come from dates, not from an AI call, so they cost no tokens.</p></div></div>
       <div class="kpis3" id="mem-stats"></div>
-      <div id="mem-list"></div></div>
+      <div id="mem-list"></div>
+      <section class="pn" id="lessons"></section></div>
 
     <div data-panel="notes">
       <div class="sechead"><span class="ib green"><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
@@ -371,10 +487,36 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
           <p class="note" style="margin:0">Failures are shown with reason codes, simulated numbers are labelled, links the agent can't verify are flagged, and the "right tier" in reports is our own annotation.</p></section>
         <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6M15 6l6 6-6 6"/></svg><b>Source and evidence</b></header>
           <p class="note" style="margin:0">Code, guidelines and the evaluation method are in the project README. Saved runs are on the Proof page.</p></section>
-      </div></div>
+      </div>
+      <section class="pn maker"><div class="mk-av">OR</div>
+        <div class="mk-body"><span class="mk-eye">Built by</span><b class="mk-name">Omkar Ramesh</b>
+          <span class="note">AI engineer who ships end to end: interfaces, APIs, data pipelines and deployment.</span></div>
+        <div class="mk-side"><span class="mk-tag">Nebius × NVIDIA Global AI Hackathon</span>
+          <a class="btn" href="https://github.com/omkar-ramesh" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px"><svg class="ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.7 5.4-5.27 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>GitHub</a>
+          <a class="btn" href="https://www.linkedin.com/in/omkar-ramesh" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px"><svg class="ico" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>LinkedIn</a></div></section></div>
+    <div data-panel="accessibility">
+      <div class="sechead"><span class="ib blue"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2"/><path d="M4 8.5l8 1.5 8-1.5M12 10v5M12 15l-3.5 6M12 15l3.5 6"/></svg></span>
+        <div><h3>Accessibility</h3><p>Replay the tour, read the README, and (soon) adjust how the app looks and moves.</p></div></div>
+      <section class="pn acc-tour"><header><svg class="ico" viewBox="0 0 24 24"><path d="M5 4l14 8-14 8z"/></svg><b>Tutorial</b></header>
+        <p class="note">A short tour of every part of the app, in plain words. About two minutes.</p>
+        <button class="btn primary" id="tourReplay">▶ Replay the tutorial</button></section>
+      <section class="pn acc-soon"><header><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><b>Coming next</b></header>
+        <div class="facts"><div><b>Text size</b><span>Small, normal, large.</span></div><div><b>Reduce motion</b><span>Turn off animations.</span></div>
+          <div><b>Plain font</b><span>Swap the cyber font for an easier read.</span></div><div><b>High contrast</b><span>Stronger borders and text.</span></div></div></section>
+      <section class="pn"><header><svg class="ico" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><b>README</b><span class="note" style="margin-left:auto">README.md · same file as the repo</span></header>
+        <div class="md readme" id="readme"><div class="note">Loading…</div></div></section></div>
   </section>
 </div>
 
+<div id="tour" hidden><div class="tour-hole" id="tourHole"></div>
+  <div class="tour-card" id="tourCard" role="dialog" aria-modal="true" aria-labelledby="tourTitle">
+    <div class="tour-top"><span class="tour-step" id="tourStep"></span><button class="tour-back" id="tourBack">‹ Back</button></div>
+    <h3 id="tourTitle"></h3><div class="tour-body" id="tourBody"></div>
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns"><button class="btn" id="tourSkip">Skip</button><button class="btn primary" id="tourNext">Next ›</button></div></div></div>
+<div id="tourToast" hidden role="status"></div>
+
+<div id="toasts" aria-live="polite"></div>
 <div id="rmodal" hidden role="dialog" aria-modal="true" aria-label="Report details"><div class="sheet" id="rsheet"></div></div>
 
 <script>
@@ -545,13 +687,27 @@ function renderBudget() {
     ? `<div class="bar" style="height:10px"><i style="width:${pct}%;background:${pct > 75 ? "var(--amber)" : "var(--green)"}"></i></div>
        <div class="note" style="margin-top:6px">${usd(spent)} of ${usd(limit)} used · ${usd(Math.max(0, limit - spent))} left${pct > 75 ? " · tight: thinking off, shorter answers" : ""}</div>`
     : `<div class="note">No limit. Spent so far: ${usd(spent)}.</div>`;
+  $("budget-view").insertAdjacentHTML("beforeend", `<div class="note basis">${health && health.mode === "online"
+    ? "<b>Measured</b>: token counts from the API's usage field × list prices. Check the total against the Nebius dashboard: prices are planning figures until then."
+    : "<b>Measured</b>: real token counts from the local model × Token Factory list prices. Local runs cost $0: this is what the same tokens would cost online."}</div>`);
+  renderGraph();
   if (!accuracy.length) { $("budget-acc").innerHTML = `<div class="note">Predicted vs measured cost appears here for each answer.</div>`; return; }
   const errs = accuracy.filter(a => a.predicted > 0).map(a => Math.abs(a.measured - a.predicted) / a.predicted);
   $("budget-acc").innerHTML = `<table><tr><th>Answer</th><th>Tier</th><th>Predicted</th><th>Measured</th><th>Off by</th></tr>`
     + accuracy.slice(-8).map((a, i) => `<tr><td>${accuracy.length - Math.min(8, accuracy.length) + i + 1}</td><td><span class="pill ${a.tier}">${a.tier}</span></td>
         <td>${usd(a.predicted)}</td><td>${usd(a.measured)}</td><td>${a.predicted ? Math.round(100 * (a.measured - a.predicted) / a.predicted) + "%" : "–"}</td></tr>`).join("")
-    + `</table><div class="note" style="margin-top:6px">Average miss: ${Math.round(100 * avg(errs))}%. The prediction guesses answer length before the call; the measurement uses the real token counts.</div>`;
+    + `</table><div class="note" style="margin-top:6px">Average miss: ${Math.round(100 * avg(errs))}%. <b>Predicted</b> is an estimate made before the call from the prompt size; <b>Measured</b> uses the real token counts.</div>`;
   renderMeter();
+}
+function renderGraph() {
+  const g = $("budget-graph"); if (!g) return;
+  if (!accuracy.length) { g.innerHTML = `<div class="note">Send a message and the spend graph starts drawing: one point per answer, in real time.</div>`; return; }
+  let c = 0; const pts = accuracy.map(a => (c += a.measured)), W = 600, H = 110, max = Math.max(...pts, 1e-9), n = pts.length;
+  const xy = pts.map((v, i) => [n === 1 ? W / 2 : 8 + i * (W - 16) / (n - 1), H - 8 - (H - 20) * v / max]);
+  const line = xy.map(p => p.join(",")).join(" "), lim = wallet.limit_usd;
+  g.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:120px" role="img" aria-label="Cumulative spend per answer"><polygon points="${xy[0][0]},${H - 8} ${line} ${xy[n - 1][0]},${H - 8}" fill="#3ddc8422"/>
+    <polyline points="${line}" fill="none" stroke="var(--green)" stroke-width="2"/>${xy.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="var(--green)"/>`).join("")}</svg>
+    <div class="gl" style="display:flex;justify-content:space-between" ><span class="note">${n} answer${n > 1 ? "s" : ""}</span><span class="note">${usd(c)} spent this session${lim ? " of " + usd(lim) : ""}</span></div>`;
 }
 async function loadBudget() {
   try { wallet = await api("/budget/" + encodeURIComponent(user)); } catch (e) { wallet = { limit_usd: 0, spent_usd: 0 }; }
@@ -726,11 +882,77 @@ function renderEvidence() {
       <div class="d">${esc(r.description)}</div>
       <div class="f">${Object.entries(r.models || {}).map(([t, m]) => `<span>${esc(t)}: ${esc(m)}</span>`).join("")}</div>
       <div class="f">${r.chips.map(c => `<span>${esc(c)}</span>`).join(" · ")}${r.cost_usd ? ` · <span>${money(r.cost_usd)}</span>` : ""}</div></button>`;
-  box.innerHTML = `<h2>Reports · click one for the full detail</h2><div class="rfilters">${filters}</div>`
+  box.innerHTML = demosHtml() + `<h2>Reports · click one for the full detail</h2><div class="rfilters">${filters}</div>`
     + (shown.length ? `<div class="rgrid">${shown.map(cardHtml).join("")}</div>`
        : `<div class="card note">${reports.length ? "No reports in this filter yet." : "No saved reports yet. Run <code>python -m src.eval --save</code> and the card appears here."}${rfilter === "api" ? " Token Factory runs appear once the cloud models have been used." : ""}</div>`)
     + `<div class="note" style="margin:0 4px 12px">Local = runs made while building, on local stand-in models (or the simulator). Token Factory = runs on the real Nemotron models. The "right tier" for each turn is our own annotation.</div>`;
 }
+function renderReportsPanel() {
+  const box = $("rpanel"); if (!box) return;
+  if (reports === null) { box.innerHTML = `<div class="pn note">Couldn't reach the server for the saved reports.</div>`; return; }
+  const mc = r => `<div class="mcard"><div class="f"><span class="src ${esc(r.source)}">${SRC[r.source] || esc(r.source)}</span>${r.simulated ? `<span class="src warn">simulated</span>` : ""}<span>${esc(stamp(r.created))}</span></div>
+      <div class="t">${esc(r.title)}</div><div class="h">${esc(r.headline)}</div>
+      ${r.personas ? `<div class="f">${r.personas.map(n => `<span class="src local">${esc(n)}</span>`).join("")}</div>` : ""}
+      <dl class="kv">${Object.entries(r.models || {}).map(([t, m]) => `<dt>${esc(t)}</dt><dd>${esc(m)}</dd>`).join("")}</dl>
+      <dl class="kv" style="border-top:1px solid var(--line);padding-top:6px">${(r.metrics || []).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>
+      <div class="foot"><span>${esc(r.run_on || "")}</span><button class="btn" data-report="${esc(r.id)}">More details</button></div></div>`;
+  const grp = (src, title, runon, empty) => {
+    const list = reports.filter(r => r.source === src);
+    return `<section class="rgroup"><header><b>${title}</b><span class="runon">${runon}</span><span class="note">${list.length} run${list.length === 1 ? "" : "s"}</span></header>
+      ${list.length ? `<div class="rgrid">${list.map(mc).join("")}</div>` : `<div class="pn note">${empty}</div>`}</section>`;
+  };
+  const hw = (health && health.hardware) || "local GPU";
+  box.innerHTML = grp("api", "Token Factory · real Nemotron models", `Nebius Token Factory API${health && health.nebius_key_set ? " · key set" : ""}`,
+      "No Token Factory runs yet. They appear here after the live run on the Nemotron models.")
+    + grp("local", "Local · while building", `${esc(hw)} · Ollama`, "No local runs saved yet.");
+}
+/* ---------- demo profiles: scripted, real answers, graded from what happened ---------- */
+let demoList = [];
+const KIND = { success: ["Success", "ok"], failure: ["Known failure", "bad"], false_claim: ["False claim", "warn"] };
+const KCOL = { ok: "var(--green)", bad: "var(--red)", warn: "var(--amber)" };
+function demosHtml() {
+  if (!demoList.length) return "";
+  return `<h2>Demo profiles · scripted, real model answers</h2><div class="rgrid">${demoList.map(d => `<div class="rcard k-${KIND[d.kind][1]}" style="cursor:default">
+    <div class="f"><span class="src ${KIND[d.kind][1]}">${KIND[d.kind][0]}</span><span>${Object.entries(d.said).map(([k, v]) => `said ${esc(k)}: ${esc(v)}`).join(", ")}</span></div>
+    <div class="t">${esc(d.name)} · ${esc(d.title)}</div><div class="d">${esc(d.guideline)}<br>Expect: ${esc(d.expect)}${d.stand_in ? `<br><b class="warn">Stand-in:</b> ${esc(d.stand_in)}` : ""}</div>
+    <button class="btn primary" data-demo="${esc(d.id)}" style="align-self:flex-start">▶ Run</button></div>`).join("")}</div>`;
+}
+const hopeCtx = {};
+function hopeHtml(d) {
+  const r = d.review; if (!r) return "";
+  hopeCtx[d.id] = { code: r.code, say: d.turns[d.turns.length - 1].say, persona: (d.name || "").toLowerCase() };
+  const ok = r.verified === true;
+  return `<div class="hope" data-hope="${esc(d.id)}"><div class="hh"><b>Hope · team lead review</b><span class="tok">${r.tokens} tokens</span>
+    ${r.verified === null ? "" : `<span class="chk ${ok ? "ok" : "warn"}">${ok ? "✓ fix checked" : "✗ fix not confirmed"}</span>`}</div>
+    <div class="hr"><b>Why it failed</b><span>${esc(r.why)}</span></div>
+    <div class="hr"><b>Fix</b><span>${esc(r.fix)}</span></div>
+    ${r.check ? `<div class="hr"><b>Check</b><span>${esc(r.check)}</span></div>` : ""}
+    ${r.fixed_answer ? `<div class="hr"><b>Answer after fix</b><span class="ans" style="margin:0">${esc(r.fixed_answer)}</span></div>` : ""}
+    ${r.kind === "rule" ? (r.applied ? `<div class="note ok">Fix kept. The reader uses it from now on: run this demo again to see the difference.</div>`
+      : `<button class="btn primary" data-hope-apply="${esc(d.id)}">Apply fix · 0 tokens</button>`) : ""}</div>`;
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-hope-apply]"); if (!b) return;
+  const c = hopeCtx[b.dataset.hopeApply]; b.disabled = true;
+  try { await api("/hope/apply", c); b.outerHTML = `<div class="note ok">Fix kept. The reader uses it from now on: run this demo again to see the difference.</div>`; }
+  catch (err) { b.disabled = false; toast(err.message); }
+});
+function demoBody(d) {
+  return `<div class="card"><b class="${["PASS", "CAUGHT", "FIXED"].includes(d.label) ? "ok" : "warn"}">${esc(d.label)}</b>${d.code ? ` <span class="code">${esc(d.code)}</span>` : ""}
+    <div class="note">${esc(d.guideline)} Expect: ${esc(d.expect)}</div>${d.stand_in ? `<div class="note"><b class="warn">Stand-in:</b> ${esc(d.stand_in)}</div>` : ""}</div>` + hopeHtml(d)
+    + d.turns.map(t => `<div class="case"><b>You:</b> ${esc(t.say)}<div class="note" style="margin-top:4px"><span class="pill ${esc(t.tier)}">${esc(t.tier)}</span> ${esc(t.model)} · ${(t.latency_ms / 1000).toFixed(1)} s · ${esc(t.reason)}</div>
+      ${t.unverified.length ? `<div class="note bad">Flagged as unverified: ${t.unverified.map(esc).join(", ")}</div>` : ""}<div class="ans">${esc(t.answer)}</div></div>`).join("");
+}
+async function runDemo(btn) {
+  const id = btn.dataset.demo; btn.disabled = true; btn.textContent = "Running… (real models)";
+  $("rsheet").innerHTML = `<div class="note">Running the “${esc(id)}” script on a fresh profile with the real models…</div>`; $("rmodal").hidden = false;
+  try {
+    const d = await api(`/demos/${encodeURIComponent(id)}/run`, {});
+    $("rsheet").innerHTML = `<div class="rd-head"><div><div class="title">${esc(d.name)} · ${esc(d.title)}</div><div class="note">Scripted demo · fresh profile ${esc(d.user)}</div></div><button class="btn" data-rclose>Close</button></div>` + demoBody(d);
+  } catch (e) { $("rsheet").innerHTML = `<div class="note bad">${esc(e.message)}</div><button class="btn" data-rclose>Close</button>`; }
+  btn.disabled = false; btn.textContent = "▶ Run";
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-demo]"); if (b) runDemo(b); });
 function strategyBars(r) {
   const order = ["always-nano", "router", "always-ultra"];
   const strat = Object.entries(r.strategies || {}).sort((x, y) => order.indexOf(x[0]) - order.indexOf(y[0]));
@@ -777,7 +999,7 @@ async function openReport(id) {
     $("rsheet").innerHTML = `<div class="rd-head"><div><div class="title">${esc(w.title)}</div>
         <div class="note"><span class="src ${esc(w.source)}">${SRC[w.source] || esc(w.source)}</span> ${esc(stamp(w.created))} · ${esc(w.description)}</div>
         <div class="note">${Object.entries(w.models || {}).map(([t, m]) => `${esc(t)}: ${esc(m)}`).join(" · ")}${w.reader ? ` · reader: ${esc(w.reader)}` : ""}</div></div>
-        <button class="btn" data-rclose>Close</button></div>${w.kind === "compare" ? compareBody(w.report) : scenarioBody(w.report)}`;
+        <button class="btn" data-rclose>Close</button></div>${w.kind === "compare" ? compareBody(w.report) : w.kind === "demos" ? w.report.demos.map(d => `<h2>${esc(d.title)}</h2>` + demoBody(d)).join("") : scenarioBody(w.report)}`;
   } catch (e) { $("rsheet").innerHTML = `<div class="note bad">${esc(e.message)}</div><button class="btn" data-rclose>Close</button>`; }
 }
 const closeReport = () => { $("rmodal").hidden = true; };
@@ -789,7 +1011,7 @@ document.addEventListener("click", e => {
   else if (row) { const d = row.nextElementSibling; d.hidden = !d.hidden; }
   else if (e.target.closest("[data-rclose]") || e.target.id === "rmodal") closeReport();
   const tile = e.target.closest("[data-go]");
-  if (tile) tile.dataset.go === "reports" ? setView("proof") : showSection(tile.dataset.go);
+  if (tile) showSection(tile.dataset.go);
 });
 
 /* ---------- settings overview: a dashboard that fills the page ---------- */
@@ -820,8 +1042,8 @@ function renderTiles() {
     <button class="more" data-go="${go}">${more || "Open"} ${ico("arrow")}</button></header>${body}</section>`;
   const soon = memory.items.filter(i => !i.kept).sort((a, b) => a.days_left - b.days_left).slice(0, 3);
   box.innerHTML = `
-    <div class="idstrip">${ico("user")}<span class="note">Session</span><code>${esc(user)}</code>
-      <button class="more" data-go="profile">Manage ${ico("arrow")}</button></div>
+    <div class="idstrip">${ico("user")}<span class="note">Profile</span><b>${esc(personaOf(user) ? personaOf(user).name : "Normal user")}</b><code>${esc(user)}</code>
+      <button class="more" data-go="profile">Switch ${ico("arrow")}</button></div>
     <div class="kpis">
       ${kpi("budget", "wallet", "Budget", lim ? usd(Math.max(0, lim - spent)) : "No limit", lim ? `left of ${usd(lim)}` : `${usd(spent)} spent so far`, lim && pct > 75 ? "amber" : "green")}
       ${kpi("memory", "box", "Memory", memory.items.length, `${kept} kept · rest delete after ${days(memory.retention_days)}`, "blue")}
@@ -855,7 +1077,7 @@ async function loadMemory() {
   const mine = gen;
   try { const m = await api("/memory/" + encodeURIComponent(user)); if (mine !== gen) return; memory = m; }
   catch (e) { $("mem-list").innerHTML = `<div class="card note bad">${esc(e.message)}</div>`; return; }
-  renderMemory(); remindMaybe(); renderTiles();
+  renderMemory(); remindMaybe(); renderTiles(); loadLessons();
 }
 function renderMemory() {
   $("mem-intro").innerHTML = `Each <b>＋ New chat</b> saves the conversation before it here, compressed. It's deleted after ${days(memory.retention_days)}
@@ -929,6 +1151,16 @@ async function memoryAction(e) {
   }
 }
 
+/* ---------- lessons: what each persona taught the team (codes only, no message text) ---------- */
+async function loadLessons() {
+  let l; try { l = await api("/lessons"); } catch (e) { return; }
+  const names = (demoList.length ? demoList.map(d => d.name) : Object.keys(l.personas).map(n => n[0].toUpperCase() + n.slice(1)));
+  $("lessons").innerHTML = `<header>${ico("shield")}<b>Team lessons · what each persona taught Hope</b><span class="note" style="margin-left:auto">${l.rules} reader rule${l.rules === 1 ? "" : "s"} kept · zero tokens</span></header>
+    <div class="lgrid">${names.map(n => { const c = l.personas[n.toLowerCase()] || { pass: 0, fail: 0 };
+      const mine = l.lessons.filter(x => x.persona === n.toLowerCase()).slice(0, 3);
+      return `<div class="lcard"><b>${esc(n)}</b><span class="note">${c.pass} passed · ${c.fail} failed</span>
+        ${mine.map(x => `<div class="lrow"><span class="tag ${x.kind === "pass" ? "kept" : "soon"}">${x.kind}</span><span>${esc(x.code)} · ${esc(when(x.created_at))}</span></div>`).join("") || `<span class="note">No runs yet.</span>`}</div>`; }).join("")}</div>`;
+}
 /* ---------- note bot: zero-token notes ---------- */
 const NOTE_ICONS = { said: "🗣", learned: "👀", faded: "🍂", contradiction: "⚡", accepted: "✅", feedback: "👎", routing: "↗", budget: "💰", memory: "📦" };
 const when = ts => { if (!ts) return ""; const d = new Date(/[zZ]|[+-]\d\d:\d\d$/.test(ts) ? ts : ts.replace(" ", "T") + "Z");
@@ -944,9 +1176,172 @@ async function loadNotes(seen) {
   noteCount = n.count; noteList = n.notes; renderTiles();
   $("nb-badge").hidden = fresh <= 0; $("nb-badge").textContent = fresh > 9 ? "9+" : fresh;
   $("notes-summary").innerHTML = n.summary.map(l => `<p style="margin:4px 0">${esc(l)}</p>`).join("");
-  $("notes-list").innerHTML = n.notes.length
-    ? n.notes.map(x => `<div class="notes-row"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><time>${esc(when(x.at))}</time><span>${esc(x.text)}</span></div>`).join("")
-    : `<div class="note">No notes yet. They appear as you set preferences, ask for things, and react to answers.</div>`;
+  allNotes = n.notes; renderNoteList();
+}
+let allNotes = [], selN = new Set(), selS = new Set(), editSaved = false;
+const noteRow = (x, sel, on) => `<label class="notes-row${on ? " on" : ""}"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><time>${esc(when(x.at))}</time><span class="nt">${esc(x.text)}</span>
+  <input type="checkbox" data-nk="${esc(x.key)}" data-nsrc="${sel}"${on ? " checked" : ""}></label>`;
+const NI = {
+  save: '<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h7V3M8 21v-7h8v7"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
+  unsave: '<path d="M5 3h11l3 3v15H5z"/><path d="M9 11l6 6M15 11l-6 6"/>',
+};
+const nIco = n => `<svg class="ico" viewBox="0 0 24 24">${NI[n]}</svg>`;
+const noteTools = (keys, sel, labelSave, canSave) => { const set = sel === "s" ? selS : selN, n = set.size, dis = n ? "" : " disabled";
+  return `<div class="ntools">${canSave ? `<button class="ibtn" data-nact="save" data-nsrc="${sel}" title="${labelSave} selected (${n})" aria-label="${labelSave} selected"${dis}>${nIco(labelSave === "Save" ? "save" : "unsave")}</button>` : ""}
+  <button class="ibtn danger" data-nact="delete" data-nsrc="${sel}" title="Delete selected (${n})" aria-label="Delete selected"${dis}>${nIco("trash")}</button>
+  <span class="nct">${n ? n + " selected" : ""}</span><span class="sp"></span>
+  <label>Select all <input type="checkbox" data-nall="${sel}"${keys.length && keys.every(k => set.has(k)) ? " checked" : ""}></label></div>`; };
+function renderNoteList() {
+  const keys = new Set(allNotes.map(x => x.key));
+  selN = new Set([...selN].filter(k => keys.has(k))); selS = new Set([...selS].filter(k => keys.has(k)));
+  const saved = allNotes.filter(x => x.saved), rest = allNotes.filter(x => !x.saved);
+  const savedBox = saved.length ? `<div class="nsaved"><div class="ntools" style="border:0;margin:0 0 6px;padding:0"><h4 style="margin:0">Saved · ${saved.length}</h4><span class="sp"></span>
+      <button class="btn" data-nedit>${editSaved ? "Done" : "Edit"}</button></div>`
+    + (editSaved ? noteTools(saved.map(x => x.key), "s", "Unsave", true) : "")
+    + saved.map(x => editSaved ? noteRow(x, "s", selS.has(x.key)) : `<div class="notes-row"><span class="ic">${NOTE_ICONS[x.kind] || "•"}</span><time>${esc(when(x.at))}</time><span>${esc(x.text)}</span></div>`).join("") + `</div>` : "";
+  $("notes-list").innerHTML = savedBox + (rest.length
+    ? noteTools(rest.map(x => x.key), "n", "Save", true) + rest.map(x => noteRow(x, "n", selN.has(x.key))).join("")
+    : `<div class="note">${saved.length ? "No other notes." : "No notes yet. They appear as you set preferences, ask for things, and react to answers."}</div>`);
+}
+function toast(msg, onUndo) {
+  const t = document.createElement("div"); t.className = "toast";
+  t.innerHTML = `<span>${esc(msg)}</span>${onUndo ? `<button>Undo</button>` : ""}<i></i>`; $("toasts").appendChild(t);
+  const done = () => t.remove(), timer = setTimeout(done, 10000);
+  if (onUndo) t.querySelector("button").onclick = async () => { clearTimeout(timer); done(); await onUndo(); };
+}
+async function markNotes(marks) { await api("/notes/mark", { user_id: user, marks }); await loadNotes(); }
+document.addEventListener("change", e => {
+  const all = e.target.closest("[data-nall]"), one = e.target.closest("[data-nk]");
+  if (all) { const sel = all.dataset.nall === "s" ? selS : selN, list = allNotes.filter(x => all.dataset.nall === "s" ? x.saved : !x.saved);
+    sel.clear(); if (all.checked) list.forEach(x => sel.add(x.key)); renderNoteList(); }
+  else if (one) { const sel = one.dataset.nsrc === "s" ? selS : selN; one.checked ? sel.add(one.dataset.nk) : sel.delete(one.dataset.nk); renderNoteList(); }
+});
+document.addEventListener("click", async e => {
+  if (e.target.closest("[data-nedit]")) { editSaved = !editSaved; selS.clear(); return renderNoteList(); }
+  const b = e.target.closest("[data-nact]"); if (!b || b.disabled) return;
+  const fromSaved = b.dataset.nsrc === "s", sel = fromSaved ? selS : selN, keys = [...sel], was = Object.fromEntries(keys.map(k => [k, fromSaved ? "saved" : "none"]));
+  const marks = Object.fromEntries(keys.map(k => [k, b.dataset.nact === "delete" ? "hidden" : fromSaved ? "none" : "saved"]));
+  sel.clear(); const n = keys.length, word = `${n} note${n === 1 ? "" : "s"}`;
+  try { await markNotes(marks); } catch (err) { return toast(err.message); }
+  toast(b.dataset.nact === "delete" ? `Deleted ${word}` : fromSaved ? `Unsaved ${word}` : `Saved ${word}`, () => markNotes(was));
+});
+
+function showStatus(h) {
+  $("status").textContent = !h ? "● backend unreachable" : h.mode === "online" ? "● online" : "● offline";
+  $("status").className = "pill " + (!h ? "bad" : h.mode === "online" ? "warn" : "ok");
+}
+function renderMode() {
+  if (!health) return;
+  showStatus(health);
+  document.querySelectorAll("#modeSwitch [data-mode]").forEach(b => b.classList.toggle("on", b.dataset.mode === health.mode));
+  const lock = health.online_blocker && health.mode !== "online";
+  $("modeNote").hidden = !(lock || health.public_demo);
+  $("modeNote").textContent = health.public_demo ? "The mode switch is off in the public demo." : `Online is locked: ${health.online_blocker}`;
+  $("modeSwitch").querySelector("[data-mode=online]").title = lock ? health.online_blocker : "";
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("#modeSwitch [data-mode]"); if (!b || b.classList.contains("on")) return;
+  const online = b.dataset.mode === "online";
+  if (online && !confirm("Online mode sends every answer to Nebius Token Factory and spends credits. Switch?")) return;
+  try { health = await api("/mode", { mode: b.dataset.mode, confirm: online }); toast(`Now ${health.mode}: ${Object.values(health.tiers).map(t => t.model).join(" · ")}`); renderSettings(); renderTiles(); }
+  catch (err) { toast(err.message); }
+});
+
+/* ---------- tutorial: a guided tour of every part of the app ---------- */
+// view: which page to show; sec: which settings tab; at: what to spotlight (none = a card in the centre).
+const TOUR = [
+  { title: "Welcome to The Dissonance Router", body: `<p>Most assistants trust what you <b>say</b>. This one also watches what you <b>do</b>.</p>
+    <pre>{ said: "keep it short",
+  did:  "asks for more detail, twice" }</pre>
+    <p>When the two clash, that's a <b>dissonance</b>. The answer moves to a stronger model, <b>Nano → Super → Ultra</b>, and the reason is written down.</p>` },
+  { view: "chat", at: "#nav-main", title: "Views", body: `<p>Switch what you see here: <b>Chat</b> with the mirror, <b>Chat + Proof</b> side by side, or <b>Proof</b> on its own.</p>
+    <p>Below them, <b>Decisions</b> lists every answer and the model that wrote it. Settings sits at the bottom.</p>` },
+  { view: "chat", at: "#chatBlock", title: "Chat", body: `<p>Talk to it like any assistant. Each answer says which model wrote it and why:</p>
+    <pre>{ tier: "super",
+  reason: "length: said concise, did detailed" }</pre><p><b>▶ Play the demo</b> at the top replays a contradiction for you.</p>` },
+  { view: "chat", at: "#mirrorBlock", title: "The mirror", body: `<p>Left: what you <b>say</b> you prefer. Right: what it <b>learned</b> from what you do.</p>
+    <p>Five things are compared: <code>length</code> <code>tone</code> <code>sourcing</code> <code>structure</code> <code>revision</code>. A gap on any of them is a dissonance.</p>` },
+  { view: "proof", at: "#top", title: "Proof · the scoreboard", body: `<p>The headline numbers from the latest test runs: how often it picked the right model and what that cost.</p>` },
+  { view: "proof", at: "#evidenceBlock .rgrid", title: "Proof · demo area", body: `<p>Five scripted people, each replayable with <b>▶ Run</b> on the real models:</p>
+    <pre>{ careful:  ["Hope", "Jordan"],
+  slip up:  ["Casey", "Sam"],
+  fakes it: ["Kai"] }</pre><p>When one fails, <b>Hope</b> reviews it, explains why and proposes a fix, at 0 tokens.</p>` },
+  { view: "proof", at: "#evidenceBlock .rfilters", title: "Proof · report area", body: `<p>Every saved test run. <b>Token Factory</b> runs are on the real Nemotron models; <b>Local</b> runs were made on this computer.</p>
+    <p>Click a card for the full record: every turn, the tier, the reason and the answer.</p>` },
+  { view: "settings", sec: "overview", at: "[data-panel=overview]", title: "Settings · Overview", body: `<p>Everything at a glance: who you are, budget, memory, notes, reports and which models are running.</p>` },
+  { view: "settings", sec: "profile", at: "[data-panel=profile]", title: "Settings · Profile", body: `<p>Pick a persona to test as, read their write-up, then <b>Activate</b>. Or stay the <b>Normal user</b>.</p>` },
+  { view: "settings", sec: "reports", at: "[data-panel=reports]", title: "Settings · Reports", body: `<p>The same saved runs as Proof, with filters and the full details.</p>` },
+  { view: "settings", sec: "budget", at: "[data-panel=budget]", title: "Settings · Budget", body: `<p>A pretend wallet. Set a limit and the router plans every answer inside it:</p>
+    <pre>{ tight: "step down a tier", empty: "stop" }</pre><p><b>Predicted</b> is a guess before the call; <b>measured</b> uses the real token counts.</p>` },
+  { view: "settings", sec: "models", at: "[data-panel=models]", title: "Settings · Models", body: `<p>Which model answers for each tier. <b>Offline</b> runs here on this computer; <b>Online</b> uses Nebius Token Factory and spends credits.</p>
+    <p>Engineers swap models in <code>models.toml</code>.</p>` },
+  { view: "settings", sec: "memory", at: "[data-panel=memory]", title: "Settings · Memory", body: `<p>Past chats, kept 10 days unless you press <b>Keep</b>. <b>Team lessons</b> show what each persona taught Hope.</p>` },
+  { view: "settings", sec: "notes", at: "[data-panel=notes]", title: "Settings · Notes", body: `<p>Plain notes on what it learned about you, written without any AI call. Tick, save or delete them; there's a 10 second undo.</p>` },
+  { view: "settings", sec: "about", at: "[data-panel=about]", title: "Settings · About", body: `<p>How it works, how it stays honest, and who built it.</p>` },
+  { view: "settings", sec: "accessibility", at: "[data-panel=accessibility] .acc-tour", title: "Accessibility", body: `<p>Replay this tour any time from here, and read the full <b>README</b> below.</p>
+    <p>That's it. Press <b>Finish</b> and try <b>▶ Play the demo</b>.</p>` },
+];
+let tourAt = -1, tourFrom = null;
+function tourShow(i) {
+  tourAt = i; const s = TOUR[i], card = $("tourCard"), hole = $("tourHole");
+  if (s.view) setView(s.view, s.sec); if (s.sec) showSection(s.sec);
+  $("tourStep").textContent = `Step ${i + 1} of ${TOUR.length}`; $("tourTitle").textContent = s.title; $("tourBody").innerHTML = s.body;
+  $("tourBack").hidden = i === 0; $("tourNext").textContent = i === TOUR.length - 1 ? "Finish" : "Next ›";
+  $("tourDots").innerHTML = TOUR.map((_, k) => `<i class="${k === i ? "on" : k < i ? "done" : ""}"></i>`).join("");
+  requestAnimationFrame(() => requestAnimationFrame(() => tourPlace(s)));
+  $("tourNext").focus();
+}
+function tourPlace(s) {
+  const card = $("tourCard"), hole = $("tourHole"), el = s.at && document.querySelector(s.at), W = innerWidth, H = innerHeight, pad = 8, gap = 16;
+  const r = el && el.getBoundingClientRect();
+  card.classList.toggle("center", !r || !r.width);
+  if (!r || !r.width || W < 700) {      // no target, or a phone: a plain card in the middle
+    hole.className = "tour-hole none"; const c = card.getBoundingClientRect();
+    card.style.left = (W - c.width) / 2 + "px"; card.style.top = Math.max(16, (H - c.height) / 2) + "px"; return;
+  }
+  el.scrollIntoView({ block: "nearest" });
+  const t = { left: Math.max(4, r.left - pad), top: Math.max(4, r.top - pad), right: Math.min(W - 4, r.right + pad), bottom: Math.min(H - 4, r.bottom + pad) };
+  hole.className = "tour-hole";
+  Object.assign(hole.style, { left: t.left + "px", top: t.top + "px", width: t.right - t.left + "px", height: t.bottom - t.top + "px" });
+  const c = card.getBoundingClientRect(), fitsY = y => Math.min(Math.max(16, y), H - c.height - 16);
+  const spots = [
+    [t.right + gap, fitsY(t.top), W - t.right - gap >= c.width + 16],                  // right of it
+    [t.left - gap - c.width, fitsY(t.top), t.left - gap >= c.width + 16],              // left of it
+    [Math.min(Math.max(16, t.left), W - c.width - 16), t.bottom + gap, H - t.bottom - gap >= c.height + 16],   // below
+    [Math.min(Math.max(16, t.left), W - c.width - 16), t.top - gap - c.height, t.top - gap >= c.height + 16],  // above
+  ];
+  const [x, y] = spots.find(p => p[2]) || [W - c.width - 24, H - c.height - 24];        // big target: bottom-right corner, inside it
+  card.style.left = x + "px"; card.style.top = y + "px";
+}
+function tourStart() { tourFrom = { view, section }; $("tour").hidden = false; tourShow(0); }
+function tourEnd(skipped) {
+  $("tour").hidden = true; tourAt = -1; store.set("dr-tour-done", "1");
+  if (!skipped) return setView("chat");
+  if (tourFrom) setView(tourFrom.view, tourFrom.section);
+  const t = $("tourToast");
+  t.innerHTML = `You can replay the tutorial anytime in <button data-tour-acc>Accessibility</button> under Settings.`; t.hidden = false;
+  clearTimeout(t.timer); t.timer = setTimeout(() => t.hidden = true, 4000);
+}
+$("tourNext").onclick = () => tourAt === TOUR.length - 1 ? tourEnd(false) : tourShow(tourAt + 1);
+$("tourBack").onclick = () => tourAt > 0 && tourShow(tourAt - 1);
+$("tourSkip").onclick = () => tourEnd(true);
+$("tourReplay").onclick = tourStart;
+document.addEventListener("click", e => { if (e.target.closest("[data-tour-acc]")) { $("tourToast").hidden = true; setView("settings", "accessibility"); } });
+document.addEventListener("keydown", e => {
+  if (tourAt < 0) return;
+  if (e.key === "Escape") tourEnd(true);
+  else if (e.key === "ArrowRight") $("tourNext").click();
+  else if (e.key === "ArrowLeft") $("tourBack").click();
+  else if (e.key === "Tab") { const f = [...$("tourCard").querySelectorAll("button:not([hidden])")]; const k = f.indexOf(document.activeElement);
+    e.preventDefault(); f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus(); }
+});
+addEventListener("resize", () => tourAt >= 0 && tourPlace(TOUR[tourAt]));
+let readmeLoaded = false;
+async function loadReadme() {
+  if (readmeLoaded) return;
+  try { $("readme").innerHTML = md((await api("/readme")).markdown); readmeLoaded = true; }
+  catch (e) { $("readme").innerHTML = `<div class="note bad">${esc(e.message)}</div>`; }
 }
 
 /* ---------- layout ---------- */
@@ -959,7 +1354,7 @@ const LAYOUTS = {
 };
 const BLOCKS = Object.fromEntries(["chatBlock", "mirrorBlock", "storyBlock", "evidenceBlock", "settingsBlock"].map(id => [id, $(id)]));
 // Settings is a mode: the sidebar's View section is replaced by these sections, one shown at a time.
-const SECTIONS = { overview: "Overview", profile: "Profile", budget: "Budget · simulated wallet", models: "Models", memory: "Memory · past conversations", notes: "Notes · what I've learned", about: "About" };
+const SECTIONS = { overview: "Overview", profile: "Profile", reports: "Reports · saved test runs", budget: "Budget · simulated wallet", models: "Models", memory: "Memory · past conversations", notes: "Notes · what I've learned", about: "About", accessibility: "Accessibility" };
 let view = "chat", lastMain = "chat", section = "overview";
 function setView(v, sec) {
   if (v === "memory" || SECTIONS[v]) { sec = SECTIONS[v] ? v : "memory"; v = "settings"; }   // old links: "memory" or a section name
@@ -991,6 +1386,7 @@ function showSection(sec) {
   if (sec === "memory") loadMemory();
   if (sec === "notes") loadNotes(true);
   if (sec === "budget") loadBudget();
+  if (sec === "accessibility") loadReadme();
   store.set("dr-section", sec);
 }
 // The gear opens Settings, and closes it again (back to wherever you were).
@@ -1012,11 +1408,21 @@ function jumpTo(id) {
 function renderSettings() {
   if (!health) { $("models").innerHTML = `<div class="pn note">The server didn't answer.</div>`; return; }
   const roles = { nano: "Fast and cheap: handles most answers.", super: "Balanced: a first contradiction or a tight budget.", ultra: "Deep reasoning: strong or repeated contradictions." };
+  const tf = health.token_factory || [], tfTier = tf.filter(m => m.tier), cand = tf.filter(m => !m.tier);
+  const price = m => m.price ? `<span class="row" style="gap:10px"><span>in <b>$${m.price.in.toFixed(2)}</b></span><span>out <b>$${m.price.out.toFixed(2)}</b></span><span class="note">per 1M tokens</span></span>` : "";
   const tiers = Object.entries(health.tiers), local = tiers.every(([, v]) => v.provider === "ollama");
-  $("models").innerHTML = `<div class="tiercards">${tiers.map(([t, v]) => `<div class="tiercard ${esc(t)}"><span class="pill ${esc(t)}" style="align-self:flex-start">${esc(t)}</span>
-      <div class="mn">${esc(v.model)}</div><div class="role">${esc(roles[t] || "")}</div>
-      <div class="row">${ico(v.provider === "ollama" ? "laptop" : "cloud")}${v.provider === "ollama" ? "Runs on this computer (Ollama)" : "Nebius Token Factory"}</div>
-      <div class="row">${ico("chip")}Thinking ${v.reasoning === "off" ? "off" : "on"}</div></div>`).join("")}</div>
+  renderMode();
+  $("models").innerHTML = `<section class="pn"><header>${ico("cloud")}<b>Nebius Token Factory</b><span class="note" style="margin-left:auto">${health.nebius_key_set ? "API key set · cloud calls off until enabled" : "No API key set"}</span></header>
+      <p class="note" style="margin:0 0 10px">The NVIDIA Nemotron models behind the live run. Priority: these are what the router is built for.</p>
+      <div class="tiercards">${tfTier.map(m => `<div class="tiercard ${esc(m.tier)}"><span class="pill ${esc(m.tier)}" style="align-self:flex-start">${esc(m.tier)}</span>
+        <div class="mn">${esc(m.name)}</div><div class="role">${esc(m.role)}</div>${price(m)}</div>`).join("")}</div>
+      ${cand.map(m => `<p class="note" style="margin:10px 0 0">${esc(m.name)}: ${esc(m.role)}</p>`).join("")}
+      <p class="note" style="margin:8px 0 0">Prices are planning figures from <code>.env</code>; exact API model ids are confirmed before the live run.</p></section>
+    <section class="pn"><header>${ico("laptop")}<b>Local · this computer</b><span class="note" style="margin-left:auto">${esc(health.hardware || "")} · Ollama</span></header>
+      <div class="tiercards">${tiers.map(([t, v]) => `<div class="tiercard ${esc(t)}"><span class="pill ${esc(t)}" style="align-self:flex-start">${esc(t)}</span>
+        <div class="mn">${esc(v.model)}</div><div class="role">${esc(roles[t] || "")}</div>
+        <div class="row">${ico(v.provider === "ollama" ? "laptop" : "cloud")}${v.provider === "ollama" ? "Runs on this computer (Ollama)" : "Nebius Token Factory"}</div>
+        <div class="row">${ico("chip")}Thinking ${v.reasoning === "off" ? "off" : "on"}</div></div>`).join("")}</div></section>
     <section class="pn"><header>${ico("note")}<b>Signal reader</b></header><p class="note" style="margin:0"><b>${esc(health.signal_reader)}</b>${health.signal_reader === "nano" ? ": Nemotron Nano reads each message with thinking off, keywords as the fallback." : ": keyword matching, no model call."}
       ${local ? "All models run locally: no cloud calls, no credits used." : "Some tiers use the cloud: those calls spend credits."}</p></section>`;
 }
@@ -1036,8 +1442,77 @@ async function load() {
                                       d.id, d.feedback, i === chrono.length - 1), "msg");
   });
 }
+const PERSON = '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6 8-6s7 1.5 8 6"/>';
+const avatar = (id, col, size = 40) => `<span class="av" style="width:${size}px;height:${size}px;color:${col};background:color-mix(in srgb,${col} 16%,transparent);border:1px solid color-mix(in srgb,${col} 40%,transparent)"><svg viewBox="0 0 24 24" style="width:${Math.round(size * .55)}px;height:${Math.round(size * .55)}px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round">${PERSON}</svg></span>`;
+const personaOf = id => demoList.find(d => d.user === id);
+let psel = null;
+const PDOC = d => d ? d.name.toLowerCase() : "normal";
+function renderPersonas() {
+  const box = $("personas"); if (!box) return;
+  const cur = personaOf(user), sel = psel === null ? (cur ? cur.id : "") : psel;
+  const card = (key, name, tag, cls, desc, on) => `<button class="rcard pcard${cls === "local" ? "" : " k-" + cls}${key === sel ? " sel" : ""}" data-persona="${esc(key)}" style="${on ? "background:#ffffff0d" : ""}">
+    ${avatar(key, cls === "local" ? "var(--blue)" : KCOL[cls], 52)}${on ? "<b class='ok act'>● active</b>" : ""}<div class="f"><span class="src ${cls}">${tag}</span></div><div class="t">${esc(name)}</div><div class="d">${esc(desc)}</div></button>`;
+  const sp = $("side-profile");
+  if (sp) sp.title = (cur ? cur.name : "Normal user") + " · " + (cur ? KIND[cur.kind][0] : "Free play");
+  if (sp) sp.innerHTML = `${avatar("", cur ? KCOL[KIND[cur.kind][1]] : "var(--blue)", 34)}<span class="label"><b>${esc(cur ? cur.name : "Normal user")}</b><small>${cur ? KIND[cur.kind][0] : "Free play"}</small></span>`;
+  box.innerHTML = card("", "Normal user", "Free play", "local", "A clean profile for your own testing.", !cur)
+    + demoList.map(d => card(d.id, d.name, KIND[d.kind][0], KIND[d.kind][1], d.title, cur && cur.id === d.id)).join("");
+  const d = demoList.find(x => x.id === sel), on = d ? cur && cur.id === d.id : !cur, col = d ? KCOL[KIND[d.kind][1]] : "var(--blue)";
+  $("pdetail").innerHTML = `<div class="hd">${avatar("", col, 56)}<div><b>${esc(d ? d.name : "Normal user")}</b><span class="src ${d ? KIND[d.kind][1] : "local"}">${d ? KIND[d.kind][0] : "Free play"}</span></div></div>
+    <div class="acts"><button class="btn" data-pdoc="${PDOC(d)}">${ico("note")} Read docs</button>
+      <button class="btn primary" data-pact="${esc(sel)}" ${on ? "disabled" : ""}>${on ? "● Active" : "Activate"}</button></div>
+    <dl>${d ? `<dt>Says</dt><dd>${Object.entries(d.said).map(([k, v]) => `${esc(k)}: <b>${esc(v)}</b>`).join(", ")}</dd>
+      <dt>Script</dt><dd>${d.messages.map((m, i) => `${i + 1}. “${esc(m)}”`).join("<br>")}</dd>
+      <dt>What it shows</dt><dd>${esc(d.guideline)}</dd><dt>Expected</dt><dd>${esc(d.expect)}</dd>
+      ${d.stand_in ? `<dt>Stand-in</dt><dd class="warn">${esc(d.stand_in)}</dd>` : ""}`
+      : `<dt>What it is</dt><dd>An empty profile: nothing set, nothing learned. Set your style in the mirror and chat to see how it routes.</dd>
+      <dt>Session id</dt><dd><code>${esc(store.get("dr-normal") || "new on first use")}</code></dd>`}</dl>`;
+}
+async function openDoc(name) {
+  $("rsheet").innerHTML = `<div class="note">Loading…</div>`; $("rmodal").hidden = false;
+  try {
+    const r = await api("/personas/" + encodeURIComponent(name) + "/doc");
+    $("rsheet").innerHTML = `<div class="rd-head"><div class="note">docs/personas/${esc(name)}.md</div><button class="btn" data-rclose>Close</button></div><div class="md">${md(r.markdown)}</div>`;
+  } catch (e) { $("rsheet").innerHTML = `<div class="note bad">${esc(e.message)}</div><button class="btn" data-rclose>Close</button>`; }
+}
+function md(src) {
+  const inl = t => esc(t).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/\*([^*]+)\*/g, "<i>$1</i>");
+  const out = []; let list = null, table = null;
+  const flush = () => {
+    if (list) { out.push(`<${list.t}>${list.i.map(x => `<li>${x}</li>`).join("")}</${list.t}>`); list = null; }
+    if (table) { out.push(`<table>${table.map((r, i) => `<tr>${r.map(c => i ? `<td>${inl(c)}</td>` : `<th>${inl(c)}</th>`).join("")}</tr>`).join("")}</table>`); table = null; }
+  };
+  for (const line of src.split("\n")) {
+    const l = line.trim(), h = l.match(/^(#{1,3}) (.*)/), li = l.match(/^(-|\d+\.) (.*)/);
+    if (l.startsWith("|")) { if (/^\|[-| ]+\|$/.test(l)) continue; if (list) flush(); (table = table || []).push(l.slice(1, -1).split("|").map(c => c.trim())); continue; }
+    if (li) { const t = li[1] === "-" ? "ul" : "ol"; if (table || (list && list.t !== t)) flush(); if (!list) list = { t, i: [] }; list.i.push(inl(li[2])); continue; }
+    flush();
+    if (h) out.push(`<h${h[1].length}>${inl(h[2])}</h${h[1].length}>`);
+    else if (l === "---") out.push("<hr>");
+    else if (l) out.push(`<p>${inl(l)}</p>`);
+  }
+  flush(); return out.join("");
+}
+async function pickPersona(id) {
+  const d = demoList.find(x => x.id === id);
+  if (!d) { await setUser(store.get("dr-normal") || newId()); }
+  else {
+    if (!personaOf(user)) store.set("dr-normal", user);
+    await setUser(d.user);
+    for (const [dim, v] of Object.entries(d.said)) await api("/update-style", { user_id: user, dimension: dim, value: v });
+  }
+  if (!store.get("dr-normal") && !d) store.set("dr-normal", user);
+  renderTiles(); setView("chat");
+}
+$("side-profile").addEventListener("click", () => view === "settings" && section === "profile" ? setView(lastMain) : setView("settings", "profile"));
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-persona]"), a = e.target.closest("[data-pact]"), doc = e.target.closest("[data-pdoc]");
+  if (b) { psel = b.dataset.persona; renderPersonas(); }
+  else if (a) { psel = null; pickPersona(a.dataset.pact); }
+  else if (doc) openDoc(doc.dataset.pdoc);
+});
 function setUser(id) {
-  user = id; store.set("dr-user", id); gen++;
+  user = id; store.set("dr-user", id); gen++; renderPersonas();
   Object.assign(session, { calls: 0, inp: 0, out: 0, cost: 0, ultraCost: 0, tps: [], ttft: [], think: 0, reads: 0, readCost: 0 });
   accuracy = []; loadBudget();
   return load();
@@ -1173,17 +1648,18 @@ setView(first, SECTIONS[store.get("dr-section")] ? store.get("dr-section") : "ov
 setCollapsed(store.get("dr-collapsed") === "1");
 renderStats();
 (async () => {
-  const [p, h, rp] = await Promise.all([api("/proof").catch(() => null), api("/health").catch(() => null), api("/reports").catch(() => null)]);
-  proof = p; health = h; reports = rp && rp.reports;
+  const [p, h, rp, dm] = await Promise.all([api("/proof").catch(() => null), api("/health").catch(() => null), api("/reports").catch(() => null), api("/demos").catch(() => null)]);
+  proof = p; health = h; reports = rp && rp.reports; demoList = (dm && dm.demos) || [];
   if (h && h.public_demo) {                        // public link: private random ids, no typing someone else's
     $("user").readOnly = true; $("public-note").hidden = false;
     if (user.length < 12) { user = newId(); store.set("dr-user", user); }
   }
-  renderSettings(); renderTiles(); loadBudget(); loadMemory(); loadNotes(false);
+  renderSettings(); renderPersonas(); renderReportsPanel(); renderTiles(); loadBudget(); loadMemory(); loadNotes(false);
   load();
+  if (!store.get("dr-tour-done")) setTimeout(tourStart, 900);
   try { renderBanner(); renderEvidence(); }
   catch (e) { $("banner").className = "banner amber"; $("banner").innerHTML = `<b class="warn">The evaluation report couldn't be read</b><span class="m">${esc(e.message)}</span>`; }
-  $("status").textContent = h ? "● online" : "● backend unreachable"; $("status").className = "pill " + (h ? "ok" : "bad");
+  showStatus(h);
 })();
 </script>
 </body>

@@ -204,3 +204,15 @@ class TestSavedReports:
     def test_bad_ids_are_refused(self, tmp_path):
         from src.eval import reports
         assert reports.get("../secrets", tmp_path) is None and reports.get("Nope", tmp_path) is None
+
+
+class TestDemos:
+    def test_every_demo_runs_and_is_graded(self, tmp_path):
+        from src.agent.core import Agent
+        from src.eval import demos
+        from src.eval.sims import SimLLM
+        agent = Agent(str(tmp_path / "d.db"), SimLLM(), memory_dir=str(tmp_path / "m"))
+        out = {d["id"]: demos.run(d["id"], agent) for d in demos.DEMOS}
+        assert out["aligned"]["label"] == "PASS"
+        assert out["false_claim"]["label"] == "CAUGHT"            # the planted link is flagged
+        assert all(r["label"] in ("PASS", "FAIL", "FIXED", "KNOWN GAP", "CAUGHT", "MISSED") for r in out.values())

@@ -1,9 +1,10 @@
-"""Saved reports: one JSON file per run in docs/reports/, so the app and the repo show the same evidence.
+"""Saved reports: one gzipped JSON file per run in docs/reports/, so the app and the repo show the same evidence.
 
 `python -m src.eval.reports` (re)builds the files for the reports already in docs/.
 Where a run happened is read from the tier providers: any tier on Nebius makes it a Token Factory run;
 everything else (Ollama, or the simulator) is local, i.e. what we did while building.
 """
+import gzip
 import json
 import re
 import sys
@@ -20,6 +21,22 @@ def where(providers: dict | None) -> str:
     return "api" if any(p == "nebius" for p in (providers or {}).values()) else "local"
 
 
+def _ms(v) -> str:
+    return f"{v / 1000:.1f} s" if v >= 1000 else f"{v:.0f} ms"
+
+
+def _scenario_metrics(report: dict) -> list:
+    r = report["strategies"].get("router") or next(iter(report["strategies"].values()), {})
+    st = report["self_test"]
+    out = []
+    if r.get("graded"):
+        out += [["Routing accuracy", f"{r['matched']}/{r['graded']}"], ["Under / over-routed", f"{r['under']} / {r['over']}"]]
+    if r:
+        out += [["Tokens in / out", f"{r['input_tokens']:,} / {r['output_tokens']:,}"], ["Latency / answer", _ms(r["latency_ms"])],
+                ["Cost (router)", f"${r['cost_usd']:.5f}"]]
+    return out + [["False claims caught", f"{st['caught']}/{st['total']}"]]
+
+
 def _scenario_card(report: dict, providers) -> dict:
     sc = report["scenarios"]
     ok = sum(1 for s in sc if s["as_expected"])
@@ -34,7 +51,7 @@ def _scenario_card(report: dict, providers) -> dict:
                         "Real model answers on every scenario, graded by the same checks as the simulated run."),
         "headline": f"{ok}/{len(sc)} as expected",
         "chips": [f"{st['caught']}/{st['total']} false claims caught", "simulated" if sim else "real answers"],
-        "cost_usd": cost, "simulated": sim, "reader": reader,
+        "cost_usd": cost, "simulated": sim, "reader": reader, "metrics": _scenario_metrics(report),
         "models": report.get("models", {}), "source": where(providers),
     }
 
@@ -50,27 +67,56 @@ def _compare_card(report: dict, providers) -> dict:
         "cost_usd": sum(v["cost_usd"] for v in report["avg"].values()) * report["cases"],
         "simulated": report["simulated"], "reader": "", "models": report.get("models", {}),
         "source": where(providers),
+        "metrics": [["Blind wins", f"{a} {report['wins'][a]} · {b} {report['wins'][b]} · tie {report['ties']}"]]
+        + [[f"{k} latency / tokens out", f"{_ms(v['latency_ms'])} / {v['output_tokens']:.0f}"] for k, v in report["avg"].items()]
+        + [["Cost ratio", f"x{report['cost_ratio']}"]],
+    }
+
+
+def _demos_card(report: dict, providers) -> dict:
+    from src.eval.demos import BY_ID
+    res = [{"name": BY_ID.get(r["id"], {}).get("name", r["id"])} | r for r in report["demos"]]
+    good = sum(1 for r in res if r["label"] in ("PASS", "CAUGHT", "KNOWN GAP", "FIXED"))
+    return {
+        "kind": "demos", "title": f"{len(res)} demo profiles · scripted",
+        "description": "Fixed scripts, real model answers: 2 success, 2 known failures, 1 planted false claim.",
+        "headline": " · ".join(f"{r['label']}" for r in res),
+        "chips": [f"{good}/{len(res)} behaved as documented"], "cost_usd": 0, "simulated": False, "reader": "",
+        "personas": [r.get("name", r["id"]) for r in res],
+        "metrics": [[r.get("name", r["id"]), f"{r['label']} · {' > '.join(t['tier'] for t in r['turns'])}"] for r in res]
+        + [["Latency / answer", _ms(sum(t["latency_ms"] for r in res for t in r["turns"]) / max(1, sum(len(r["turns"]) for r in res)))],
+           ["Tokens (total)", f"{sum(t['tokens'].get('total_tokens', 0) for r in res for t in r['turns']):,}"]],
+        "models": report.get("models", {}), "source": where(providers),
     }
 
 
 def build(report: dict, name: str, providers: dict | None = None, created: str | None = None) -> dict:
-    card = (_compare_card if "contestants" in report else _scenario_card)(report, providers)
+    card = (_compare_card if "contestants" in report else _demos_card if "demos" in report else _scenario_card)(report, providers)
+    src = card["source"]
+    card["run_on"] = ("Simulator · no model calls" if card["simulated"] else
+                      f"Nebius Token Factory · {config.NEBIUS_BASE_URL or 'api.tokenfactory.nebius.com'}" if src == "api"
+                      else f"Local · {config.HARDWARE} · Ollama")
     return {"id": name, "created": created or datetime.now(timezone.utc).isoformat(timespec="seconds"),
             **card, "report": report}
 
 
 def save(report: dict, name: str, providers: dict | None = None, out: Path = REPORTS_DIR, created=None) -> Path:
     out.mkdir(parents=True, exist_ok=True)
-    path = out / f"{name}.json"
-    path.write_text(json.dumps(build(report, name, providers or config.TIER_PROVIDERS, created), indent=1), encoding="utf-8")
+    path = out / f"{name}.json.gz"
+    path.write_bytes(gzip.compress(json.dumps(build(report, name, providers or config.TIER_PROVIDERS, created)).encode("utf-8")))
     return path
+
+
+def _read(path: Path) -> dict:
+    raw = path.read_bytes()
+    return json.loads(gzip.decompress(raw) if path.suffix == ".gz" else raw)
 
 
 def cards(out: Path = REPORTS_DIR) -> list[dict]:
     items = []
-    for path in sorted(out.glob("*.json")) if out.is_dir() else []:
+    for path in sorted([*out.glob("*.json.gz"), *out.glob("*.json")]) if out.is_dir() else []:
         try:
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data = _read(path)
         except (OSError, ValueError):
             continue
         items.append({k: v for k, v in data.items() if k != "report"})
@@ -80,8 +126,10 @@ def cards(out: Path = REPORTS_DIR) -> list[dict]:
 def get(report_id: str, out: Path = REPORTS_DIR) -> dict | None:
     if not ID_RE.match(report_id):
         return None
-    path = out / f"{report_id}.json"
-    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+    for path in (out / f"{report_id}.json.gz", out / f"{report_id}.json"):
+        if path.is_file():
+            return _read(path)
+    return None
 
 
 def import_existing() -> list[Path]:
@@ -98,7 +146,23 @@ def import_existing() -> list[Path]:
     return made
 
 
+def compress_all(out: Path = REPORTS_DIR) -> list[Path]:
+    """Rewrite every report as .json.gz, re-deriving the card so new fields appear."""
+    made = []
+    for path in sorted([*out.glob("*.json"), *out.glob("*.json.gz")]):
+        data = _read(path)
+        prov = {"nano": "nebius"} if data.get("source") == "api" else {"nano": "ollama"}
+        made.append(save(data["report"], data["id"], prov, out, data.get("created")))
+        if path.suffix == ".json":
+            path.unlink()
+    return made
+
+
 if __name__ == "__main__":
+    if "--compress" in sys.argv:
+        for path in compress_all():
+            print("compressed", path)
+        sys.exit(0)
     for path in import_existing():
         print("wrote", path)
     sys.exit(0)

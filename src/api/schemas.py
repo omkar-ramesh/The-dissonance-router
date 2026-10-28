@@ -52,3 +52,21 @@ class BudgetUpdate(BaseModel):
     user_id: str = USER_ID
     limit_usd: float = Field(ge=0, le=100)     # 0 = no limit
     reset_spent: bool = False
+
+
+class NoteMarks(BaseModel):
+    user_id: str = USER_ID
+    marks: dict[str, Literal["hidden", "saved", "none"]] = Field(max_length=200)   # note key -> new state
+
+
+class HopeReview(BaseModel):
+    code: str = Field(max_length=40, pattern=r"^[A-Z_]+$")
+    say: str = Field(default="", max_length=2000)
+    answer: str = Field(default="", max_length=4000)
+    unverified: list[str] = Field(default_factory=list, max_length=20)
+    persona: str = Field(default="", max_length=20)
+
+
+class ModeRequest(BaseModel):
+    mode: Literal["offline", "online"]
+    confirm: bool = False

@@ -6,13 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from src import config
 from src.agent.core import Agent
+from src.agent import hope
 from src.agent.honesty import find_unbacked_sources
 from src.api import limits
 from src.api.dependencies import get_agent
-from src.eval import reports
+from src.eval import demos, reports
 from fastapi.responses import FileResponse
 
-from src.api.schemas import (AcceptRequest, BudgetUpdate, ChatRequest, FeedbackRequest, KeepRequest, NewChat,
+from src.api.schemas import (AcceptRequest, BudgetUpdate, ChatRequest, FeedbackRequest, HopeReview, KeepRequest, ModeRequest, NewChat, NoteMarks,
                              RegenerateRequest, StyleUpdate)
 
 router = APIRouter()
@@ -37,7 +38,28 @@ def health() -> dict:
         },
         "signal_reader": config.SIGNAL_EXTRACTOR,
         "public_demo": config.PUBLIC_DEMO,
+        "hardware": config.HARDWARE,
+        "token_factory": [m | {"price": config.PRICES.get(m["tier"])} for m in config.TOKEN_FACTORY_MODELS],
+        "nebius_key_set": bool(config.NEBIUS_API_KEY),
+        "mode": config.MODE,
+        "online_blocker": config.online_blocker(),
     }
+
+
+@router.post("/mode")
+def set_mode(req: ModeRequest) -> dict:
+    """Switch every tier between the offline (local) and online (Token Factory) profile in models.toml.
+    Online needs the key, confirmed model ids and an explicit `confirm`; it is never available in the public demo."""
+    if config.PUBLIC_DEMO:
+        raise HTTPException(403, "The mode switch is off in the public demo.")
+    if req.mode == "online" and not req.confirm:
+        raise HTTPException(400, "Online mode spends Token Factory credits: send confirm=true to switch.")
+    try:
+        config.set_mode(req.mode)
+    except ValueError as e:
+        raise HTTPException(409, str(e)) from e
+    get_agent.cache_clear()          # the next request builds a client for the new models
+    return health()
 
 
 @router.get("/proof")
@@ -53,6 +75,57 @@ def proof() -> dict:
     compare, compare_source = _load(COMPARE_SOURCES)
     return {"report": report, "source": source, "nano_report": nano, "nano_source": nano_source,
             "compare": compare, "compare_source": compare_source}
+
+
+@router.get("/demos")
+def demos_list() -> dict:
+    """The five scripted demo profiles (what each one says and what should happen)."""
+    return {"demos": [demos.card(d) for d in demos.DEMOS]}
+
+
+@router.post("/demos/{demo_id}/run", dependencies=[Depends(limits.admit)])
+def demos_run(demo_id: str, agent: Agent = Depends(get_agent)) -> dict:
+    """Replay one demo on a fresh profile with the real models; graded from what happened."""
+    if demo_id not in demos.BY_ID:
+        raise HTTPException(status_code=404, detail="No such demo.")
+    return demos.run(demo_id, agent)
+
+
+@router.get("/lessons")
+def lessons(agent: Agent = Depends(get_agent)) -> dict:
+    """What the team has learned: codes and patterns per persona, never message text."""
+    return hope.ledger(agent.memory.db_path)
+
+
+@router.post("/hope/review")
+def hope_review(req: HopeReview) -> dict:
+    """Hope's review of one failure: why, the proposed fix and a zero-token check. Nothing is changed."""
+    return hope.review(req.code, req.say, req.answer, req.unverified)
+
+
+@router.post("/hope/apply")
+def hope_apply(req: HopeReview, agent: Agent = Depends(get_agent)) -> dict:
+    """Keep Hope's rule fix: the signal reader uses it from now on."""
+    added = hope.apply(agent.memory.db_path, req.code, req.persona)
+    return {**hope.review(req.code, req.say, req.answer, req.unverified), "applied": added > 0, "rules_added": added}
+
+
+@router.get("/readme")
+def readme() -> dict:
+    """The project README, shown in Settings → Accessibility."""
+    return {"markdown": (_ROOT / "README.md").read_text(encoding="utf-8")}
+
+
+PERSONA_DOCS = _ROOT / "docs" / "personas"
+
+
+@router.get("/personas/{persona}/doc")
+def persona_doc(persona: str = Path(pattern=r"^[a-z]{1,20}$")) -> dict:
+    """The Markdown write-up for one persona (docs/personas/<name>.md)."""
+    path = PERSONA_DOCS / f"{persona}.md"
+    if not path.is_file():
+        raise HTTPException(404, "No doc for that persona.")
+    return {"persona": persona, "markdown": path.read_text(encoding="utf-8")}
 
 
 @router.get("/reports")
@@ -166,6 +239,14 @@ def notes(user_id: str = UserIdPath, agent: Agent = Depends(get_agent)) -> dict:
     records with fixed sentences: no model call, no tokens (`tokens_used` is always 0)."""
     limits.require_private_id(user_id)
     return agent.notes.render(user_id, agent.inspect(user_id))
+
+
+@router.post("/notes/mark")
+def mark_notes(req: NoteMarks, agent: Agent = Depends(get_agent)) -> dict:
+    """Delete ('hidden'), save ('saved') or restore ('none') notes. The event log is never edited."""
+    limits.require_private_id(req.user_id)
+    agent.notes.mark(req.user_id, req.marks)
+    return {"ok": True}
 
 
 @router.get("/budget/{user_id}")

@@ -1,0 +1,58 @@
+# Which model serves each tier, offline (local) and online (Nebius Token Factory).
+# Edit this file, restart the server, and the Models tab shows the change. The Offline / Online switch
+# in the app picks one of the two profiles. A value in .env (MODEL_NANO, PRICE_NANO_IN, ...) still wins.
+#
+#   provider   "ollama" (runs on this machine) or "nebius" (Token Factory, spends credits)
+#   model      the exact id the provider knows. Offline: `ollama list`. Online: the Token Factory catalog.
+#   reasoning  "on" lets the model think before answering (more tokens), "off" answers directly.
+
+default_mode = "offline"
+
+[offline.nano]
+provider = "ollama"
+model = "nemotron-3-nano:4b"
+reasoning = "off"
+
+[offline.super]
+provider = "ollama"
+model = "nemotron-3-nano:30b"
+reasoning = "off"
+
+[offline.ultra]
+provider = "ollama"
+model = "deepseek-r1:32b"        # local stand-in for Nemotron-3-Ultra
+reasoning = "on"
+
+# Online profile. The ids below are the catalog names and are NOT confirmed API ids yet:
+# the switch stays locked until `confirmed = true`, so nothing can spend credits by accident.
+[online]
+confirmed = false
+
+[online.nano]
+provider = "nebius"
+model = "Nemotron-3-Nano-30B-A3B"
+reasoning = "off"
+
+[online.super]
+provider = "nebius"
+model = "Nemotron-3-Super-120B"
+reasoning = "off"
+
+[online.ultra]
+provider = "nebius"
+model = "Nemotron-3-Ultra-550B"
+reasoning = "on"
+
+# USD per 1M tokens (Token Factory list prices). Planning figures until checked against the
+# Nebius price page and billing. Offline runs are priced the same way for the simulated wallet.
+[prices.nano]
+in = 0.06
+out = 0.24
+
+[prices.super]
+in = 0.30
+out = 0.90
+
+[prices.ultra]
+in = 1.00
+out = 3.00
