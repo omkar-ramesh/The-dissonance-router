@@ -62,19 +62,30 @@ Six rules, each enforced in code and checked by its own test ([details](docs/GUI
 
 ## Nemotron and Nebius Token Factory
 
-The three tiers map to Nemotron 3 **Nano**, **Super** and **Ultra**, served through Nebius Token Factory (an OpenAI-compatible API). Nano and Super handle everyday calls; Ultra is reserved for when the agent is unsure about you.
+The three tiers run NVIDIA Nemotron 3 models served by Nebius Token Factory (an OpenAI-compatible API):
 
-During development the same code runs against local Ollama models, selected per tier in `.env`:
-
-| Tier | Local development | Final (Token Factory) |
+| Tier | Token Factory model | Used when |
 |---|---|---|
-| Nano | `nemotron-3-nano:4b` | Nemotron 3 Nano |
-| Super | `nemotron-3-nano:30b` | Nemotron 3 Super |
-| Ultra | `deepseek-r1:32b` | Nemotron 3 Ultra |
+| Nano | `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B` | Words and behaviour agree. Also reads every message for style requests. |
+| Super | `nvidia/nemotron-3-super-120b-a12b` | A preference is emerging. |
+| Ultra | `nvidia/Nemotron-3-Ultra-550b-a55b` | A clear contradiction (reasoning on). |
 
-Switching a tier to Token Factory is configuration only (`PROVIDER_ULTRA=nebius` plus the API key and model ID), so credits can be spent on one tier at a time.
+**Where Token Factory helped**
 
-> Status: development and testing so far ran on the local models above. Token Factory results and measurements will be added here.
+- **The 550B model.** Nemotron 3 Ultra cannot run on one local GPU, so local runs use a stand-in (`deepseek-r1:32b`). Token Factory is the only place the real Ultra tier runs.
+- **Volume.** I ran 512 reports, one per test, on the real Nemotron models, with several runs in parallel. Each report is saved in `docs/reports/`.
+- **One switch.** The same code runs against local Ollama or Token Factory. `models.toml` lists the model ids for each, and the Models page switches between them.
+- **Measured cost.** Token counts come from the API's usage field, so the budget limiter and the cost figures use real numbers.
+
+Other Nebius services: Token Factory only. Prices in `models.toml` are planning figures and have not been checked against Nebius billing.
+
+Local development used Ollama models, selected per tier in `models.toml`:
+
+| Tier | Local development |
+|---|---|
+| Nano | `nemotron-3-nano:4b` |
+| Super | `nemotron-3-nano:30b` |
+| Ultra | `deepseek-r1:32b` (stand-in) |
 
 ## Quick start
 
