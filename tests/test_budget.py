@@ -138,3 +138,8 @@ class TestApi:
 
     def test_limit_is_validated(self, client):
         assert client.post("/budget", json={"user_id": "u1", "limit_usd": -1}).status_code == 422
+
+
+def test_a_big_budget_never_asks_for_more_output_than_the_models_allow():
+    p = plan("nano", 50, 10.0, 0.0, {"nano": {"in": 0.06, "out": 0.24}})
+    assert p.max_tokens <= budget.MAX_ANSWER_TOKENS

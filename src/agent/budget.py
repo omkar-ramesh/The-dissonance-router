@@ -25,7 +25,8 @@ TIGHT_CAP = {"nano": 400, "super": 600, "ultra": 900}
 SHARE = 0.20
 TIGHT = 0.25
 MIN_ANSWER_TOKENS = 60   # below this an answer isn't worth giving: say the budget is used up instead
-INPUT_MARGIN = 1.5       # input tokens are estimated (~4 chars each) before the call; leave room for error
+MAX_ANSWER_TOKENS = 32_000   # a large budget must not ask for more output than the models allow (context is ~262k)
+INPUT_MARGIN = 1.5      # input tokens are estimated (~4 chars each) before the call; leave room for error
 
 
 class BudgetExceeded(RuntimeError):
@@ -101,7 +102,7 @@ def plan(router_tier: str, input_tokens: int, limit: float, spent: float, prices
     if fit < MIN_ANSWER_TOKENS:
         raise BudgetExceeded(f"Budget nearly used up: ${remaining:.5f} left isn't enough for a useful answer. "
                              "Raise it in Settings.")
-    cap = min(fit, max(tokens_for(allowance), MIN_ANSWER_TOKENS))
+    cap = min(fit, max(tokens_for(allowance), MIN_ANSWER_TOKENS), MAX_ANSWER_TOKENS)
     if tight:
         cap = min(cap, TIGHT_CAP[tier])
     out = min(expected(tier), cap)
