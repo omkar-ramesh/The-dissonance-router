@@ -105,4 +105,5 @@ TOKEN_FACTORY_MODELS = [
 NEBIUS_BASE_URL = os.getenv("NEBIUS_BASE_URL", "")
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")
 
-apply_mode(MODE, use_env=True)
+# The .env MODEL_* / PROVIDER_* overrides are local-model settings; online uses the ids in models.toml.
+apply_mode(MODE, use_env=MODE != "online")

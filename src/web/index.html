@@ -235,6 +235,9 @@ main{flex:1;min-height:0;display:grid}
 .group .gi{display:flex;gap:22px;flex-wrap:wrap}.gi small{display:block;color:var(--muted);font-size:10px;letter-spacing:.06em;text-transform:uppercase}.gi b{font-size:15px;font-weight:600}
 /* chat */
 .chat{display:flex;flex-direction:column;height:100%;min-height:0}
+.threadwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.tobottom{position:absolute;right:14px;bottom:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--panel,var(--bg));color:var(--text);font-size:16px;line-height:1;cursor:pointer;box-shadow:0 2px 10px #0006}
+.tobottom:hover{border-color:var(--blue);color:var(--blue)}
 .thread{flex:1;min-height:0;overflow:auto;padding-right:4px}
 .msg{margin:0 0 12px;max-width:92%}.msg.you{margin-left:auto;background:#1c2434;padding:8px 12px;border-radius:10px;white-space:pre-wrap}
 .msg .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:11px;margin-bottom:3px}
@@ -490,7 +493,8 @@ td{padding:5px 7px;border-bottom:1px solid #1a2130;vertical-align:top}
 <div hidden id="parking">
   <section class="chat" id="chatBlock">
     <h2>Chat</h2>
-    <div class="thread" id="thread"></div>
+    <div class="threadwrap"><div class="thread" id="thread"></div>
+      <button type="button" class="tobottom" id="tobottom" hidden title="Jump to the latest message" aria-label="Jump to the latest message">↓</button></div>
     <div id="undo"></div><div id="remind"></div>
     <form class="composer" id="form">
       <div class="notebot"><button type="button" class="nb" id="notebot" aria-label="Note bot: open notes" aria-describedby="nb-pop"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nb-badge" id="nb-badge" hidden></span></button>
@@ -769,8 +773,12 @@ function askHtml(h) {
     ? `You never set a ${esc(h.dimension)} preference, but you keep asking for <b>${esc(h.observed)}</b>.`
     : `You said <b>${esc(h.stated)}</b>, but you keep asking for <b>${esc(h.observed)}</b>.`;
   return `<div class="ask"><span class="t">${said} Should I treat <b>${esc(h.observed)}</b> as your ${esc(h.dimension)} preference?</span>
-    <button class="btn primary" data-accept="${esc(h.dimension)}">Yes, update it</button></div>`;
+    <button class="btn primary" data-accept="${esc(h.dimension)}">Yes, update it</button>
+    <button class="btn ghost" data-decline="${esc(declineKey(h))}">No</button></div>`;
 }
+// "No" hides the offer for this exact conflict; it comes back if the conflict changes.
+const declined = new Set();
+const declineKey = h => [user, h.dimension, h.stated, h.observed].join("|");
 // What the user can do with an answer. Each click is behavior evidence for the observed profile.
 function actsHtml(id, feedback, latest) {
   if (!id) return "";
@@ -912,7 +920,7 @@ function renderMirror(p) {
   $("score").textContent = p.conflict_score ? "· dissonance " + p.conflict_score.toFixed(2) : "";
   $("lamps").innerHTML = Object.entries(TIERS).map(([t, d]) => `<div class="lamp ${p.model_chosen === t ? "on" : ""}"><b>${t.toUpperCase()}</b>${d}</div>`).join("");
   $("reason").innerHTML = explain(p.routing_reason, { ultra: "Ultra, because", super: "Super, because", nano: "Nano" }[p.model_chosen]);
-  $("suggest").innerHTML = p.suggestion && p.highest_conflict ? askHtml(p.highest_conflict) : "";
+  $("suggest").innerHTML = p.suggestion && p.highest_conflict && !declined.has(declineKey(p.highest_conflict)) ? askHtml(p.highest_conflict) : "";
 }
 function renderDecisions(list) {
   $("side-log").innerHTML = list.length ? list.slice(0, 12).map(d => {
@@ -1293,7 +1301,7 @@ function renderMemory() {
         <button class="btn ${i.kept ? "ghost" : "primary"}" data-keep="${i.kept ? 0 : 1}">${i.kept ? "Unkeep" : "Keep"}</button>
         <button class="btn" data-open>Open</button>
         <a class="btn" href="/memory/${encodeURIComponent(user)}/${Number(i.id)}/download" download style="text-decoration:none">Download</a>
-        <button class="btn ghost" data-del>Delete</button></div></div></div>`;
+        <button class="btn ghost" data-del title="Deletes this conversation now: the file and the message text are erased">Delete</button></div></div></div>`;
   }).join("") : `<div class="card note">Nothing here yet. Press <b>＋ New chat</b> and the conversation you leave is saved here.
       <div class="example" aria-hidden="true"><span class="ex-tag">Example</span><b style="color:var(--text)">Conversation 1</b> · 6 messages · Nano, Ultra · deletes in 10 days
         <div style="display:flex;gap:6px;margin-top:8px"><span class="btn">Keep</span><span class="btn">Open</span><span class="btn">Download</span><span class="btn">Delete</span></div></div></div>`;
@@ -1335,10 +1343,11 @@ async function memoryAction(e) {
   const keep = e.target.closest("[data-keep]");
   if (keep) { await api("/memory/keep", { user_id: user, conversation_id: id, kept: keep.dataset.keep === "1" }); return loadMemory(); }
   if (e.target.closest("[data-del]")) {
-    if (!confirm("Delete this conversation now? The file and the message text are erased; this can't be undone.")) return;
+    card.remove();
     const res = await fetch(`/memory/${encodeURIComponent(user)}/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Delete failed (" + res.status + ")");
-    return loadMemory();
+    if (!res.ok) toast("Delete failed (" + res.status + ")");
+    await loadMemory(); refresh();
+    return;
   }
   if (e.target.closest("[data-open]")) {
     const open = card.querySelector(".transcript");
@@ -1745,6 +1754,11 @@ function setView(v, sec) {
   $("gear-label").innerHTML = inSettings ? "Close settings<small>back to the main page</small>" : "Settings<small>profile, budget, memory</small>";
   $("gear").title = inSettings ? "Close settings" : "Settings";
   if (inSettings) showSection(section);
+  // Settings gets its own history entry, so the browser's Back button returns to the main page.
+  try {
+    if (inSettings && !(history.state && history.state.settings)) history.pushState({ settings: 1 }, "");
+    else if (!inSettings && history.state && history.state.settings) history.back();
+  } catch (e) { /* history unavailable: the in-page buttons still work */ }
   store.set("dr-view", v === "settings" ? lastMain : v); thread.scrollTop = thread.scrollHeight;
 }
 function showSection(sec) {
@@ -1759,6 +1773,8 @@ function showSection(sec) {
 
   store.set("dr-section", sec);
 }
+// Back from Settings: the entry is already gone, so just show the main page (no second history.back()).
+window.addEventListener("popstate", () => { if (view === "settings") setView(lastMain); });
 // The gear opens Settings, and closes it again (back to wherever you were).
 function toggleSettings() { view === "settings" ? setView(lastMain) : setView("settings", section); }
 function setCollapsed(on) {
@@ -1896,8 +1912,10 @@ async function playDemo() {
     renderMirror(await api("/update-style", { user_id: user, dimension: "length", value: "concise" }));
     thread.innerHTML = "";
     add("Demo: you said you prefer <b>concise</b> answers (the ring on Length). Now you keep asking for detail…", "note-line");
-    await send("Explain attention in transformers, in more detail please");
-    await send("Can you elaborate on the softmax step?");
+    await send("How does a mixture-of-experts model like Nemotron decide which experts handle a token? Explain in more detail please");
+    await send("Can you elaborate on why the KV cache is the memory bottleneck at long context?");
+    await send("Go deeper on how FP8 quantization keeps accuracy on a GPU like Blackwell");
+    await send("Walk me through tensor parallelism step by step, in depth");
     add("That's the contradiction: you said concise, you keep asking for detail. Accept the suggestion below, or use 👍 / 👎 on an answer: what you do counts too.", "note-line");
   } catch (e) { add(esc(e.message), "note-line err"); }
   finally { btn.disabled = false; btn.textContent = "▶ Play the demo"; }
@@ -1996,6 +2014,8 @@ document.addEventListener("click", async e => {
     finally { busy = false; $("send").disabled = false; if (mine === gen) refresh(); }
     return;
   }
+  const decline = e.target.closest("[data-decline]");
+  if (decline) { declined.add(decline.dataset.decline); $("suggest").innerHTML = ""; return; }
   const accept = e.target.closest("[data-accept]");
   if (accept) {
     // The confirmation goes in #undo: #suggest is redrawn by renderMirror and would wipe it.
@@ -2005,6 +2025,7 @@ document.addEventListener("click", async e => {
       $("undo").innerHTML = `<div class="ask"><span class="t">Updated. Your ${esc(dim)} preference is now <b>${esc(p.stated_profile[dim])}</b>.</span>
         <button class="btn ghost" data-undo="${esc(dim)}" data-previous="${esc(p.previous)}">Undo</button></div>`;
       renderMirror(p); refresh();
+      clearTimeout(undoTimer); undoTimer = setTimeout(() => { $("undo").innerHTML = ""; }, 2000);
     } catch (err) { accept.disabled = false; add(esc(err.message), "note-line err"); }
     return;
   }
@@ -2015,10 +2036,19 @@ document.addEventListener("click", async e => {
       const p = await api("/update-style", { user_id: user, dimension: dim, value: previous });
       $("undo").innerHTML = `<div class="ask"><span class="t">Undone. Your ${esc(dim)} preference is back to <b>${esc(previous === "balanced" ? "no preference" : previous)}</b>.</span></div>`;
       renderMirror(p); refresh();
+      clearTimeout(undoTimer); undoTimer = setTimeout(() => { $("undo").innerHTML = ""; }, 2000);
     } catch (err) { undo.disabled = false; add(esc(err.message), "note-line err"); }
   }
 });
 
+let undoTimer;
+{ // the arrow shows only when the chat is scrolled up from the latest message
+  const tb = $("tobottom"), th = $("thread");
+  const sync = () => { tb.hidden = th.scrollHeight - th.scrollTop - th.clientHeight < 80; };
+  th.addEventListener("scroll", sync);
+  new MutationObserver(sync).observe(th, { childList: true, subtree: true });
+  tb.addEventListener("click", () => { th.scrollTo({ top: th.scrollHeight, behavior: "smooth" }); });
+}
 // /?view=chat|both|proof opens a given view (handy for linking someone straight to the proof)
 const wanted = new URLSearchParams(location.search).get("view") || store.get("dr-view");
 const first = LAYOUTS[wanted] || SECTIONS[wanted] || wanted === "memory" ? wanted : "chat";

@@ -22,6 +22,7 @@ def test_offline_profile_matches_the_local_models():
 def test_online_is_locked_until_ids_are_confirmed(monkeypatch):
     monkeypatch.setattr(config, "NEBIUS_API_KEY", "k")
     monkeypatch.setattr(config, "NEBIUS_BASE_URL", "https://example.test/v1")
+    monkeypatch.setattr(config, "_FILE", {**config._FILE, "online": {"confirmed": False}})
     with pytest.raises(ValueError, match="confirmed"):
         config.set_mode("online")
     assert config.MODE == "offline"

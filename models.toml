@@ -6,7 +6,7 @@
 #   model      the exact id the provider knows. Offline: `ollama list`. Online: the Token Factory catalog.
 #   reasoning  "on" lets the model think before answering (more tokens), "off" answers directly.
 
-default_mode = "offline"
+default_mode = "online"
 
 [offline.nano]
 provider = "ollama"
