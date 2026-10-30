@@ -75,7 +75,9 @@ SIGNAL_EXTRACTOR = os.getenv("SIGNAL_EXTRACTOR", "nano")
 # Public demo mode: private random session ids, a per-IP rate limit, output caps and a daily
 # spend cut-off, so a public link can't read other people's chats or drain the credits.
 PUBLIC_DEMO = os.getenv("PUBLIC_DEMO", "0") == "1"
-RATE_LIMIT_PER_MIN = int(os.getenv("RATE_LIMIT_PER_MIN", "6"))
+# Hosted demo for judges only: when set, every request needs this code (see src/api/gate.py).
+DEMO_ACCESS_CODE = os.getenv("DEMO_ACCESS_CODE", "")
+RATE_LIMIT_PER_MIN =int(os.getenv("RATE_LIMIT_PER_MIN", "6"))
 DAILY_BUDGET_USD = float(os.getenv("DAILY_BUDGET_USD", "1.00"))
 # Max output tokens per answer (0 = no cap). Capped by default only in public demo mode.
 _CAP_DEFAULTS = {"nano": "1500", "super": "2500", "ultra": "4000"} if PUBLIC_DEMO else {}

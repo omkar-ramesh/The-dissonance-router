@@ -15,6 +15,7 @@ from src import config
 from src.agent.budget import BudgetExceeded
 from src.agent.llm_client import LLMError
 from src.agent.memory import MemoryStore
+from src.api.gate import gate
 from src.api.routes import router
 from src.db.database import init_db
 
@@ -54,6 +55,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.include_router(router)
+app.middleware("http")(gate)
 
 WEB_PAGE = Path(__file__).parent / "web" / "index.html"
 
